@@ -11,7 +11,7 @@ async function connect() {
 }
 
 const Pending = mongoose.models.Pending || mongoose.model('Pending', new mongoose.Schema({
-    type: String, data: Object, done: Boolean, createdAt: Date
+    type: String, data: Object, done: Boolean, result: String, createdAt: Date
 }));
 
 const JWT_SECRET = process.env.JWT_SECRET || 'hostville-secret-key-2024';
@@ -23,18 +23,19 @@ module.exports = async (req, res) => {
 
     try {
         const token = req.headers['authorization']?.replace('Bearer ', '');
-        if (!token) return res.json({ error: 'Não autorizado' });
+        if (!token) return res.status(401).json({ error: 'Não autorizado' });
         const user = jwt.verify(token, JWT_SECRET);
         const { command, params } = req.body || {};
 
         await connect();
-        await Pending.create({
+        const pending = await Pending.create({
             type: 'comando',
             data: { command, params, guildId: user.guildId, userId: user.id, role: user.role },
-            done: false
+            done: false,
+            result: 'Executando...'
         });
 
-        res.json({ message: `✅ Comando /${command} enviado! O bot executará em até 5 segundos.` });
+        res.json({ ok: true, pendingId: pending._id.toString(), message: '⏳ Executando...' });
     } catch (e) {
         res.json({ error: e.message });
     }
