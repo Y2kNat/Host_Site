@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HostVille BOT - Pendências</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0a0a1a; color: #fff; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        h1 { color: #5865F2; margin-bottom: 20px; }
+        .back { color: #5865F2; text-decoration: none; font-size: 14px; }
+        .main { display: flex; gap: 20px; height: calc(100vh - 120px); }
+        
+        .chat-panel { width: 20%; background: #16213e; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; }
+        .chat-panel h3 { color: #888; margin-bottom: 10px; font-size: 14px; }
+        .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 10px; font-size: 13px; }
+        .chat-messages .msg { margin-bottom: 8px; padding: 8px; border-radius: 5px; }
+        .chat-messages .user { background: #5865F2; text-align: right; }
+        .chat-messages .bot { background: #0f3460; }
+        .chat-input { display: flex; gap: 5px; }
+        .chat-input input { flex: 1; padding: 8px; border: none; border-radius: 5px; background: #0f3460; color: #fff; font-size: 12px; }
+        .chat-input button { padding: 8px 12px; background: #5865F2; border: none; border-radius: 5px; color: #fff; cursor: pointer; font-size: 12px; }
+        .cmd-btn { padding: 6px 10px; background: #3498db; border: none; border-radius: 5px; color: #fff; cursor: pointer; font-size: 11px; margin-bottom: 10px; width: 100%; }
+        .cmds-list { display: none; margin-bottom: 10px; font-size: 11px; }
+        .cmds-list.show { display: block; }
+        .cmds-list div { padding: 4px 6px; cursor: pointer; border-radius: 3px; }
+        .cmds-list div:hover { background: #0f3460; }
+        
+        .pending-panel { width: 80%; background: #16213e; border-radius: 10px; padding: 20px; overflow-y: auto; }
+        .pending-panel h3 { color: #888; margin-bottom: 15px; }
+        .pending-item { padding: 12px; border-bottom: 1px solid #333; }
+        .pending-item .type { font-weight: bold; }
+        .pending-item .time { color: #888; font-size: 12px; }
+        .badge { padding: 3px 6px; border-radius: 3px; font-size: 10px; }
+        .badge-active { background: #e74c3c; }
+        .badge-done { background: #2ecc71; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/dashboard" class="back">← Voltar</a>
+        <h1>⚡ Pendências & Comandos</h1>
+        
+        <div class="main">
+            <!-- CHAT IA (20%) -->
+            <div class="chat-panel">
+                <h3>🤖 Chat IA</h3>
+                <button class="cmd-btn" onclick="toggleCmds()">🔘 Listar Comandos</button>
+                <div class="cmds-list" id="cmdsList"></div>
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Digite ou selecione um comando..." onkeypress="if(event.key==='Enter')sendChat()">
+                    <button onclick="sendChat()">▶</button>
+                </div>
+            </div>
+            
+            <!-- PENDÊNCIAS (80%) -->
+            <div class="pending-panel">
+                <h3>📋 Pendências</h3>
+                <div id="pendingList">Carregando...</div>
+            </div>
+        </div>
+    </div>
+    <script>
+        if (!localStorage.getItem('token')) window.location.href = '/';
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        // Comandos por nível
+        const commandsByRole = {
+            full: ['warn @user motivo', 'kick @user motivo', 'ban @user motivo', 'mute @user minutos', 'unmute @user', 'clear quantidade', 'slowmode segundos', 'lock', 'unlock', 'say mensagem', 'anuncio mensagem', 'modo normal/savage/hacker', 'voicemode on/off', 'tickets abertos', 'stats', 'aprender pergunta resposta', 'ping', 'uptime', 'servidor info', 'bot status'],
+            owner: ['warn @user motivo', 'kick @user motivo', 'mute @user minutos', 'unmute @user', 'clear quantidade', 'slowmode segundos', 'lock', 'unlock', 'say mensagem', 'anuncio mensagem', 'tickets abertos', 'stats'],
+            admin: ['warn @user motivo', 'mute @user minutos', 'unmute @user', 'clear quantidade', 'slowmode segundos', 'say mensagem', 'tickets abertos', 'ping'],
+            tester: ['ping', 'uptime', 'bot status', 'servidor info']
+        };
+
+        function toggleCmds() {
+            const list = document.getElementById('cmdsList');
+            if (list.classList.contains('show')) {
+                list.classList.remove('show');
+                return;
+            }
+            const cmds = commandsByRole[user.role] || [];
+            list.innerHTML = cmds.map(c => `<div onclick="document.getElementById('chatInput').value='${c}';list.classList.remove('show');">/${c}</div>`).join('');
+            list.classList.add('show');
+        }
+
+        async function sendChat() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            addChatMsg('user', msg);
+            input.value = '';
+
+            const res = await fetch('/api/pendings/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({ message: msg, role: user.role })
+            });
+            const data = await res.json();
+            addChatMsg('bot', data.response || 'Sem resposta');
+        }
+
+        function addChatMsg(type, text) {
+            const div = document.createElement('div');
+            div.className = 'msg ' + type;
+            div.textContent = text;
+            document.getElementById('chatMessages').appendChild(div);
+            div.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Carregar pendências
+        fetch('/api/pendings/list', {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        })
+        .then(r => r.json())
+        .then(data => {
+            const list = document.getElementById('pendingList');
+            if (data.pendings && data.pendings.length > 0) {
+                list.innerHTML = data.pendings.map(p => `
+                    <div class="pending-item">
+                        <span class="badge ${p.done ? 'badge-done' : 'badge-active'}">${p.done ? '✅' : '⏳'}</span>
+                        <span class="type">${p.type}</span>
+                        <span style="color:#888"> - ${JSON.stringify(p.data).substring(0, 60)}</span>
+                        <span class="time">${new Date(p.createdAt).toLocaleString('pt-BR')}</span>
+                    </div>
+                `).join('');
+            } else {
+                list.innerHTML = '<p style="color:#888">Nenhuma pendência</p>';
+            }
+        });
+    </script>
+</body>
+</html>
