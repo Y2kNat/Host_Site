@@ -48,12 +48,12 @@
         fetch('/api/status', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } })
             .then(r => r.json())
             .then(d => {
-                const s = d.stats || d;
-                document.getElementById('tickets').textContent = s.ticketsAtivos ?? 0;
-                document.getElementById('warns').textContent = s.warns ?? 0;
-                document.getElementById('pendings').textContent = s.pendentes ?? 0;
+                var s = d.stats || d;
+                document.getElementById('tickets').textContent = s.ticketsAtivos || 0;
+                document.getElementById('warns').textContent = s.warns || 0;
+                document.getElementById('pendings').textContent = s.pendentes || 0;
             })
-            .catch(() => {
+            .catch(function() {
                 document.getElementById('tickets').textContent = '❌';
                 document.getElementById('warns').textContent = '❌';
                 document.getElementById('pendings').textContent = '❌';
