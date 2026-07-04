@@ -11,7 +11,6 @@
         h1 { color: #5865F2; margin-bottom: 20px; }
         .back { color: #5865F2; text-decoration: none; font-size: 14px; }
         .main { display: flex; gap: 20px; height: calc(100vh - 120px); }
-        
         .chat-panel { width: 20%; background: #16213e; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; }
         .chat-panel h3 { color: #888; margin-bottom: 10px; font-size: 14px; }
         .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 10px; font-size: 13px; }
@@ -26,7 +25,6 @@
         .cmds-list.show { display: block; }
         .cmds-list div { padding: 4px 6px; cursor: pointer; border-radius: 3px; }
         .cmds-list div:hover { background: #0f3460; }
-        
         .pending-panel { width: 80%; background: #16213e; border-radius: 10px; padding: 20px; overflow-y: auto; }
         .pending-panel h3 { color: #888; margin-bottom: 15px; }
         .pending-item { padding: 12px; border-bottom: 1px solid #333; font-size: 13px; }
@@ -39,7 +37,6 @@
     <div class="container">
         <a href="/dashboard" class="back">← Voltar</a>
         <h1>⚡ Pendências & Comandos</h1>
-        
         <div class="main">
             <div class="chat-panel">
                 <h3>🤖 Comandos</h3>
@@ -51,7 +48,6 @@
                     <button onclick="sendChat()">▶</button>
                 </div>
             </div>
-            
             <div class="pending-panel">
                 <h3>📋 Pendências</h3>
                 <div id="pendingList">Carregando...</div>
@@ -88,22 +84,44 @@
                 const parts = msg.substring(1).split(' ');
                 const command = parts[0];
                 const params = parts.slice(1).join(' ');
-                const res = await fetch('/api/pendings/executar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
-                    body: JSON.stringify({ command, params })
-                });
-                const data = await res.json();
-                addChatMsg('bot', data.message || '✅ Enviado!');
+                try {
+                    const res = await fetch('/api/pendings/executar', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                        body: JSON.stringify({ command, params })
+                    });
+                    const data = await res.json();
+                    if (data.pendingId) {
+                        const msgDiv = addChatMsg('bot', '⏳ Executando...');
+                        const checkResult = setInterval(async () => {
+                            const checkRes = await fetch('/api/pendings/resultado?pendingId=' + data.pendingId, {
+                                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                            });
+                            const checkData = await checkRes.json();
+                            if (checkData.done) {
+                                clearInterval(checkResult);
+                                msgDiv.textContent = checkData.result;
+                            }
+                        }, 1000);
+                    } else {
+                        addChatMsg('bot', data.message || 'Erro');
+                    }
+                } catch (e) {
+                    addChatMsg('bot', 'Erro ao executar comando');
+                }
                 loadPendings();
             } else {
-                const res = await fetch('/api/pendings/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
-                    body: JSON.stringify({ message: msg, role: user.role })
-                });
-                const data = await res.json();
-                addChatMsg('bot', data.response || 'Sem resposta');
+                try {
+                    const res = await fetch('/api/pendings/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                        body: JSON.stringify({ message: msg, role: user.role })
+                    });
+                    const data = await res.json();
+                    addChatMsg('bot', data.response || 'Sem resposta');
+                } catch (e) {
+                    addChatMsg('bot', 'Erro na IA');
+                }
             }
         }
 
@@ -113,6 +131,7 @@
             div.textContent = text;
             document.getElementById('chatMessages').appendChild(div);
             div.scrollIntoView({ behavior: 'smooth' });
+            return div;
         }
 
         function loadPendings() {
