@@ -7,6 +7,57 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #0a0a1a; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .login-box { background: #16213e; padding: 40px; border-radius: 10px; width: 380px; text-align: center; }
+        .login-box h1 { color: #5865F2; margin-bottom: 10px; font-size: 28px; }
+        .login-box p { color: #888; margin-bottom: 25px; }
+        .login-box input { width: 100%; padding: 14px; margin-bottom: 12px; border: none; border-radius: 6px; background: #0f3460; color: #fff; font-size: 16px; }
+        .login-box button { width: 100%; padding: 14px; background: #5865F2; border: none; border-radius: 6px; color: #fff; font-size: 16px; cursor: pointer; font-weight: bold; }
+        .login-box button:hover { background: #4752c4; }
+        .error { color: #e74c3c; margin-top: 15px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>🤖 HostVille BOT</h1>
+        <p>Painel de Administração</p>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Usuário" required>
+            <input type="password" id="password" placeholder="Senha" required>
+            <button type="submit">Entrar</button>
+        </form>
+        <p class="error" id="error"></p>
+    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const res = await fetch('/api/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value
+                })
+            });
+            const data = await res.json();
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                window.location.href = '/dashboard';
+            } else {
+                document.getElementById('error').textContent = data.error || 'Erro ao fazer login';
+            }
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HostVille BOT - Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0a0a1a; display: flex; justify-content: center; align-items: center; height: 100vh; }
         .box { background: #16213e; padding: 30px; border-radius: 10px; width: 350px; text-align: center; }
         .box h1 { color: #5865F2; margin-bottom: 20px; }
         input { width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 5px; background: #0f3460; color: #fff; font-size: 16px; }
