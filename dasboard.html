@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HostVille BOT - Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0a0a1a; color: #fff; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { color: #5865F2; margin-bottom: 20px; }
+        .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
+        .card { background: #16213e; padding: 20px; border-radius: 8px; text-align: center; }
+        .card h3 { color: #888; font-size: 14px; margin-bottom: 8px; }
+        .card .num { color: #5865F2; font-size: 28px; font-weight: bold; }
+        .btn { padding: 8px 16px; background: #e74c3c; border: none; border-radius: 5px; color: #fff; cursor: pointer; }
+        .links { display: flex; gap: 10px; }
+        .links a { color: #5865F2; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Dashboard</h1>
+        <div class="cards">
+            <div class="card"><h3>🎫 Tickets Ativos</h3><div class="num" id="tickets">-</div></div>
+            <div class="card"><h3>🧠 Conhecimentos</h3><div class="num" id="knowledge">-</div></div>
+            <div class="card"><h3>⚠️ Warns</h3><div class="num" id="warns">-</div></div>
+            <div class="card"><h3>⚡ Pendências</h3><div class="num" id="pendings">-</div></div>
+        </div>
+        <div class="links">
+            <a href="/memoria">🧠 Memória</a>
+            <a href="/credenciais">🔑 Credenciais</a>
+            <button class="btn" onclick="logout()">🚪 Sair</button>
+        </div>
+    </div>
+    <script>
+        if (!localStorage.getItem('token')) window.location.href = '/';
+        
+        fetch('/api/status', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } })
+            .then(r => r.json())
+            .then(d => {
+                const s = d.stats || d;
+                document.getElementById('tickets').textContent = s.ticketsAtivos || 0;
+                document.getElementById('knowledge').textContent = s.conhecimentos || 0;
+                document.getElementById('warns').textContent = s.warns || 0;
+                document.getElementById('pendings').textContent = s.pendentes || 0;
+            })
+            .catch(() => {
+                document.getElementById('tickets').textContent = '❌';
+            });
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>
