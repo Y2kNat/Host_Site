@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
 
     try {
         // POST /api/auth - LOGIN
-        if (req.method === 'POST') {
+        if (req.method === 'POST' && !req.body?.action) {
             const { username, password } = req.body || {};
             if (!username || !password) return res.json({ error: 'Usuário e senha obrigatórios' });
 
@@ -45,6 +45,57 @@ module.exports = async (req, res) => {
             );
 
             return res.json({ token, user: { name: cred.user, role: cred.role } });
+        }
+
+        // POST /api/auth - CRIAR CREDENCIAL (action=credentials)
+        if (req.method === 'POST' && req.body?.action === 'credentials') {
+            const token = req.headers['authorization']?.replace('Bearer ', '');
+            if (!token) return res.status(401).json({ error: 'Não autorizado' });
+
+            let decoded;
+            try { decoded = jwt.verify(token, JWT_SECRET); }
+            catch (e) { return res.status(401).json({ error: 'Token inválido' }); }
+
+            if (decoded.role !== 'full') return res.status(403).json({ error: 'Apenas FULL pode criar credenciais' });
+
+            const { user, password, role, guildId } = req.body;
+            if (!['full', 'owner', 'admin', 'tester'].includes(role)) return res.json({ error: 'Role inválida' });
+
+            const exists = await Credential.findOne({ user });
+            if (exists) {
+                exists.password = password;
+                exists.role = role;
+                exists.guildId = guildId || null;
+                await exists.save();
+            } else {
+                await Credential.create({
+                    user, password, role,
+                    guildId: guildId || null,
+                    active: true,
+                    createdBy: decoded.user
+                });
+            }
+
+            return res.json({ ok: true });
+        }
+
+        // GET /api/auth - LISTAR CREDENCIAIS
+        if (req.method === 'GET') {
+            const token = req.headers['authorization']?.replace('Bearer ', '');
+            if (!token) return res.status(401).json({ error: 'Não autorizado' });
+
+            let decoded;
+            try { decoded = jwt.verify(token, JWT_SECRET); }
+            catch (e) { return res.status(401).json({ error: 'Token inválido' }); }
+
+            if (decoded.role !== 'full') return res.status(403).json({ error: 'Apenas FULL' });
+
+            const credentials = await Credential.find({ active: true })
+                .select('-password')
+                .sort({ createdAt: -1 })
+                .lean();
+
+            return res.json(credentials);
         }
 
         res.status(404).json({ error: 'Rota não encontrada' });
