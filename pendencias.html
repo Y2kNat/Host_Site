@@ -59,10 +59,10 @@
         const user = JSON.parse(localStorage.getItem('user') || '{}');
 
         const commandsByRole = {
-            full: ['clear quantidade', 'slowmode segundos', 'lock', 'unlock', 'say mensagem', 'anuncio mensagem', 'modo normal/savage/hacker', 'voicemode on/off', 'stats', 'ping', 'uptime', 'servidor info', 'bot status'],
-            owner: ['clear quantidade', 'slowmode segundos', 'lock', 'unlock', 'say mensagem', 'anuncio mensagem', 'stats'],
-            admin: ['clear quantidade', 'slowmode segundos', 'say mensagem', 'ping'],
-            tester: ['ping', 'uptime', 'bot status', 'servidor info']
+            full: ['ping', 'uptime', 'stats', 'servidor', 'bot', 'say mensagem', 'anuncio mensagem', 'modo normal/savage/hacker/respeitoso/boiola', 'voicemode on/off', 'mencionar @user', 'autointervalo 30m', 'automsg on/off'],
+            owner: ['ping', 'uptime', 'stats', 'say mensagem', 'anuncio mensagem', 'autointervalo 30m', 'automsg on/off'],
+            admin: ['ping', 'say mensagem', 'automsg on/off'],
+            tester: ['ping', 'uptime', 'bot']
         };
 
         function toggleCmds() {
