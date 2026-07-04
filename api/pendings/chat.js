@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
         if (!message) return res.json({ response: 'Digite algo.' });
 
         const completion = await groq.chat.completions.create({
-            model: 'llama-3.3-70b-versatile',
+            model: 'openai/gpt-oss-120b',
             messages: [
                 { role: 'system', content: `Você é o HostBot. Usuário nível ${user.role} falou com você. Responda de forma útil e amigável.` },
                 { role: 'user', content: message }
