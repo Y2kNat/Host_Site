@@ -29,9 +29,7 @@
         
         .pending-panel { width: 80%; background: #16213e; border-radius: 10px; padding: 20px; overflow-y: auto; }
         .pending-panel h3 { color: #888; margin-bottom: 15px; }
-        .pending-item { padding: 12px; border-bottom: 1px solid #333; }
-        .pending-item .type { font-weight: bold; }
-        .pending-item .time { color: #888; font-size: 12px; }
+        .pending-item { padding: 12px; border-bottom: 1px solid #333; font-size: 13px; }
         .badge { padding: 3px 6px; border-radius: 3px; font-size: 10px; }
         .badge-active { background: #e74c3c; }
         .badge-done { background: #2ecc71; }
@@ -43,19 +41,17 @@
         <h1>⚡ Pendências & Comandos</h1>
         
         <div class="main">
-            <!-- CHAT IA (20%) -->
             <div class="chat-panel">
-                <h3>🤖 Chat IA</h3>
+                <h3>🤖 Comandos</h3>
                 <button class="cmd-btn" onclick="toggleCmds()">🔘 Listar Comandos</button>
                 <div class="cmds-list" id="cmdsList"></div>
                 <div class="chat-messages" id="chatMessages"></div>
                 <div class="chat-input">
-                    <input type="text" id="chatInput" placeholder="Digite ou selecione um comando..." onkeypress="if(event.key==='Enter')sendChat()">
+                    <input type="text" id="chatInput" placeholder="/comando ou conversa..." onkeypress="if(event.key==='Enter')sendChat()">
                     <button onclick="sendChat()">▶</button>
                 </div>
             </div>
             
-            <!-- PENDÊNCIAS (80%) -->
             <div class="pending-panel">
                 <h3>📋 Pendências</h3>
                 <div id="pendingList">Carregando...</div>
@@ -65,23 +61,19 @@
     <script>
         if (!localStorage.getItem('token')) window.location.href = '/';
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        
-        // Comandos por nível
+
         const commandsByRole = {
-            full: ['warn @user motivo', 'kick @user motivo', 'ban @user motivo', 'mute @user minutos', 'unmute @user', 'clear quantidade', 'slowmode segundos', 'lock', 'unlock', 'say mensagem', 'anuncio mensagem', 'modo normal/savage/hacker', 'voicemode on/off', 'tickets abertos', 'stats', 'aprender pergunta resposta', 'ping', 'uptime', 'servidor info', 'bot status'],
-            owner: ['warn @user motivo', 'kick @user motivo', 'mute @user minutos', 'unmute @user', 'clear quantidade', 'slowmode segundos', 'lock', 'unlock', 'say mensagem', 'anuncio mensagem', 'tickets abertos', 'stats'],
-            admin: ['warn @user motivo', 'mute @user minutos', 'unmute @user', 'clear quantidade', 'slowmode segundos', 'say mensagem', 'tickets abertos', 'ping'],
+            full: ['clear quantidade', 'slowmode segundos', 'lock', 'unlock', 'say mensagem', 'anuncio mensagem', 'modo normal/savage/hacker', 'voicemode on/off', 'stats', 'ping', 'uptime', 'servidor info', 'bot status'],
+            owner: ['clear quantidade', 'slowmode segundos', 'lock', 'unlock', 'say mensagem', 'anuncio mensagem', 'stats'],
+            admin: ['clear quantidade', 'slowmode segundos', 'say mensagem', 'ping'],
             tester: ['ping', 'uptime', 'bot status', 'servidor info']
         };
 
         function toggleCmds() {
             const list = document.getElementById('cmdsList');
-            if (list.classList.contains('show')) {
-                list.classList.remove('show');
-                return;
-            }
+            if (list.classList.contains('show')) { list.classList.remove('show'); return; }
             const cmds = commandsByRole[user.role] || [];
-            list.innerHTML = cmds.map(c => `<div onclick="document.getElementById('chatInput').value='${c}';list.classList.remove('show');">/${c}</div>`).join('');
+            list.innerHTML = cmds.map(c => `<div onclick="document.getElementById('chatInput').value='/${c}';list.classList.remove('show');">/${c}</div>`).join('');
             list.classList.add('show');
         }
 
@@ -89,20 +81,30 @@
             const input = document.getElementById('chatInput');
             const msg = input.value.trim();
             if (!msg) return;
-
             addChatMsg('user', msg);
             input.value = '';
 
-            const res = await fetch('/api/pendings/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                },
-                body: JSON.stringify({ message: msg, role: user.role })
-            });
-            const data = await res.json();
-            addChatMsg('bot', data.response || 'Sem resposta');
+            if (msg.startsWith('/')) {
+                const parts = msg.substring(1).split(' ');
+                const command = parts[0];
+                const params = parts.slice(1).join(' ');
+                const res = await fetch('/api/pendings/executar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                    body: JSON.stringify({ command, params })
+                });
+                const data = await res.json();
+                addChatMsg('bot', data.message || '✅ Enviado!');
+                loadPendings();
+            } else {
+                const res = await fetch('/api/pendings/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                    body: JSON.stringify({ message: msg, role: user.role })
+                });
+                const data = await res.json();
+                addChatMsg('bot', data.response || 'Sem resposta');
+            }
         }
 
         function addChatMsg(type, text) {
@@ -113,26 +115,27 @@
             div.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Carregar pendências
-        fetch('/api/pendings/list', {
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-        })
-        .then(r => r.json())
-        .then(data => {
-            const list = document.getElementById('pendingList');
-            if (data.pendings && data.pendings.length > 0) {
-                list.innerHTML = data.pendings.map(p => `
-                    <div class="pending-item">
-                        <span class="badge ${p.done ? 'badge-done' : 'badge-active'}">${p.done ? '✅' : '⏳'}</span>
-                        <span class="type">${p.type}</span>
-                        <span style="color:#888"> - ${JSON.stringify(p.data).substring(0, 60)}</span>
-                        <span class="time">${new Date(p.createdAt).toLocaleString('pt-BR')}</span>
-                    </div>
-                `).join('');
-            } else {
-                list.innerHTML = '<p style="color:#888">Nenhuma pendência</p>';
-            }
-        });
+        function loadPendings() {
+            fetch('/api/pendings/list', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } })
+            .then(r => r.json())
+            .then(data => {
+                const list = document.getElementById('pendingList');
+                if (data.pendings && data.pendings.length > 0) {
+                    list.innerHTML = data.pendings.map(p => `
+                        <div class="pending-item">
+                            <span class="badge ${p.done ? 'badge-done' : 'badge-active'}">${p.done ? '✅' : '⏳'}</span>
+                            <strong>/${p.data?.command || p.type}</strong>
+                            <span style="color:#888">${p.data?.params || ''}</span>
+                            <span style="float:right;color:#888;font-size:11px">${new Date(p.createdAt).toLocaleString('pt-BR')}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<p style="color:#888">Nenhuma pendência</p>';
+                }
+            });
+        }
+
+        loadPendings();
     </script>
 </body>
 </html>
