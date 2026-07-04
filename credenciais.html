@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HostVille BOT - Credenciais</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0a0a1a; color: #fff; }
+        .container { max-width: 800px; margin: 0 auto; padding: 30px; }
+        h1 { color: #5865F2; margin-bottom: 20px; }
+        .card { background: #16213e; padding: 25px; border-radius: 10px; margin-bottom: 20px; }
+        .card h3 { color: #888; margin-bottom: 15px; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: none; border-radius: 5px; background: #0f3460; color: #fff; font-size: 14px; }
+        button { padding: 12px 25px; background: #5865F2; border: none; border-radius: 5px; color: #fff; cursor: pointer; font-size: 14px; }
+        button:hover { background: #4752c4; }
+        .list-item { padding: 10px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .badge-full { background: #e74c3c; }
+        .badge-owner { background: #f1c40f; color: #000; }
+        .badge-admin { background: #2ecc71; }
+        .badge-tester { background: #3498db; }
+        .back { color: #5865F2; text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/dashboard" class="back">← Voltar</a>
+        <h1>🔑 Credenciais</h1>
+        
+        <div class="card">
+            <h3>Gerar Nova Credencial</h3>
+            <form id="credForm">
+                <input type="text" id="newUser" placeholder="Nome do usuário" required>
+                <select id="newRole" required>
+                    <option value="">Selecione o nível</option>
+                    <option value="full">🔴 Full (Total)</option>
+                    <option value="owner">🟡 Owner (Servidor)</option>
+                    <option value="admin">🟢 Admin</option>
+                    <option value="tester">🔵 Tester</option>
+                </select>
+                <input type="text" id="newGuild" placeholder="ID do Servidor (opcional)">
+                <button type="submit">Gerar Credencial</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Credenciais Ativas</h3>
+            <div id="credList">Carregando...</div>
+        </div>
+    </div>
+    <script>
+        if (!localStorage.getItem('token')) window.location.href = '/';
+
+        document.getElementById('credForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pwd = Array(16).fill().map(() => 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$'[Math.floor(Math.random()*67)]).join('');
+            const res = await fetch('/api/auth', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    action: 'credentials',
+                    user: document.getElementById('newUser').value,
+                    role: document.getElementById('newRole').value,
+                    guildId: document.getElementById('newGuild').value,
+                    password: pwd
+                })
+            });
+            const data = await res.json();
+            if (data.ok) {
+                alert('✅ Criada!\n👤 ' + document.getElementById('newUser').value + '\n🔑 ' + pwd);
+                loadCreds();
+                e.target.reset();
+            } else {
+                alert('❌ ' + (data.error || 'Erro'));
+            }
+        });
+
+        async function loadCreds() {
+            const res = await fetch('/api/auth', {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+                document.getElementById('credList').innerHTML = data.map(c => `
+                    <div class="list-item">
+                        <span><strong>${c.user}</strong> - <span class="badge badge-${c.role}">${c.role.toUpperCase()}</span></span>
+                        <span style="color:#888">${new Date(c.createdAt).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('credList').innerHTML = '<p style="color:#888">Nenhuma credencial</p>';
+            }
+        }
+
+        loadCreds();
+    </script>
+</body>
+</html>
