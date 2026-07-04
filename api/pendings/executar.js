@@ -23,11 +23,10 @@ module.exports = async (req, res) => {
 
     try {
         const token = req.headers['authorization']?.replace('Bearer ', '');
-        if (!token) return res.status(401).json({ error: 'Não autorizado' });
+        if (!token) return res.json({ error: 'Não autorizado' });
         const user = jwt.verify(token, JWT_SECRET);
         const { command, params } = req.body || {};
 
-        // Criar pendência no MongoDB (o MemoryWatcher do bot executa em 5s)
         await connect();
         await Pending.create({
             type: 'comando',
@@ -35,8 +34,8 @@ module.exports = async (req, res) => {
             done: false
         });
 
-        res.json({ ok: true, message: `Comando /${command} enviado! O bot executará em até 5 segundos.` });
+        res.json({ message: `✅ Comando /${command} enviado! O bot executará em até 5 segundos.` });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        res.json({ error: e.message });
     }
 };
