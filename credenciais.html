@@ -4,98 +4,867 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HostVille BOT - Credenciais</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #050508;
+            --surface: rgba(14, 14, 22, 0.85);
+            --surface-elevated: rgba(18, 18, 28, 0.92);
+            --accent: #5865F2;
+            --accent-hover: #4752c4;
+            --text: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.55);
+            --text-dim: rgba(255, 255, 255, 0.30);
+            --border: rgba(255, 255, 255, 0.06);
+            --border-hover: rgba(255, 255, 255, 0.10);
+            --border-focus: rgba(88, 101, 242, 0.3);
+            --input-bg: rgba(10, 10, 18, 0.6);
+            --radius: 10px;
+            --radius-sm: 6px;
+            --transition: 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #0a0a1a; color: #fff; }
-        .container { max-width: 800px; margin: 0 auto; padding: 30px; }
-        h1 { color: #5865F2; margin-bottom: 20px; }
-        .card { background: #16213e; padding: 25px; border-radius: 10px; margin-bottom: 20px; }
-        .card h3 { color: #888; margin-bottom: 15px; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: none; border-radius: 5px; background: #0f3460; color: #fff; font-size: 14px; }
-        button { padding: 12px 25px; background: #5865F2; border: none; border-radius: 5px; color: #fff; cursor: pointer; font-size: 14px; }
-        button:hover { background: #4752c4; }
-        .list-item { padding: 10px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
-        .badge-full { background: #e74c3c; }
-        .badge-owner { background: #f1c40f; color: #000; }
-        .badge-admin { background: #2ecc71; }
-        .badge-tester { background: #3498db; }
-        .back { color: #5865F2; text-decoration: none; font-size: 14px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <a href="/dashboard" class="back">← Voltar</a>
-        <h1>🔑 Credenciais</h1>
-        
-        <div class="card">
-            <h3>Gerar Nova Credencial</h3>
-            <form id="credForm">
-                <input type="text" id="newUser" placeholder="Nome do usuário" required>
-                <select id="newRole" required>
-                    <option value="">Selecione o nível</option>
-                    <option value="full">🔴 Full (Total)</option>
-                    <option value="owner">🟡 Owner (Servidor)</option>
-                    <option value="admin">🟢 Admin</option>
-                    <option value="tester">🔵 Tester</option>
-                </select>
-                <input type="text" id="newGuild" placeholder="ID do Servidor (opcional)">
-                <button type="submit">Gerar Credencial</button>
-            </form>
-        </div>
 
-        <div class="card">
-            <h3>Credenciais Ativas</h3>
-            <div id="credList">Carregando...</div>
-        </div>
-    </div>
-    <script>
-        if (!localStorage.getItem('token')) window.location.href = '/';
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
 
-        document.getElementById('credForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const pwd = Array(16).fill().map(() => 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$'[Math.floor(Math.random()*67)]).join('');
-            const res = await fetch('/api/auth', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                },
-                body: JSON.stringify({
-                    action: 'credentials',
-                    user: document.getElementById('newUser').value,
-                    role: document.getElementById('newRole').value,
-                    guildId: document.getElementById('newGuild').value,
-                    password: pwd
-                })
-            });
-            const data = await res.json();
-            if (data.ok) {
-                alert('✅ Criada!\n👤 ' + document.getElementById('newUser').value + '\n🔑 ' + pwd);
-                loadCreds();
-                e.target.reset();
-            } else {
-                alert('❌ ' + (data.error || 'Erro'));
+        /* ================================================================
+           AMBIENT BACKGROUND — Premium animated atmosphere
+        ================================================================ */
+        .ambient-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .ambient-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.22;
+            will-change: transform, opacity;
+        }
+
+        .glow-1 {
+            width: 850px;
+            height: 850px;
+            background: radial-gradient(circle at 55% 45%, rgba(88, 101, 242, 0.30) 0%, transparent 70%);
+            top: -25%;
+            right: -15%;
+            animation: floatA 16s ease-in-out infinite alternate;
+        }
+
+        .glow-2 {
+            width: 750px;
+            height: 750px;
+            background: radial-gradient(circle at 40% 55%, rgba(140, 145, 200, 0.20) 0%, transparent 70%);
+            bottom: -20%;
+            left: -10%;
+            animation: floatB 20s ease-in-out 3s infinite alternate;
+        }
+
+        .glow-3 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle at 50% 50%, rgba(88, 101, 242, 0.15) 0%, transparent 70%);
+            top: 35%;
+            left: 55%;
+            animation: floatC 22s ease-in-out 6s infinite alternate;
+        }
+
+        @keyframes floatA {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.22; }
+            50% { transform: translate(2vw, -2vh) scale(1.05); opacity: 0.28; }
+            100% { transform: translate(-1.5vw, 1.5vh) scale(0.96); opacity: 0.20; }
+        }
+
+        @keyframes floatB {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.20; }
+            50% { transform: translate(-2.5vw, 1.5vh) scale(1.04); opacity: 0.25; }
+            100% { transform: translate(1.5vw, -2vh) scale(0.97); opacity: 0.18; }
+        }
+
+        @keyframes floatC {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.15; }
+            50% { transform: translate(-1vw, -1.5vh) scale(1.06); opacity: 0.20; }
+            100% { transform: translate(1vw, 1vh) scale(0.95); opacity: 0.13; }
+        }
+
+        /* ================================================================
+           MAIN CONTAINER
+        ================================================================ */
+        .app-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1050px;
+            padding: 32px 28px;
+            animation: fadeSlideUp 0.9s cubic-bezier(0.23, 1, 0.32, 1) both;
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
             }
-        });
-
-        async function loadCreds() {
-            const res = await fetch('/api/auth', {
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-            });
-            const data = await res.json();
-            if (Array.isArray(data) && data.length > 0) {
-                document.getElementById('credList').innerHTML = data.map(c => `
-                    <div class="list-item">
-                        <span><strong>${c.user}</strong> - <span class="badge badge-${c.role}">${c.role.toUpperCase()}</span></span>
-                        <span style="color:#888">${new Date(c.createdAt).toLocaleDateString('pt-BR')}</span>
-                    </div>
-                `).join('');
-            } else {
-                document.getElementById('credList').innerHTML = '<p style="color:#888">Nenhuma credencial</p>';
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
+        /* ================================================================
+           NAVIGATION HEADER
+        ================================================================ */
+        .nav-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-id {
+            font-family: 'Space Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            display: block;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .brand-name {
+            font-weight: 800;
+            font-size: 1.3rem;
+            letter-spacing: -0.5px;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .back-link {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+        }
+
+        .back-link:hover {
+            color: var(--text);
+            border-color: var(--border-hover);
+            background: var(--surface-elevated);
+        }
+
+        .back-link .arrow {
+            transition: transform 0.3s ease;
+            font-size: 14px;
+        }
+
+        .back-link:hover .arrow {
+            transform: translateX(-3px);
+        }
+
+        /* ================================================================
+           TWO-COLUMN LAYOUT
+        ================================================================ */
+        .panel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            align-items: start;
+        }
+
+        /* ================================================================
+           PREMIUM CARDS
+        ================================================================ */
+        .panel-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 26px;
+            transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+            transform: translateY(0);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .panel-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(88, 101, 242, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .panel-card:hover {
+            background: var(--surface-elevated);
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .panel-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            margin-bottom: 24px;
+        }
+
+        .card-header h2 {
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .card-header .card-subtitle {
+            font-size: 12px;
+            color: var(--text-dim);
+            font-family: 'Space Mono', monospace;
+            letter-spacing: 0.5px;
+        }
+
+        /* ================================================================
+           FORM ELEMENTS — Premium inputs
+        ================================================================ */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: 'Space Mono', monospace;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .input-field,
+        .select-field {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .input-field::placeholder {
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+
+        .select-field {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff55' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 35px;
+        }
+
+        .select-field option {
+            background: #0e0e16;
+            color: #fff;
+            padding: 10px;
+        }
+
+        .input-field:hover,
+        .select-field:hover {
+            border-color: var(--border-hover);
+        }
+
+        .input-field:focus,
+        .select-field:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.08);
+            background: rgba(14, 14, 22, 0.8);
+        }
+
+        /* ================================================================
+           SUBMIT BUTTON — Premium style
+        ================================================================ */
+        .btn-submit {
+            width: 100%;
+            padding: 13px 24px;
+            background: var(--accent);
+            border: none;
+            border-radius: var(--radius-sm);
+            color: #fff;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-weight: 500;
+            margin-top: 6px;
+            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.25);
+        }
+
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(88, 101, 242, 0.35);
+        }
+
+        .btn-submit:hover::after {
+            opacity: 1;
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(88, 101, 242, 0.2);
+        }
+
+        /* ================================================================
+           CREDENTIALS LIST
+        ================================================================ */
+        .cred-list-container {
+            max-height: 380px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.08) transparent;
+        }
+
+        .cred-list-container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .cred-list-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .cred-list-container::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.06);
+            border-radius: 10px;
+        }
+
+        .cred-list-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.12);
+        }
+
+        .cred-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.25s ease;
+            border-radius: var(--radius-sm);
+            margin-bottom: 2px;
+            animation: listFadeIn 0.5s ease both;
+        }
+
+        .cred-item:nth-child(1) { animation-delay: 0.05s; }
+        .cred-item:nth-child(2) { animation-delay: 0.10s; }
+        .cred-item:nth-child(3) { animation-delay: 0.15s; }
+        .cred-item:nth-child(4) { animation-delay: 0.20s; }
+        .cred-item:nth-child(5) { animation-delay: 0.25s; }
+        .cred-item:nth-child(6) { animation-delay: 0.30s; }
+        .cred-item:nth-child(7) { animation-delay: 0.35s; }
+        .cred-item:nth-child(8) { animation-delay: 0.40s; }
+
+        @keyframes listFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .cred-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom-color: var(--border-hover);
+        }
+
+        .cred-item:last-child {
+            border-bottom: none;
+        }
+
+        .cred-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .cred-username {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .cred-date {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: var(--text-dim);
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        /* ================================================================
+           ROLE BADGES — Modern pill style
+        ================================================================ */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-family: 'Space Mono', monospace;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 500;
+            line-height: 1;
+            white-space: nowrap;
+            flex-shrink: 0;
+            border: 1px solid transparent;
+        }
+
+        .badge-full {
+            background: rgba(231, 76, 60, 0.12);
+            color: #e74c3c;
+            border-color: rgba(231, 76, 60, 0.2);
+        }
+
+        .badge-owner {
+            background: rgba(241, 196, 15, 0.12);
+            color: #f1c40f;
+            border-color: rgba(241, 196, 15, 0.2);
+        }
+
+        .badge-admin {
+            background: rgba(46, 204, 113, 0.12);
+            color: #2ecc71;
+            border-color: rgba(46, 204, 113, 0.2);
+        }
+
+        .badge-tester {
+            background: rgba(52, 152, 219, 0.12);
+            color: #3498db;
+            border-color: rgba(52, 152, 219, 0.2);
+        }
+
+        /* ================================================================
+           EMPTY STATE
+        ================================================================ */
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-dim);
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        .empty-state .empty-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            opacity: 0.3;
+            display: block;
+        }
+
+        /* ================================================================
+           LOADING STATE
+        ================================================================ */
+        .loading-text {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-dim);
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 1px;
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        /* ================================================================
+           RESPONSIVE DESIGN
+        ================================================================ */
+        @media (max-width: 850px) {
+            .panel-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .app-wrapper {
+                padding: 20px 16px;
+                max-width: 100%;
+            }
+
+            .panel-card {
+                padding: 22px 18px;
+            }
+
+            .cred-list-container {
+                max-height: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-wrapper {
+                padding: 14px 10px;
+            }
+
+            .nav-header {
+                margin-bottom: 20px;
+            }
+
+            .brand-name {
+                font-size: 1.1rem;
+            }
+
+            .panel-card {
+                padding: 18px 14px;
+                border-radius: var(--radius-sm);
+            }
+
+            .input-field,
+            .select-field {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+
+            .btn-submit {
+                padding: 11px 20px;
+                font-size: 10px;
+            }
+
+            .cred-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+                padding: 12px;
+            }
+
+            .cred-date {
+                font-size: 9px;
+            }
+        }
+
+        /* ================================================================
+           REDUCED MOTION
+        ================================================================ */
+        @media (prefers-reduced-motion: reduce) {
+            .ambient-glow {
+                animation: none;
+            }
+
+            .panel-card {
+                transition: none;
+            }
+
+            .panel-card:hover {
+                transform: none;
+            }
+
+            .btn-submit {
+                transition: none;
+            }
+
+            .cred-item {
+                animation: none;
+            }
+
+            .app-wrapper {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================================================================
+         AMBIENT BACKGROUND — Premium animated atmosphere
+    ================================================================ -->
+    <div class="ambient-layer" id="ambientLayer">
+        <div class="ambient-glow glow-1"></div>
+        <div class="ambient-glow glow-2"></div>
+        <div class="ambient-glow glow-3"></div>
+    </div>
+
+    <!-- ================================================================
+         MAIN APPLICATION WRAPPER
+    ================================================================ -->
+    <div class="app-wrapper">
+
+        <!-- Navigation Header -->
+        <div class="nav-header">
+            <div class="brand-section">
+                <div>
+                    <span class="brand-id">HostVille Control Panel</span>
+                    <span class="brand-name">Credentials Manager</span>
+                </div>
+            </div>
+            <a href="/dashboard" class="back-link">
+                <span class="arrow">←</span> Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Two-Column Panel Grid -->
+        <div class="panel-grid">
+
+            <!-- LEFT: Generate Credential -->
+            <div class="panel-card">
+                <div class="card-header">
+                    <h2>Generate Credential</h2>
+                    <span class="card-subtitle">Create new access key</span>
+                </div>
+
+                <form id="credForm">
+                    <div class="form-group">
+                        <label for="newUser">Username</label>
+                        <input
+                            type="text"
+                            id="newUser"
+                            class="input-field"
+                            placeholder="Enter username"
+                            required
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newRole">Access Level</label>
+                        <select id="newRole" class="select-field" required>
+                            <option value="">Select role level</option>
+                            <option value="full">Full Access</option>
+                            <option value="owner">Server Owner</option>
+                            <option value="admin">Administrator</option>
+                            <option value="tester">Tester</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newGuild">Server ID (optional)</label>
+                        <input
+                            type="text"
+                            id="newGuild"
+                            class="input-field"
+                            placeholder="Discord server ID"
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <button type="submit" class="btn-submit">Generate Credential</button>
+                </form>
+            </div>
+
+            <!-- RIGHT: Active Credentials -->
+            <div class="panel-card">
+                <div class="card-header">
+                    <h2>Active Credentials</h2>
+                    <span class="card-subtitle" id="credCount">Loading…</span>
+                </div>
+
+                <div class="cred-list-container" id="credList">
+                    <div class="loading-text">Loading credentials…</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================================================================
+         JAVASCRIPT — Preserved original logic
+    ================================================================ -->
+    <script>
+        // ================================================================
+        // AUTHENTICATION — Preserved
+        // ================================================================
+        if (!localStorage.getItem('token')) {
+            window.location.href = '/';
+        }
+
+        // ================================================================
+        // AMBIENT PARALLAX — Subtle mouse tracking
+        // ================================================================
+        const glows = document.querySelectorAll('.ambient-glow');
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 10;
+            const y = (e.clientY / window.innerHeight - 0.5) * 10;
+            glows.forEach((g, i) => {
+                const factor = (i + 1) * 2.5;
+                g.style.transform = `translate(${x * factor}px, ${y * factor}px)`;
+            });
+        });
+
+        // ================================================================
+        // CREDENTIAL FORM SUBMISSION — Preserved original logic
+        // ================================================================
+        document.getElementById('credForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Generate random password — preserved original logic
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$';
+            const pwd = Array(16).fill().map(() => chars[Math.floor(Math.random() * chars.length)]).join('');
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Generating…';
+            submitBtn.disabled = true;
+
+            try {
+                const res = await fetch('/api/auth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({
+                        action: 'credentials',
+                        user: document.getElementById('newUser').value,
+                        role: document.getElementById('newRole').value,
+                        guildId: document.getElementById('newGuild').value,
+                        password: pwd
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.ok) {
+                    alert('✅ Credential Created!\n\n👤 User: ' + document.getElementById('newUser').value + '\n🔑 Password: ' + pwd + '\n\n⚠️ Save this password — it cannot be recovered.');
+                    loadCreds();
+                    e.target.reset();
+                } else {
+                    alert('❌ Error: ' + (data.error || 'Failed to create credential'));
+                }
+            } catch (err) {
+                alert('❌ Connection error. Please try again.');
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // ================================================================
+        // LOAD CREDENTIALS — Preserved original logic
+        // ================================================================
+        async function loadCreds() {
+            const credListEl = document.getElementById('credList');
+            const credCountEl = document.getElementById('credCount');
+
+            try {
+                const res = await fetch('/api/auth', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+
+                const data = await res.json();
+
+                if (Array.isArray(data) && data.length > 0) {
+                    credCountEl.textContent = `${data.length} active credential${data.length !== 1 ? 's' : ''}`;
+
+                    credListEl.innerHTML = data.map(c => `
+                        <div class="cred-item">
+                            <div class="cred-user-info">
+                                <span class="cred-username">${escapeHtml(c.user)}</span>
+                                <span class="badge badge-${c.role}">${c.role.toUpperCase()}</span>
+                            </div>
+                            <span class="cred-date">${new Date(c.createdAt).toLocaleDateString('pt-BR')}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    credCountEl.textContent = 'No credentials';
+                    credListEl.innerHTML = `
+                        <div class="empty-state">
+                            <span class="empty-icon">🔐</span>
+                            No active credentials found
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                credCountEl.textContent = 'Error loading';
+                credListEl.innerHTML = `
+                    <div class="empty-state">
+                        <span class="empty-icon">⚠️</span>
+                        Failed to load credentials
+                    </div>
+                `;
+            }
+        }
+
+        // Simple HTML escaping utility
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ================================================================
+        // INITIALIZATION
+        // ================================================================
         loadCreds();
     </script>
 </body>
