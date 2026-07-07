@@ -4,47 +4,419 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HostVille BOT - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;800&family=Space+Mono&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #050505;
+            --accent: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.5);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #0a0a1a; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .login-box { background: #16213e; padding: 40px; border-radius: 10px; width: 380px; text-align: center; }
-        .login-box h1 { color: #5865F2; margin-bottom: 10px; font-size: 28px; }
-        .login-box p { color: #888; margin-bottom: 25px; }
-        .login-box input { width: 100%; padding: 14px; margin-bottom: 12px; border: none; border-radius: 6px; background: #0f3460; color: #fff; font-size: 16px; }
-        .login-box button { width: 100%; padding: 14px; background: #5865F2; border: none; border-radius: 6px; color: #fff; font-size: 16px; cursor: pointer; font-weight: bold; }
-        .login-box button:hover { background: #4752c4; }
-        .error { color: #e74c3c; margin-top: 15px; font-size: 14px; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--accent);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Background Blobs - NO FILTER, visible */
+        .stage {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            will-change: transform;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        .blob-1 {
+            width: 400px;
+            height: 400px;
+            background: rgba(88, 101, 242, 0.3);
+            left: -5%;
+            top: -10%;
+            animation: float1 20s ease-in-out infinite;
+        }
+
+        .blob-2 {
+            width: 350px;
+            height: 350px;
+            background: rgba(255, 255, 255, 0.15);
+            left: 55%;
+            top: -5%;
+            animation: float2 25s ease-in-out infinite;
+        }
+
+        .blob-3 {
+            width: 500px;
+            height: 500px;
+            background: rgba(88, 101, 242, 0.2);
+            left: 25%;
+            top: 40%;
+            animation: float3 30s ease-in-out infinite;
+        }
+
+        .blob-4 {
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.12);
+            left: 70%;
+            top: 35%;
+            animation: float1 22s ease-in-out infinite reverse;
+        }
+
+        .blob-5 {
+            width: 380px;
+            height: 380px;
+            background: rgba(88, 101, 242, 0.25);
+            left: 10%;
+            top: 55%;
+            animation: float2 28s ease-in-out infinite reverse;
+        }
+
+        .blob-6 {
+            width: 250px;
+            height: 250px;
+            background: rgba(255, 255, 255, 0.1);
+            left: 45%;
+            top: 0%;
+            animation: float3 18s ease-in-out infinite;
+        }
+
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(100px, -50px) scale(1.15); }
+            50% { transform: translate(-40px, 80px) scale(0.9); }
+            75% { transform: translate(-80px, -30px) scale(1.1); }
+        }
+
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-60px, 60px) scale(1.2); }
+            66% { transform: translate(50px, -80px) scale(0.85); }
+        }
+
+        @keyframes float3 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            20% { transform: translate(80px, 40px) scale(1.1); }
+            40% { transform: translate(-50px, -60px) scale(0.9); }
+            60% { transform: translate(30px, 80px) scale(1.15); }
+            80% { transform: translate(-70px, -30px) scale(0.95); }
+        }
+
+        /* Auth Container */
+        .auth-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 440px;
+            padding: 40px;
+        }
+
+        .header {
+            margin-bottom: 60px;
+            text-align: left;
+        }
+
+        .brand-id {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .header h1 {
+            font-weight: 800;
+            font-size: 3rem;
+            line-height: 0.9;
+            letter-spacing: -2px;
+            margin-left: -4px;
+            margin-top: 0;
+            color: var(--accent);
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 30px;
+            transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+        }
+
+        .form-group:focus-within {
+            transform: translateX(8px);
+        }
+
+        .form-group label {
+            display: block;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--accent);
+            padding: 12px 0;
+            font-size: 18px;
+            outline: none;
+            transition: border-color 0.5s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        .input-glow {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 1.5px;
+            background: var(--accent);
+            transition: width 0.8s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .form-group input:focus + .input-glow {
+            width: 100%;
+        }
+
+        .submit-wrap {
+            margin-top: 50px;
+            position: relative;
+            filter: url('#gooey');
+        }
+
+        .btn-base {
+            background: var(--accent);
+            color: #050505;
+            border: none;
+            padding: 20px 40px;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+            transition: letter-spacing 0.4s ease, background 0.3s ease, transform 0.3s ease;
+            border-radius: 50px;
+        }
+
+        .btn-base:hover {
+            letter-spacing: 5px;
+            background: #f0f0f0;
+        }
+
+        .btn-base:active {
+            transform: scale(0.98);
+        }
+
+        .btn-base:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .mercury-drop {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            border-radius: 50px;
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .submit-wrap:hover .mercury-drop {
+            transform: translate(-50%, -50%) scale(1.08, 1.25);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .error-msg {
+            color: #ff6b6b;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            text-align: left;
+            margin-top: 20px;
+            display: none;
+            letter-spacing: 1px;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+
+        .footer-nav {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+        }
+
+        .footer-nav a {
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-nav a:hover {
+            color: var(--accent);
+        }
+
+        .svg-filter-hidden {
+            position: absolute;
+            width: 0;
+            height: 0;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+            border-top-color: #050505;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h1>🤖 HostVille BOT</h1>
-        <p>Painel de Administração</p>
-        <form id="loginForm">
-            <input type="text" id="username" placeholder="Usuário" required>
-            <input type="password" id="password" placeholder="Senha" required>
-            <button type="submit">Entrar</button>
-        </form>
-        <p class="error" id="error"></p>
+    <svg class="svg-filter-hidden">
+        <defs>
+            <filter id="gooey">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+            </filter>
+        </defs>
+    </svg>
+
+    <!-- Blobs SEM filtro gooey, com blur e opacidade visível -->
+    <div class="stage">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+        <div class="blob blob-5"></div>
+        <div class="blob blob-6"></div>
     </div>
+
+    <main class="auth-container">
+        <header class="header">
+            <span class="brand-id">System Node: HV-01</span>
+            <h1>HOST<br/>VILLE</h1>
+        </header>
+
+        <form id="loginForm" autocomplete="off">
+            <div class="form-group">
+                <label>User Identity</label>
+                <input type="text" id="username" placeholder="USER" required />
+                <div class="input-glow"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Sequence Key</label>
+                <input type="password" id="password" placeholder="••••••••" required />
+                <div class="input-glow"></div>
+            </div>
+
+            <div class="submit-wrap">
+                <div class="mercury-drop"></div>
+                <button type="submit" class="btn-base" id="submitBtn">Get Started</button>
+            </div>
+        </form>
+
+        <p class="error-msg" id="errorMsg">Invalid credentials. Access denied.</p>
+
+        
+    </main>
+
     <script>
+        const blobs = document.querySelectorAll('.blob');
+        
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+            blobs.forEach((blob, i) => {
+                blob.style.transform = `translate(${x * (i + 1) * 10}px, ${y * (i + 1) * 10}px)`;
+            });
+        });
+
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const res = await fetch('/api/auth', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: document.getElementById('username').value,
-                    password: document.getElementById('password').value
-                })
-            });
-            const data = await res.json();
-            if (data.token) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
-                window.location.href = '/dashboard';
-            } else {
-                document.getElementById('error').textContent = data.error || 'Erro ao fazer login';
+            const btn = document.getElementById('submitBtn');
+            const err = document.getElementById('errorMsg');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Authenticating...';
+            err.classList.remove('show');
+
+            try {
+                const res = await fetch('/api/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value,
+                        password: document.getElementById('password').value
+                    })
+                });
+                const data = await res.json();
+                if (data.token) {
+                    btn.textContent = 'Access Granted';
+                    btn.style.background = '#2ecc71';
+                    btn.style.color = '#fff';
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    setTimeout(() => window.location.href = '/dashboard', 500);
+                } else {
+                    err.textContent = data.error || 'Invalid credentials.';
+                    err.classList.add('show');
+                    btn.disabled = false;
+                    btn.textContent = 'Get Started';
+                }
+            } catch (err) {
+                document.getElementById('errorMsg').textContent = 'Connection error.';
+                document.getElementById('errorMsg').classList.add('show');
+                btn.disabled = false;
+                btn.textContent = 'Get Started';
             }
         });
     </script>
