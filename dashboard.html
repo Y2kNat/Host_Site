@@ -394,16 +394,8 @@
         'use strict';
 
         // =============================================
-        // LOADING ANIMATION CLASSES (escopo fechado)
+        // LOADING ANIMATION
         // =============================================
-        class Vec2 {
-            constructor(x = 0, y = 0) { this.x = x; this.y = y; }
-        }
-
-        class Vec3 {
-            constructor(x = 0, y = 0, z = 0) { this.x = x; this.y = y; this.z = z; }
-        }
-
         class Particle {
             constructor(baseX, baseY, baseZ, size) {
                 this.baseX = baseX;
@@ -433,7 +425,7 @@
                 if (dz < this.near) return null;
                 const scale = this.focalLength / dz;
                 return {
-                    x: (px - 0) * scale * (sw / 2) + sw / 2,
+                    x: px * scale * (sw / 2) + sw / 2,
                     y: -py * scale * (sh / 2) + sh / 2,
                     z: dz,
                     scale: scale
@@ -632,9 +624,10 @@
         }
 
         // =============================================
-        // DASHBOARD FUNCTIONS
+        // DASHBOARD
         // =============================================
         let dashboardLoaded = false;
+        let currentStats = null;
 
         function initDashboard() {
             if (dashboardLoaded) return;
@@ -683,7 +676,7 @@
             svg.setAttribute("viewBox", "0 0 " + width + " " + height);
             svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
 
-            // Grid lines horizontal
+            // Grid horizontal
             const gridLines = 5;
             for (let i = 0; i <= gridLines; i++) {
                 const y = padding.top + (chartHeight / gridLines) * i;
@@ -705,7 +698,7 @@
                 svg.appendChild(label);
             }
 
-            // Grid lines vertical
+            // Grid vertical
             if (data[0] && data[0].data.length > 1) {
                 const numPoints = data[0].data.length;
                 for (let i = 0; i < numPoints; i++) {
@@ -720,7 +713,7 @@
                 }
             }
 
-            // Draw each series
+            // Draw series
             data.forEach(function(series, seriesIndex) {
                 const points = series.data.map(function(value, index) {
                     const x = padding.left + (chartWidth / (series.data.length - 1 || 1)) * index;
@@ -753,7 +746,7 @@
                 defs.appendChild(gradient);
                 svg.appendChild(defs);
 
-                // Smooth curve
+                // Curve
                 let d = '';
                 points.forEach(function(p, i) {
                     if (i === 0) {
@@ -881,30 +874,42 @@
                 const sr = await fetch('/api/status', { 
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
                 });
-                const cr = await fetch('/api/dashboard/charts', { 
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
-                });
                 
                 const sd = await sr.json(); 
                 const s = sd.stats || sd;
                 
-                document.getElementById('tickets').textContent = s.ticketsAtivos || 0;
-                document.getElementById('warns').textContent = s.warns || 0;
-                document.getElementById('pendings').textContent = s.pendentes || 0;
+                // Salva os dados reais
+                currentStats = {
+                    ticketsAtivos: s.ticketsAtivos || 0,
+                    ticketsFechados: s.ticketsFechados || 0,
+                    warns: s.warns || 0,
+                    warnsHoje: s.warnsHoje || s.warns || 0,
+                    warnsSemana: s.warnsSemana || 0,
+                    pendentes: s.pendentes || 0,
+                    pendentesConcluidas: s.pendentesConcluidas || 0,
+                    mensagens: s.mensagens || 0,
+                    comandos: s.comandos || 0
+                };
 
-                let cd;
-                try { 
-                    cd = await cr.json(); 
+                // Atualiza os cards com dados REAIS
+                document.getElementById('tickets').textContent = currentStats.ticketsAtivos;
+                document.getElementById('warns').textContent = currentStats.warns;
+                document.getElementById('pendings').textContent = currentStats.pendentes;
+
+                // Tenta pegar histórico dos charts
+                let chartData = null;
+                try {
+                    const cr = await fetch('/api/dashboard/charts', { 
+                        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
+                    });
+                    chartData = await cr.json();
                 } catch (e) {
-                    cd = { 
-                        tickets: { ativos: s.ticketsAtivos||0, fechados:0, historico:[] }, 
-                        warns: { hoje:s.warns||0, semana:0, historico:[] }, 
-                        pendings: { ativas:s.pendentes||0, concluidas:0, historico:[] }, 
-                        activity: { mensagens:0, comandos:0, historico:[] } 
-                    };
+                    // Se não conseguir, usa os dados do status
                 }
+
+                // Renderiza os gráficos com os MESMOS dados
+                renderCharts(currentStats, chartData);
                 
-                renderCharts(cd);
             } catch (e) {
                 console.error('Error loading data:', e);
                 document.getElementById('tickets').textContent = '—';
@@ -913,66 +918,115 @@
             }
         }
 
-        function renderCharts(d) {
-            const ticketsHistory = d.tickets.historico || [];
-            const ticketsData = [
+        function renderCharts(stats, chartData) {
+            // TICKETS - Usa os mesmos números do card
+            const ticketsAtivos = stats.ticketsAtivos;
+            const ticketsFechados = stats.ticketsFechados;
+            
+            let ticketsLabels = ['Agora'];
+            let ticketsAtivosHistory = [ticketsAtivos];
+            let ticketsFechadosHistory = [ticketsFechados];
+            
+            if (chartData && chartData.tickets && chartData.tickets.historico && chartData.tickets.historico.length > 0) {
+                ticketsLabels = chartData.tickets.historico.map(h => h.data || '');
+                ticketsAtivosHistory = chartData.tickets.historico.map(h => h.ativos || 0);
+                ticketsFechadosHistory = chartData.tickets.historico.map(h => h.fechados || 0);
+            }
+            
+            createLineChart('chart-tickets', [
                 {
                     name: 'Active',
-                    data: ticketsHistory.length > 0 ? ticketsHistory.map(h => h.ativos || 0) : [d.tickets.ativos || 0, Math.max(0, (d.tickets.ativos || 0) - 2), Math.max(0, (d.tickets.ativos || 0) + 1)],
-                    labels: ticketsHistory.length > 0 ? ticketsHistory.map(h => h.data || '') : ['Jan', 'Fev', 'Mar']
+                    data: ticketsAtivosHistory,
+                    labels: ticketsLabels
                 },
                 {
                     name: 'Closed',
-                    data: ticketsHistory.length > 0 ? ticketsHistory.map(h => h.fechados || 0) : [d.tickets.fechados || 0, Math.max(0, (d.tickets.fechados || 0) + 1), Math.max(0, (d.tickets.fechados || 0) + 3)],
-                    labels: ticketsHistory.length > 0 ? ticketsHistory.map(h => h.data || '') : ['Jan', 'Fev', 'Mar']
+                    data: ticketsFechadosHistory,
+                    labels: ticketsLabels
                 }
-            ];
-            createLineChart('chart-tickets', ticketsData, ['#5865F2', 'rgba(88,101,242,0.4)']);
+            ], ['#5865F2', 'rgba(88,101,242,0.4)']);
 
-            const warnsHistory = d.warns.historico || [];
-            const warnsData = [
+            // WARNS - Usa os mesmos números do card
+            const warnsTotal = stats.warns;
+            const warnsHoje = stats.warnsHoje;
+            const warnsSemana = stats.warnsSemana;
+            
+            let warnsLabels = ['Agora'];
+            let warnsHojeHistory = [warnsHoje];
+            let warnsSemanaHistory = [warnsSemana];
+            
+            if (chartData && chartData.warns && chartData.warns.historico && chartData.warns.historico.length > 0) {
+                warnsLabels = chartData.warns.historico.map(h => h.data || '');
+                warnsHojeHistory = chartData.warns.historico.map(h => h.hoje || 0);
+                warnsSemanaHistory = chartData.warns.historico.map(h => h.semana || 0);
+            }
+            
+            createLineChart('chart-warns', [
                 {
                     name: 'Today',
-                    data: warnsHistory.length > 0 ? warnsHistory.map(h => h.hoje || 0) : [d.warns.hoje || 0, Math.max(0, (d.warns.hoje || 0) - 1), Math.max(0, (d.warns.hoje || 0) + 2)],
-                    labels: warnsHistory.length > 0 ? warnsHistory.map(h => h.data || '') : ['Jan', 'Fev', 'Mar']
+                    data: warnsHojeHistory,
+                    labels: warnsLabels
                 },
                 {
                     name: 'Week',
-                    data: warnsHistory.length > 0 ? warnsHistory.map(h => h.semana || 0) : [d.warns.semana || 0, Math.max(0, (d.warns.semana || 0) - 2), Math.max(0, (d.warns.semana || 0) + 1)],
-                    labels: warnsHistory.length > 0 ? warnsHistory.map(h => h.data || '') : ['Jan', 'Fev', 'Mar']
+                    data: warnsSemanaHistory,
+                    labels: warnsLabels
                 }
-            ];
-            createLineChart('chart-warns', warnsData, ['#ff6b6b', 'rgba(255,107,107,0.4)']);
+            ], ['#ff6b6b', 'rgba(255,107,107,0.4)']);
 
-            const pendingsHistory = d.pendings.historico || [];
-            const pendingsData = [
+            // PENDINGS - Usa os mesmos números do card
+            const pendentesAtivas = stats.pendentes;
+            const pendentesConcluidas = stats.pendentesConcluidas;
+            
+            let pendingsLabels = ['Agora'];
+            let pendingsAtivasHistory = [pendentesAtivas];
+            let pendingsConcluidasHistory = [pendentesConcluidas];
+            
+            if (chartData && chartData.pendings && chartData.pendings.historico && chartData.pendings.historico.length > 0) {
+                pendingsLabels = chartData.pendings.historico.map(h => h.data || '');
+                pendingsAtivasHistory = chartData.pendings.historico.map(h => h.ativas || 0);
+                pendingsConcluidasHistory = chartData.pendings.historico.map(h => h.concluidas || 0);
+            }
+            
+            createLineChart('chart-pendings', [
                 {
                     name: 'Active',
-                    data: pendingsHistory.length > 0 ? pendingsHistory.map(h => h.ativas || 0) : [d.pendings.ativas || 0, Math.max(0, (d.pendings.ativas || 0) - 1), Math.max(0, (d.pendings.ativas || 0) + 3)],
-                    labels: pendingsHistory.length > 0 ? pendingsHistory.map(h => h.data || '') : ['Jan', 'Fev', 'Mar']
+                    data: pendingsAtivasHistory,
+                    labels: pendingsLabels
                 },
                 {
                     name: 'Done',
-                    data: pendingsHistory.length > 0 ? pendingsHistory.map(h => h.concluidas || 0) : [d.pendings.concluidas || 0, Math.max(0, (d.pendings.concluidas || 0) + 2), Math.max(0, (d.pendings.concluidas || 0) + 5)],
-                    labels: pendingsHistory.length > 0 ? pendingsHistory.map(h => h.data || '') : ['Jan', 'Fev', 'Mar']
+                    data: pendingsConcluidasHistory,
+                    labels: pendingsLabels
                 }
-            ];
-            createLineChart('chart-pendings', pendingsData, ['#ffffff', 'rgba(255,255,255,0.4)']);
+            ], ['#ffffff', 'rgba(255,255,255,0.4)']);
 
-            const activityHistory = d.activity.historico || [];
-            const activityData = [
+            // ACTIVITY
+            const mensagens = stats.mensagens;
+            const comandos = stats.comandos;
+            
+            let activityLabels = ['Agora'];
+            let mensagensHistory = [mensagens];
+            let comandosHistory = [comandos];
+            
+            if (chartData && chartData.activity && chartData.activity.historico && chartData.activity.historico.length > 0) {
+                activityLabels = chartData.activity.historico.map(h => h.data || '');
+                mensagensHistory = chartData.activity.historico.map(h => h.mensagens || 0);
+                comandosHistory = chartData.activity.historico.map(h => h.comandos || 0);
+            }
+            
+            createLineChart('chart-activity', [
                 {
                     name: 'Messages',
-                    data: activityHistory.length > 0 ? activityHistory.map(h => h.mensagens || 0) : [d.activity.mensagens || 0, Math.max(0, (d.activity.mensagens || 0) - 5), Math.max(0, (d.activity.mensagens || 0) + 8)],
-                    labels: activityHistory.length > 0 ? activityHistory.map(h => h.data || '') : ['Jan', 'Fev', 'Mar']
+                    data: mensagensHistory,
+                    labels: activityLabels
                 },
                 {
                     name: 'Commands',
-                    data: activityHistory.length > 0 ? activityHistory.map(h => h.comandos || 0) : [d.activity.comandos || 0, Math.max(0, (d.activity.comandos || 0) - 2), Math.max(0, (d.activity.comandos || 0) + 4)],
-                    labels: activityHistory.length > 0 ? activityHistory.map(h => h.data || '') : ['Jan', 'Fev', 'Mar']
+                    data: comandosHistory,
+                    labels: activityLabels
                 }
-            ];
-            createLineChart('chart-activity', activityData, ['#5865F2', 'rgba(88,101,242,0.4)']);
+            ], ['#5865F2', 'rgba(88,101,242,0.4)']);
         }
 
         window.logout = function() { 
