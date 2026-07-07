@@ -1399,7 +1399,7 @@
         // ================================================================
         // INITIALIZE DASHBOARD
         // ================================================================
-        requestAnimationFrame(() => requestAnimationFrame(() => loadDashboard()));
+        window.addEventListener('DOMContentLoaded', loadDashboard);
         
         // Auto-refresh every 30 seconds (preserved from original)
         setInterval(loadDashboard, 30000);
