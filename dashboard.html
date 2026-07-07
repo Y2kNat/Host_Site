@@ -14,9 +14,6 @@
             --card-hover: rgba(255,255,255,0.06);
             --accent: #ffffff;
             --accent-blue: rgba(88,101,242,0.6);
-            --accent-blue-light: rgba(88,101,242,0.3);
-            --accent-red: #ff6b6b;
-            --accent-red-light: rgba(255,107,107,0.3);
             --text: #ffffff;
             --text-dim: rgba(255,255,255,0.5);
             --text-tertiary: rgba(255,255,255,0.25);
@@ -31,113 +28,61 @@
             background: var(--bg);
             color: var(--text);
             font-family: 'Inter', sans-serif;
-            height: 100vh;
+            min-height: 100vh;
             width: 100vw;
-            overflow: hidden;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
-        /* Loading Screen */
-        .loading-screen {
+        /* LOADING SCREEN - Full screen overlay */
+        #loading-screen {
             position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease-out;
+        }
+
+        #loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #loading-screen.hidden {
+            display: none;
+        }
+
+        #loading-canvas {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--bg);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
 
-        .loading-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        .loading-content {
-            text-align: center;
-        }
-
-        .loading-logo {
-            font-family: 'Space Mono', monospace;
-            font-size: 12px;
-            letter-spacing: 6px;
+        #welcome-text {
+            position: relative;
+            z-index: 1;
+            color: white;
+            font-weight: 200;
+            font-size: 2rem;
+            letter-spacing: 0.4em;
             text-transform: uppercase;
-            color: var(--text-dim);
-            margin-bottom: 20px;
-            animation: fadeInUp 0.8s ease;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+            font-family: 'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif;
         }
 
-        .loading-title {
-            font-size: 3rem;
-            font-weight: 800;
-            letter-spacing: -2px;
-            line-height: 0.9;
-            margin-bottom: 40px;
-            animation: fadeInUp 0.8s ease 0.2s both;
-        }
-
-        .loading-bar-container {
-            width: 200px;
-            height: 2px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            overflow: hidden;
-            margin: 0 auto;
-            animation: fadeInUp 0.8s ease 0.4s both;
-        }
-
-        .loading-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent-blue), rgba(88,101,242,0.8), var(--accent-blue));
-            background-size: 200% 100%;
-            animation: loadingShimmer 1.5s ease-in-out infinite;
-            border-radius: 2px;
-            width: 60%;
-        }
-
-        .loading-status {
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-            color: var(--text-tertiary);
-            margin-top: 20px;
-            letter-spacing: 2px;
-            animation: fadeInUp 0.8s ease 0.6s both;
-        }
-
-        .loading-dots {
-            display: inline-block;
-            animation: dots 1.5s steps(4, end) infinite;
-        }
-
-        @keyframes loadingShimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60%, 100% { content: '...'; }
-        }
-
-        /* Main Stage */
+        /* STAGE BACKGROUND */
         .stage {
             position: fixed;
             width: 100%;
@@ -172,21 +117,24 @@
             0%,100%{transform:translate(0,0) scale(1)} 20%{transform:translate(80px,40px) scale(1.1)} 40%{transform:translate(-50px,-60px) scale(0.9)} 60%{transform:translate(30px,80px) scale(1.15)} 80%{transform:translate(-70px,-30px) scale(0.95)}
         }
 
-        /* Main App */
-        .app-container {
+        /* DASHBOARD */
+        #dashboard {
             position: relative;
             z-index: 10;
+            opacity: 0;
+            transition: opacity 0.8s ease-out;
+        }
+
+        #dashboard.visible {
+            opacity: 1;
+        }
+
+        .app-container {
             display: flex;
-            height: 100vh;
+            min-height: 100vh;
             width: 100vw;
             padding: 24px;
             gap: 24px;
-            opacity: 0;
-            transition: opacity 0.6s ease;
-        }
-
-        .app-container.visible {
-            opacity: 1;
         }
 
         .sidebar { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
@@ -202,7 +150,6 @@
         .stat-card {
             background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
             padding: 22px 24px; transition: all 0.5s cubic-bezier(0.25,0.8,0.25,1.2); cursor: default;
-            backdrop-filter: blur(10px);
         }
         .stat-card:hover { background: var(--card-hover); border-color: var(--border-hover); transform: translateX(6px); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
 
@@ -213,7 +160,7 @@
 
         .stat-card-value { font-size: 48px; font-weight: 800; letter-spacing: -2px; line-height: 1; }
         .stat-card-value.accent-blue { color: var(--accent-blue); }
-        .stat-card-value.accent-red { color: var(--accent-red); }
+        .stat-card-value.accent-red { color: #ff6b6b; }
         .stat-card-value.accent-white { color: var(--text); }
 
         .stat-card-detail {
@@ -221,7 +168,7 @@
             margin-top: 6px; letter-spacing: 1px;
         }
 
-        .main-content { flex: 1; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+        .main-content { flex: 1; display: flex; flex-direction: column; gap: 16px; }
         .main-content::-webkit-scrollbar { width: 3px; }
         .main-content::-webkit-scrollbar-track { background: transparent; }
         .main-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
@@ -244,10 +191,15 @@
 
         .chart-panel {
             background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-            padding: 20px 22px; transition: all 0.3s;
-            backdrop-filter: blur(10px);
+            padding: 20px 22px; transition: all 0.3s; position: relative; overflow: hidden;
         }
         .chart-panel:hover { border-color: var(--border-hover); background: var(--card-hover); }
+        .chart-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
 
         .chart-panel h3 {
             font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase;
@@ -255,7 +207,7 @@
         }
 
         .chart-inner { 
-            min-height: 200px; 
+            min-height: 180px; 
             display: flex; 
             align-items: center; 
             justify-content: center;
@@ -267,191 +219,66 @@
             color: var(--text-dim); 
             font-family: 'Space Mono', monospace; 
             font-size: 10px; 
+            letter-spacing: 1px;
         }
         @keyframes pulse { 0%,100%{opacity:0.2} 50%{opacity:0.6} }
 
-        /* Chart Styles */
-        .bar-chart-vertical {
-            display: flex;
-            gap: 30px;
-            align-items: flex-end;
-            height: 180px;
+        /* Estilos para gráficos de linha */
+        .line-chart {
             width: 100%;
-            padding: 10px 20px;
-            position: relative;
-        }
-
-        .bar-group {
-            flex: 1;
-            display: flex;
-            gap: 6px;
-            align-items: flex-end;
-            justify-content: center;
             height: 100%;
             position: relative;
         }
 
-        .bar-item {
-            width: 40px;
-            border-radius: 4px 4px 0 0;
-            transition: height 1s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative;
-            cursor: pointer;
-            min-width: 30px;
-        }
-
-        .bar-item:hover {
-            filter: brightness(1.3);
-            transform: scaleY(1.02);
-            transform-origin: bottom;
-        }
-
-        .bar-item.primary {
-            background: linear-gradient(180deg, var(--accent-blue) 0%, rgba(88,101,242,0.4) 100%);
-            box-shadow: 0 0 15px rgba(88,101,242,0.3);
-        }
-
-        .bar-item.secondary {
-            background: linear-gradient(180deg, rgba(88,101,242,0.3) 0%, rgba(88,101,242,0.1) 100%);
-            box-shadow: 0 0 10px rgba(88,101,242,0.15);
-        }
-
-        .bar-item.warn-primary {
-            background: linear-gradient(180deg, var(--accent-red) 0%, rgba(255,107,107,0.4) 100%);
-            box-shadow: 0 0 15px rgba(255,107,107,0.3);
-        }
-
-        .bar-item.warn-secondary {
-            background: linear-gradient(180deg, rgba(255,107,107,0.3) 0%, rgba(255,107,107,0.1) 100%);
-            box-shadow: 0 0 10px rgba(255,107,107,0.15);
-        }
-
-        .bar-item.white-primary {
-            background: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.3) 100%);
-            box-shadow: 0 0 15px rgba(255,255,255,0.2);
-        }
-
-        .bar-item.white-secondary {
-            background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%);
-            box-shadow: 0 0 10px rgba(255,255,255,0.1);
-        }
-
-        .bar-item .bar-tooltip {
-            position: absolute;
-            top: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
-            color: #fff;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-family: 'Space Mono', monospace;
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
-
-        .bar-item:hover .bar-tooltip {
-            opacity: 1;
-        }
-
-        .bar-label-group {
-            display: flex;
-            gap: 6px;
-            justify-content: center;
-            margin-top: 10px;
-            position: absolute;
-            bottom: -25px;
+        .line-chart svg {
             width: 100%;
+            height: 100%;
+            overflow: visible;
         }
 
-        .bar-label-item {
-            font-family: 'Space Mono', monospace;
-            font-size: 8px;
-            color: rgba(255,255,255,0.4);
-            text-align: center;
-            width: 40px;
-        }
-
-        .chart-grid {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 25px;
+        .chart-legend {
             display: flex;
-            flex-direction: column-reverse;
-            gap: 0;
-            pointer-events: none;
-        }
-
-        .grid-line {
-            flex: 1;
-            border-top: 1px solid rgba(255,255,255,0.04);
-            position: relative;
-        }
-
-        .grid-label {
-            position: absolute;
-            left: -25px;
-            top: -7px;
-            font-family: 'Space Mono', monospace;
-            font-size: 8px;
-            color: rgba(255,255,255,0.2);
-            text-align: right;
-            width: 20px;
-        }
-
-        /* Donut Chart */
-        .donut-chart-container {
-            display: flex;
-            align-items: center;
+            gap: 16px;
+            margin-top: 8px;
             justify-content: center;
-            gap: 30px;
-            width: 100%;
-            position: relative;
-        }
-
-        .donut-svg {
-            filter: drop-shadow(0 0 10px rgba(88,101,242,0.3));
-        }
-
-        .donut-legend {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
             font-family: 'Space Mono', monospace;
-            font-size: 10px;
+            font-size: 9px;
             color: rgba(255,255,255,0.5);
         }
 
         .legend-dot {
             width: 8px;
             height: 8px;
-            border-radius: 2px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px currentColor;
         }
 
-        .legend-value {
-            margin-left: auto;
-            font-weight: 600;
-            color: rgba(255,255,255,0.7);
+        .grid-line {
+            stroke: rgba(255,255,255,0.04);
+            stroke-width: 1;
+        }
+
+        .data-point {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .data-point:hover {
+            filter: brightness(1.5);
         }
 
         @media (max-width: 1024px) {
-            .app-container { flex-direction: column; overflow-y: auto; }
+            .app-container { flex-direction: column; }
             .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; gap: 8px; }
             .stat-card { flex: 1; min-width: 120px; padding: 16px; }
             .stat-card-value { font-size: 28px; }
             .charts-grid { grid-template-columns: 1fr; }
-            .bar-item { width: 30px; min-width: 25px; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -462,89 +289,371 @@
 </head>
 <body>
 
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loading-content">
-            <div class="loading-logo">System Node: HV-DASH</div>
-            <div class="loading-title">HOST<br/>VILLE</div>
-            <div class="loading-bar-container">
-                <div class="loading-bar" id="loadingBar"></div>
-            </div>
-            <div class="loading-status" id="loadingStatus">
-                INITIALIZING<span class="loading-dots"></span>
-            </div>
+    <!-- ===== LOADING SCREEN (ANIMAÇÃO INICIAL) ===== -->
+    <div id="loading-screen">
+        <canvas id="loading-canvas"></canvas>
+        <div id="welcome-text">WELCOME</div>
+    </div>
+    <!-- ===== FIM DO LOADING SCREEN ===== -->
+
+    <!-- ===== DASHBOARD (INICIALMENTE INVISÍVEL) ===== -->
+    <div id="dashboard">
+        <div class="stage">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+            <div class="blob blob-4"></div>
+            <div class="blob blob-5"></div>
+            <div class="blob blob-6"></div>
+        </div>
+
+        <div class="app-container">
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <span class="brand-id">System Node: HV-DASH</span>
+                    <h1>HOST<br/>VILLE</h1>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Active Tickets</div>
+                    <div class="stat-card-value accent-blue" id="tickets">-</div>
+                    <div class="stat-card-detail">Open requests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Total Warns</div>
+                    <div class="stat-card-value accent-red" id="warns">-</div>
+                    <div class="stat-card-detail">Infractions logged</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Pending Tasks</div>
+                    <div class="stat-card-value accent-white" id="pendings">-</div>
+                    <div class="stat-card-detail">Awaiting execution</div>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <nav class="top-nav">
+                    <a href="/pendencias">Command Center</a>
+                    <a href="/credenciais">Credentials</a>
+                    <button class="btn-logout" onclick="logout()">Disconnect</button>
+                </nav>
+
+                <div class="charts-grid">
+                    <div class="chart-panel">
+                        <h3>• Tickets Overview</h3>
+                        <div class="chart-inner" id="chart-tickets"><span class="loading-pulse">Loading…</span></div>
+                    </div>
+                    <div class="chart-panel">
+                        <h3>• Warnings History</h3>
+                        <div class="chart-inner" id="chart-warns"><span class="loading-pulse">Loading…</span></div>
+                    </div>
+                    <div class="chart-panel">
+                        <h3>• Pending Tasks</h3>
+                        <div class="chart-inner" id="chart-pendings"><span class="loading-pulse">Loading…</span></div>
+                    </div>
+                    <div class="chart-panel">
+                        <h3>• System Activity</h3>
+                        <div class="chart-inner" id="chart-activity"><span class="loading-pulse">Loading…</span></div>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
-
-    <!-- Background Blobs -->
-    <div class="stage">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-        <div class="blob blob-4"></div>
-        <div class="blob blob-5"></div>
-        <div class="blob blob-6"></div>
-    </div>
-
-    <!-- Main App -->
-    <div class="app-container" id="appContainer">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <span class="brand-id">System Node: HV-DASH</span>
-                <h1>HOST<br/>VILLE</h1>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-label">Active Tickets</div>
-                <div class="stat-card-value accent-blue" id="tickets">-</div>
-                <div class="stat-card-detail">Open requests</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-label">Total Warns</div>
-                <div class="stat-card-value accent-red" id="warns">-</div>
-                <div class="stat-card-detail">Infractions logged</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-label">Pending Tasks</div>
-                <div class="stat-card-value accent-white" id="pendings">-</div>
-                <div class="stat-card-detail">Awaiting execution</div>
-            </div>
-        </aside>
-
-        <main class="main-content">
-            <nav class="top-nav">
-                <a href="/pendencias">Command Center</a>
-                <a href="/credenciais">Credentials</a>
-                <button class="btn-logout" onclick="logout()">Disconnect</button>
-            </nav>
-
-            <div class="charts-grid">
-                <div class="chart-panel">
-                    <h3>• Tickets Overview</h3>
-                    <div class="chart-inner" id="chart-tickets"><span class="loading-pulse">Loading…</span></div>
-                </div>
-                <div class="chart-panel">
-                    <h3>• Warnings History</h3>
-                    <div class="chart-inner" id="chart-warns"><span class="loading-pulse">Loading…</span></div>
-                </div>
-                <div class="chart-panel">
-                    <h3>• Pending Tasks</h3>
-                    <div class="chart-inner" id="chart-pendings"><span class="loading-pulse">Loading…</span></div>
-                </div>
-                <div class="chart-panel">
-                    <h3>• System Activity</h3>
-                    <div class="chart-inner" id="chart-activity"><span class="loading-pulse">Loading…</span></div>
-                </div>
-            </div>
-        </main>
-    </div>
+    <!-- ===== FIM DA DASHBOARD ===== -->
 
     <script>
-        // Check authentication
-        if (!localStorage.getItem('token')) {
-            window.location.href = '/';
+        // ===== ANIMAÇÃO DE LOADING =====
+        class Vector2 {
+            constructor(x = 0, y = 0) {
+                this.x = x;
+                this.y = y;
+            }
+            clone() {
+                return new Vector2(this.x, this.y);
+            }
         }
 
-        // Blob animation
+        class Vector3 {
+            constructor(x = 0, y = 0, z = 0) {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
+            clone() {
+                return new Vector3(this.x, this.y, this.z);
+            }
+            add(v) {
+                this.x += v.x;
+                this.y += v.y;
+                this.z += v.z;
+                return this;
+            }
+            scale(s) {
+                this.x *= s;
+                this.y *= s;
+                this.z *= s;
+                return this;
+            }
+        }
+
+        class Particle {
+            constructor(baseX, baseY, baseZ, size) {
+                this.basePosition = new Vector3(baseX, baseY, baseZ);
+                this.position = new Vector3(baseX, baseY, baseZ);
+                this.size = size;
+                this.screenPos = new Vector2();
+                this.projectedZ = 0;
+            }
+            reset() {
+                this.position.x = this.basePosition.x;
+                this.position.y = this.basePosition.y;
+                this.position.z = this.basePosition.z;
+            }
+        }
+
+        class Camera {
+            constructor() {
+                this.position = new Vector3(0, 0, 0);
+                this.fov = 60;
+                this.focalLength = 1.0 / Math.tan((this.fov * 0.5) * Math.PI / 180.0);
+                this.near = 0.1;
+                this.far = 1000;
+            }
+            project(point, screenWidth, screenHeight) {
+                const camZ = this.position.z;
+                const dx = point.x - this.position.x;
+                const dy = point.y - this.position.y;
+                const dz = point.z - camZ;
+                if (dz < this.near) return null;
+                const scale = this.focalLength / dz;
+                const screenX = dx * scale * (screenWidth / 2) + screenWidth / 2;
+                const screenY = -dy * scale * (screenHeight / 2) + screenHeight / 2;
+                return { x: screenX, y: screenY, z: dz, scale: scale };
+            }
+            moveForward(speed) {
+                this.position.z += speed;
+            }
+        }
+
+        class SpiralAnimation {
+            constructor(canvas, welcomeElement) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.welcomeElement = welcomeElement;
+                this.particles = [];
+                this.camera = new Camera();
+                this.animationId = null;
+                this.animationStartTime = null;
+                this.animationDuration = 6000;
+                this.fadeOutDuration = 600;
+                this.holdDuration = 300;
+                this.totalDuration = this.animationDuration + this.holdDuration + this.fadeOutDuration;
+                this.isFinished = false;
+                this.fadeOutStartTime = null;
+                this.holdStartTime = null;
+                this.spiralLoops = 6;
+                this.spiralRadius = 4.5;
+                this.spiralHeight = 14.0;
+                this.particleCount = 2800;
+                this.baseSize = 1.8;
+                this.sizeVariation = 0.7;
+                this.textOpacity = 0;
+                this.textFadeInDelay = 1500;
+                this.textFadeInDuration = 800;
+                this.initParticles();
+                this.resize();
+                this.setupEventListeners();
+            }
+
+            initParticles() {
+                for (let i = 0; i < this.particleCount; i++) {
+                    const t = i / (this.particleCount - 1);
+                    const angle = t * Math.PI * 2 * this.spiralLoops;
+                    const radiusVar = 0.3 * Math.sin(t * 30) + 0.2;
+                    const radius = this.spiralRadius * (0.7 + t * 0.3) + (Math.random() - 0.5) * radiusVar;
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    const z = -t * this.spiralHeight + (Math.random() - 0.5) * 0.8;
+                    const size = this.baseSize + (Math.random() - 0.5) * this.sizeVariation;
+                    this.particles.push(new Particle(x, y, z, Math.max(0.6, size)));
+                }
+                this.camera.position.z = 2.5;
+                this.initialCameraZ = this.camera.position.z;
+                this.finalCameraZ = -this.spiralHeight - 2.0;
+            }
+
+            setupEventListeners() {
+                window.addEventListener('resize', () => this.resize());
+            }
+
+            resize() {
+                const dpr = window.devicePixelRatio || 1;
+                const displayWidth = window.innerWidth;
+                const displayHeight = window.innerHeight;
+                this.canvas.width = displayWidth * dpr;
+                this.canvas.height = displayHeight * dpr;
+                this.canvas.style.width = displayWidth + 'px';
+                this.canvas.style.height = displayHeight + 'px';
+                this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+                this.ctx.scale(dpr, dpr);
+                this.displayWidth = displayWidth;
+                this.displayHeight = displayHeight;
+                this.centerX = displayWidth / 2;
+                this.centerY = displayHeight / 2;
+            }
+
+            start() {
+                if (this.animationId) return;
+                this.animationStartTime = performance.now();
+                this.holdStartTime = null;
+                this.fadeOutStartTime = null;
+                this.isFinished = false;
+                this.textOpacity = 0;
+                this.welcomeElement.style.opacity = '0';
+                this.particles.forEach(p => p.reset());
+                this.camera.position.z = this.initialCameraZ;
+                this.animate(performance.now());
+            }
+
+            animate(timestamp) {
+                if (this.isFinished) return;
+                const elapsed = timestamp - this.animationStartTime;
+
+                if (elapsed < this.animationDuration) {
+                    this.updateAnimation(elapsed / this.animationDuration);
+                } else if (!this.holdStartTime) {
+                    this.holdStartTime = timestamp;
+                    this.updateAnimation(1.0);
+                } else if (elapsed < this.animationDuration + this.holdDuration + this.fadeOutDuration) {
+                    if (!this.fadeOutStartTime) {
+                        this.fadeOutStartTime = timestamp;
+                    }
+                    const fadeElapsed = timestamp - this.fadeOutStartTime;
+                    const fadeProgress = Math.min(1.0, fadeElapsed / this.fadeOutDuration);
+                    const easedFade = this.easeInOutQuad(fadeProgress);
+                    const canvasOpacity = 1.0 - easedFade;
+                    const textOpacity = Math.max(0, this.textOpacity - easedFade);
+                    
+                    this.ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
+                    if (canvasOpacity > 0.01) {
+                        this.ctx.globalAlpha = canvasOpacity;
+                        this.renderParticles(1.0);
+                        this.ctx.globalAlpha = 1.0;
+                    }
+                    this.welcomeElement.style.opacity = textOpacity;
+                } else {
+                    this.finish();
+                    return;
+                }
+
+                if (elapsed < this.animationDuration + this.holdDuration) {
+                    this.updateText(elapsed);
+                }
+
+                this.animationId = requestAnimationFrame((t) => this.animate(t));
+            }
+
+            updateAnimation(progress) {
+                const easedProgress = this.easeInOutCubic(progress);
+                const targetZ = this.initialCameraZ + (this.finalCameraZ - this.initialCameraZ) * easedProgress;
+                this.camera.position.z = targetZ;
+                const expansionFactor = 1.0 + progress * 0.5;
+                
+                this.particles.forEach(p => {
+                    p.position.x = p.basePosition.x * expansionFactor;
+                    p.position.y = p.basePosition.y * expansionFactor;
+                    p.position.z = p.basePosition.z;
+                });
+
+                this.ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
+                this.ctx.globalAlpha = 1.0;
+                this.renderParticles(progress);
+            }
+
+            renderParticles(progress) {
+                const ctx = this.ctx;
+                const particles = this.particles;
+                const cam = this.camera;
+                const w = this.displayWidth;
+                const h = this.displayHeight;
+
+                const projectedParticles = [];
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    const projected = cam.project(p.position, w, h);
+                    if (projected) {
+                        projectedParticles.push({
+                            x: projected.x,
+                            y: projected.y,
+                            z: projected.z,
+                            size: p.size * projected.scale * 0.9,
+                            originalSize: p.size
+                        });
+                    }
+                }
+
+                projectedParticles.sort((a, b) => b.z - a.z);
+
+                for (let i = 0; i < projectedParticles.length; i++) {
+                    const p = projectedParticles[i];
+                    const depthFade = Math.min(1.0, Math.max(0.2, 1.0 - (p.z / 18.0)));
+                    const brightness = 0.7 + (p.originalSize / (this.baseSize + this.sizeVariation)) * 0.3;
+                    const alpha = depthFade * brightness * 0.9;
+                    
+                    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, Math.max(0.4, p.size * 0.5), 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            updateText(elapsed) {
+                if (elapsed >= this.textFadeInDelay) {
+                    const fadeProgress = Math.min(1.0, (elapsed - this.textFadeInDelay) / this.textFadeInDuration);
+                    const easedFade = this.easeInOutQuad(fadeProgress);
+                    const breathPeriod = 3200;
+                    const breathPhase = (elapsed - this.textFadeInDelay) / breathPeriod;
+                    const breath = 0.7 + 0.3 * (0.5 + 0.5 * Math.sin(breathPhase * Math.PI * 2));
+                    this.textOpacity = easedFade * breath;
+                    this.welcomeElement.style.opacity = this.textOpacity;
+                }
+            }
+
+            finish() {
+                this.isFinished = true;
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+                this.ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
+                this.welcomeElement.style.opacity = '0';
+                showDashboard();
+            }
+
+            easeInOutQuad(t) {
+                return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+            }
+
+            easeInOutCubic(t) {
+                return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+            }
+        }
+
+        function showDashboard() {
+            const loadingScreen = document.getElementById('loading-screen');
+            const dashboard = document.getElementById('dashboard');
+            
+            loadingScreen.classList.add('fade-out');
+            
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                dashboard.classList.add('visible');
+                loadDashboard();
+            }, 600);
+        }
+
+        // ===== DASHBOARD SCRIPTS =====
+        if (!localStorage.getItem('token')) window.location.href = '/';
+
         var blobs = document.querySelectorAll('.blob');
         document.addEventListener('mousemove', function(e) {
             var x = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -554,240 +663,172 @@
             });
         });
 
-        // Loading sequence
-        function showLoading() {
-            var loadingScreen = document.getElementById('loadingScreen');
-            var loadingBar = document.getElementById('loadingBar');
-            var loadingStatus = document.getElementById('loadingStatus');
-            var appContainer = document.getElementById('appContainer');
-            
-            // Simulate loading progress
-            var progress = 0;
-            var statusMessages = [
-                'INITIALIZING',
-                'CONNECTING TO DATABASE',
-                'FETCHING ANALYTICS',
-                'RENDERING DASHBOARD',
-                'COMPLETE'
-            ];
-            
-            var interval = setInterval(function() {
-                progress += Math.random() * 30;
-                if (progress > 100) progress = 100;
-                
-                loadingBar.style.width = progress + '%';
-                
-                var statusIndex = Math.floor(progress / 25);
-                if (statusIndex < statusMessages.length) {
-                    loadingStatus.innerHTML = statusMessages[statusIndex] + '<span class="loading-dots"></span>';
-                }
-                
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    setTimeout(function() {
-                        loadingScreen.classList.add('hidden');
-                        appContainer.classList.add('visible');
-                        loadDashboard();
-                    }, 500);
-                }
-            }, 500);
-        }
-
-        function createVerticalBarChart(data, containerId, primaryClass, secondaryClass) {
+        function createLineChart(containerId, data, colors) {
             var container = document.getElementById(containerId);
             if (!container) return;
-            
-            var maxValue = Math.max(data[0].value, data[1].value, 1);
-            var chartHeight = 160;
-            
-            var chartDiv = document.createElement('div');
-            chartDiv.style.cssText = 'position:relative;width:100%;height:100%;display:flex;align-items:flex-end;justify-content:center;';
-            
-            // Grid lines
-            var gridDiv = document.createElement('div');
-            gridDiv.className = 'chart-grid';
-            for (var i = 0; i < 4; i++) {
-                var line = document.createElement('div');
-                line.className = 'grid-line';
-                var label = document.createElement('span');
-                label.className = 'grid-label';
-                label.textContent = Math.round(maxValue * (i + 1) / 4);
-                line.appendChild(label);
-                gridDiv.appendChild(line);
-            }
-            
-            // Bars container
-            var barsContainer = document.createElement('div');
-            barsContainer.className = 'bar-chart-vertical';
-            
-            // Create bar groups for each category
-            var categories = [data[0], data[1]];
-            var colors = [
-                [primaryClass, secondaryClass],
-                [primaryClass, secondaryClass]
-            ];
-            
-            categories.forEach(function(cat, catIndex) {
-                var barGroup = document.createElement('div');
-                barGroup.className = 'bar-group';
-                barGroup.style.position = 'relative';
-                
-                // Primary bar (taller, lighter color)
-                var primaryBar = document.createElement('div');
-                primaryBar.className = 'bar-item ' + primaryClass;
-                primaryBar.style.height = (cat.value / maxValue * chartHeight) + 'px';
-                
-                var tooltip = document.createElement('div');
-                tooltip.className = 'bar-tooltip';
-                tooltip.textContent = cat.value;
-                primaryBar.appendChild(tooltip);
-                
-                // Secondary bar (shorter, darker color)
-                var secondaryValue = cat.value * 0.4; // 40% of primary for secondary effect
-                var secondaryBar = document.createElement('div');
-                secondaryBar.className = 'bar-item ' + secondaryClass;
-                secondaryBar.style.height = (secondaryValue / maxValue * chartHeight) + 'px';
-                
-                barGroup.appendChild(primaryBar);
-                barGroup.appendChild(secondaryBar);
-                
-                // Label
-                var labelDiv = document.createElement('div');
-                labelDiv.className = 'bar-label-group';
-                labelDiv.innerHTML = '<span class="bar-label-item">' + cat.name + '</span>';
-                
-                barGroup.appendChild(labelDiv);
-                barsContainer.appendChild(barGroup);
-            });
-            
-            chartDiv.appendChild(gridDiv);
-            chartDiv.appendChild(barsContainer);
-            container.innerHTML = '';
-            container.appendChild(chartDiv);
-        }
 
-        function createDonutChart(data, containerId) {
-            var container = document.getElementById(containerId);
-            if (!container) return;
-            
-            var total = data.reduce(function(sum, item) { return sum + item.value; }, 0) || 1;
-            
-            var containerDiv = document.createElement('div');
-            containerDiv.className = 'donut-chart-container';
-            
-            // SVG Donut
+            var width = container.offsetWidth || 400;
+            var height = 180;
+            var padding = { top: 20, right: 20, bottom: 30, left: 40 };
+            var chartWidth = width - padding.left - padding.right;
+            var chartHeight = height - padding.top - padding.bottom;
+
+            var allValues = data.flatMap(function(series) { return series.data; });
+            var maxValue = Math.max.apply(null, allValues.length > 0 ? allValues : [1]);
+            var minValue = Math.min.apply(null, allValues.length > 0 ? allValues : [0]);
+            var valueRange = maxValue - minValue || 1;
+
             var svgNS = "http://www.w3.org/2000/svg";
             var svg = document.createElementNS(svgNS, "svg");
-            svg.setAttribute("width", "140");
-            svg.setAttribute("height", "140");
-            svg.setAttribute("viewBox", "0 0 140 140");
-            svg.className = 'donut-svg';
-            
-            var centerX = 70, centerY = 70, radius = 55;
-            var circumference = 2 * Math.PI * radius;
-            var offset = -Math.PI / 2; // Start from top
-            
-            var colors = [
-                { main: 'rgba(255,255,255,0.8)', glow: 'rgba(255,255,255,0.3)' },
-                { main: 'rgba(88,101,242,0.6)', glow: 'rgba(88,101,242,0.2)' }
-            ];
-            
-            data.forEach(function(item, index) {
-                if (item.value === 0) return;
-                
-                var percentage = item.value / total;
-                var dashLength = circumference * percentage;
-                
-                // Glow circle (background)
-                var glowCircle = document.createElementNS(svgNS, "circle");
-                glowCircle.setAttribute("cx", centerX);
-                glowCircle.setAttribute("cy", centerY);
-                glowCircle.setAttribute("r", radius);
-                glowCircle.setAttribute("fill", "none");
-                glowCircle.setAttribute("stroke", colors[index].glow);
-                glowCircle.setAttribute("stroke-width", "12");
-                glowCircle.setAttribute("stroke-dasharray", dashLength + " " + (circumference - dashLength));
-                glowCircle.setAttribute("stroke-dashoffset", -offset * radius + circumference * 0.25);
-                glowCircle.setAttribute("stroke-linecap", "round");
-                
-                // Main circle
-                var circle = document.createElementNS(svgNS, "circle");
-                circle.setAttribute("cx", centerX);
-                circle.setAttribute("cy", centerY);
-                circle.setAttribute("r", radius);
-                circle.setAttribute("fill", "none");
-                circle.setAttribute("stroke", colors[index].main);
-                circle.setAttribute("stroke-width", "8");
-                circle.setAttribute("stroke-dasharray", dashLength + " " + (circumference - dashLength));
-                circle.setAttribute("stroke-dashoffset", -offset * radius + circumference * 0.25);
-                circle.setAttribute("stroke-linecap", "round");
-                circle.style.transition = "all 1.5s cubic-bezier(0.25, 0.8, 0.25, 1)";
-                
-                offset += (percentage * 2 * Math.PI);
-                
-                svg.appendChild(glowCircle);
-                svg.appendChild(circle);
+            svg.setAttribute("viewBox", "0 0 " + width + " " + height);
+            svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+            var gridLines = 4;
+            for (var i = 0; i <= gridLines; i++) {
+                var y = padding.top + (chartHeight / gridLines) * i;
+                var gridLine = document.createElementNS(svgNS, "line");
+                gridLine.setAttribute("x1", padding.left);
+                gridLine.setAttribute("y1", y);
+                gridLine.setAttribute("x2", width - padding.right);
+                gridLine.setAttribute("y2", y);
+                gridLine.setAttribute("class", "grid-line");
+                svg.appendChild(gridLine);
+
+                var label = document.createElementNS(svgNS, "text");
+                label.setAttribute("x", padding.left - 8);
+                label.setAttribute("y", y + 4);
+                label.setAttribute("text-anchor", "end");
+                label.setAttribute("fill", "rgba(255,255,255,0.2)");
+                label.setAttribute("font-size", "8");
+                label.setAttribute("font-family", "Space Mono, monospace");
+                label.textContent = Math.round(maxValue - (valueRange / gridLines) * i);
+                svg.appendChild(label);
+            }
+
+            data.forEach(function(series, seriesIndex) {
+                var points = series.data.map(function(value, index) {
+                    var x = padding.left + (chartWidth / (series.data.length - 1 || 1)) * index;
+                    var y = padding.top + chartHeight - ((value - minValue) / valueRange) * chartHeight;
+                    return { x: x, y: y, value: value };
+                });
+
+                var gradientId = 'gradient-' + containerId + '-' + seriesIndex;
+                var defs = document.createElementNS(svgNS, "defs");
+                var gradient = document.createElementNS(svgNS, "linearGradient");
+                gradient.setAttribute("id", gradientId);
+                gradient.setAttribute("x1", "0");
+                gradient.setAttribute("y1", "0");
+                gradient.setAttribute("x2", "0");
+                gradient.setAttribute("y2", "1");
+
+                var stop1 = document.createElementNS(svgNS, "stop");
+                stop1.setAttribute("offset", "0%");
+                stop1.setAttribute("stop-color", colors[seriesIndex]);
+                stop1.setAttribute("stop-opacity", "0.3");
+
+                var stop2 = document.createElementNS(svgNS, "stop");
+                stop2.setAttribute("offset", "100%");
+                stop2.setAttribute("stop-color", colors[seriesIndex]);
+                stop2.setAttribute("stop-opacity", "0.02");
+
+                gradient.appendChild(stop1);
+                gradient.appendChild(stop2);
+                defs.appendChild(gradient);
+                svg.appendChild(defs);
+
+                var linePath = document.createElementNS(svgNS, "path");
+                var d = points.map(function(p, i) {
+                    return (i === 0 ? 'M' : 'L') + ' ' + p.x + ',' + p.y;
+                }).join(' ');
+                linePath.setAttribute("d", d);
+                linePath.setAttribute("fill", "none");
+                linePath.setAttribute("stroke", colors[seriesIndex]);
+                linePath.setAttribute("stroke-width", "2");
+                linePath.setAttribute("stroke-linecap", "round");
+                linePath.setAttribute("stroke-linejoin", "round");
+                linePath.style.filter = 'drop-shadow(0 0 6px ' + colors[seriesIndex] + ')';
+                svg.appendChild(linePath);
+
+                var areaPath = document.createElementNS(svgNS, "path");
+                var areaD = d + ' L ' + points[points.length - 1].x + ',' + (padding.top + chartHeight) + 
+                           ' L ' + points[0].x + ',' + (padding.top + chartHeight) + ' Z';
+                areaPath.setAttribute("d", areaD);
+                areaPath.setAttribute("fill", 'url(#' + gradientId + ')');
+                svg.appendChild(areaPath);
+
+                points.forEach(function(point) {
+                    var circle = document.createElementNS(svgNS, "circle");
+                    circle.setAttribute("cx", point.x);
+                    circle.setAttribute("cy", point.y);
+                    circle.setAttribute("r", "4");
+                    circle.setAttribute("fill", colors[seriesIndex]);
+                    circle.setAttribute("stroke", "#000");
+                    circle.setAttribute("stroke-width", "1.5");
+                    circle.setAttribute("class", "data-point");
+                    circle.style.filter = 'drop-shadow(0 0 4px ' + colors[seriesIndex] + ')';
+
+                    var title = document.createElementNS(svgNS, "title");
+                    title.textContent = series.name + ': ' + point.value;
+                    circle.appendChild(title);
+
+                    svg.appendChild(circle);
+                });
             });
+
+            if (data[0] && data[0].data.length > 0) {
+                var labels = data[0].labels || data[0].data.map(function(_, i) { return 'P' + (i + 1); });
+                labels.forEach(function(label, index) {
+                    var x = padding.left + (chartWidth / (labels.length - 1 || 1)) * index;
+                    var text = document.createElementNS(svgNS, "text");
+                    text.setAttribute("x", x);
+                    text.setAttribute("y", height - 5);
+                    text.setAttribute("text-anchor", "middle");
+                    text.setAttribute("fill", "rgba(255,255,255,0.3)");
+                    text.setAttribute("font-size", "8");
+                    text.setAttribute("font-family", "Space Mono, monospace");
+                    text.textContent = label;
+                    svg.appendChild(text);
+                });
+            }
+
+            container.innerHTML = '';
             
-            // Center text
-            var centerText = document.createElementNS(svgNS, "text");
-            centerText.setAttribute("x", centerX);
-            centerText.setAttribute("y", centerY);
-            centerText.setAttribute("text-anchor", "middle");
-            centerText.setAttribute("dominant-baseline", "middle");
-            centerText.setAttribute("fill", "white");
-            centerText.setAttribute("font-size", "28");
-            centerText.setAttribute("font-weight", "800");
-            centerText.setAttribute("font-family", "Inter, sans-serif");
-            centerText.setAttribute("letter-spacing", "-1");
-            centerText.textContent = total;
-            
-            var totalLabel = document.createElementNS(svgNS, "text");
-            totalLabel.setAttribute("x", centerX);
-            totalLabel.setAttribute("y", centerY + 18);
-            totalLabel.setAttribute("text-anchor", "middle");
-            totalLabel.setAttribute("dominant-baseline", "middle");
-            totalLabel.setAttribute("fill", "rgba(255,255,255,0.4)");
-            totalLabel.setAttribute("font-size", "8");
-            totalLabel.setAttribute("font-family", "Space Mono, monospace");
-            totalLabel.setAttribute("letter-spacing", "1");
-            totalLabel.textContent = "TOTAL";
-            
-            svg.appendChild(centerText);
-            svg.appendChild(totalLabel);
-            
-            // Legend
+            var chartDiv = document.createElement('div');
+            chartDiv.className = 'line-chart';
+            chartDiv.appendChild(svg);
+
             var legendDiv = document.createElement('div');
-            legendDiv.className = 'donut-legend';
-            
-            data.forEach(function(item, index) {
+            legendDiv.className = 'chart-legend';
+            data.forEach(function(series, index) {
                 var legendItem = document.createElement('div');
                 legendItem.className = 'legend-item';
                 
                 var dot = document.createElement('div');
                 dot.className = 'legend-dot';
-                dot.style.background = colors[index].main;
+                dot.style.backgroundColor = colors[index];
+                dot.style.color = colors[index];
                 
-                var name = document.createElement('span');
-                name.textContent = item.name;
-                
-                var value = document.createElement('span');
-                value.className = 'legend-value';
-                value.textContent = item.value;
+                var span = document.createElement('span');
+                span.textContent = series.name;
                 
                 legendItem.appendChild(dot);
-                legendItem.appendChild(name);
-                legendItem.appendChild(value);
+                legendItem.appendChild(span);
                 legendDiv.appendChild(legendItem);
             });
-            
-            containerDiv.appendChild(svg);
-            containerDiv.appendChild(legendDiv);
-            container.innerHTML = '';
-            container.appendChild(containerDiv);
+
+            var wrapper = document.createElement('div');
+            wrapper.style.width = '100%';
+            wrapper.appendChild(chartDiv);
+            wrapper.appendChild(legendDiv);
+            container.appendChild(wrapper);
         }
 
-        async function loadDashboard() {
+        function loadDashboard() {
+            load();
+            setInterval(load, 30000);
+        }
+
+        async function load() {
             try {
                 var sr = await fetch('/api/status', { 
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
@@ -799,95 +840,91 @@
                 var sd = await sr.json(); 
                 var s = sd.stats || sd;
                 
-                // Update stat cards with animation
-                animateValue('tickets', s.ticketsAtivos || 0);
-                animateValue('warns', s.warns || 0);
-                animateValue('pendings', s.pendentes || 0);
+                document.getElementById('tickets').textContent = s.ticketsAtivos || 0;
+                document.getElementById('warns').textContent = s.warns || 0;
+                document.getElementById('pendings').textContent = s.pendentes || 0;
 
                 var cd;
                 try { 
                     cd = await cr.json(); 
                 } catch (e) {
                     cd = { 
-                        tickets: { ativos: s.ticketsAtivos||0, fechados:0 }, 
-                        warns: { hoje:s.warns||0, semana:0 }, 
-                        pendings: { ativas:s.pendentes||0, concluidas:0 }, 
-                        activity: { mensagens:0, comandos:0 } 
+                        tickets: { ativos: s.ticketsAtivos||0, fechados:0, historico:[] }, 
+                        warns: { hoje:s.warns||0, semana:0, historico:[] }, 
+                        pendings: { ativas:s.pendentes||0, concluidas:0, historico:[] }, 
+                        activity: { mensagens:0, comandos:0, historico:[] } 
                     };
                 }
                 
                 renderCharts(cd);
-                
-                // Set up periodic refresh
-                setInterval(async function() {
-                    try {
-                        var refreshRes = await fetch('/api/status', { 
-                            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
-                        });
-                        var refreshData = await refreshRes.json();
-                        var rs = refreshData.stats || refreshData;
-                        
-                        document.getElementById('tickets').textContent = rs.ticketsAtivos || 0;
-                        document.getElementById('warns').textContent = rs.warns || 0;
-                        document.getElementById('pendings').textContent = rs.pendentes || 0;
-                    } catch (e) {
-                        console.error('Refresh error:', e);
-                    }
-                }, 30000);
-                
             } catch (e) {
-                console.error('Error loading dashboard:', e);
+                console.error('Error loading data:', e);
                 document.getElementById('tickets').textContent = '—';
                 document.getElementById('warns').textContent = '—';
                 document.getElementById('pendings').textContent = '—';
             }
         }
 
-        function animateValue(elementId, finalValue) {
-            var element = document.getElementById(elementId);
-            var startValue = 0;
-            var duration = 1000;
-            var startTime = null;
-            
-            function animation(currentTime) {
-                if (!startTime) startTime = currentTime;
-                var progress = (currentTime - startTime) / duration;
-                
-                if (progress < 1) {
-                    element.textContent = Math.floor(progress * finalValue);
-                    requestAnimationFrame(animation);
-                } else {
-                    element.textContent = finalValue;
-                }
-            }
-            
-            requestAnimationFrame(animation);
-        }
-
         function renderCharts(d) {
-            // Tickets - vertical bars with blue theme
-            createVerticalBarChart([
-                {name: 'Active', value: d.tickets.ativos || 0},
-                {name: 'Closed', value: d.tickets.fechados || 0}
-            ], 'chart-tickets', 'primary', 'secondary');
-            
-            // Warns - vertical bars with red theme
-            createVerticalBarChart([
-                {name: 'Today', value: d.warns.hoje || 0},
-                {name: 'Week', value: d.warns.semana || 0}
-            ], 'chart-warns', 'warn-primary', 'warn-secondary');
-            
-            // Pending tasks - donut chart
-            createDonutChart([
-                {name: 'Active', value: d.pendings.ativas || 0},
-                {name: 'Done', value: d.pendings.concluidas || 0}
-            ], 'chart-pendings');
-            
-            // Activity - vertical bars with white theme
-            createVerticalBarChart([
-                {name: 'Msgs', value: d.activity.mensagens || 0},
-                {name: 'Cmds', value: d.activity.comandos || 0}
-            ], 'chart-activity', 'white-primary', 'white-secondary');
+            var ticketsHistory = d.tickets.historico || [];
+            var ticketsData = [
+                {
+                    name: 'Active',
+                    data: ticketsHistory.length > 0 ? ticketsHistory.map(function(h) { return h.ativos || 0; }) : [d.tickets.ativos || 0, Math.max(0, (d.tickets.ativos || 0) - 2)],
+                    labels: ticketsHistory.length > 0 ? ticketsHistory.map(function(h) { return h.data || ''; }) : ['Now', 'Prev']
+                },
+                {
+                    name: 'Closed',
+                    data: ticketsHistory.length > 0 ? ticketsHistory.map(function(h) { return h.fechados || 0; }) : [d.tickets.fechados || 0, Math.max(0, (d.tickets.fechados || 0) + 1)],
+                    labels: ticketsHistory.length > 0 ? ticketsHistory.map(function(h) { return h.data || ''; }) : ['Now', 'Prev']
+                }
+            ];
+            createLineChart('chart-tickets', ticketsData, ['#5865F2', 'rgba(88,101,242,0.3)']);
+
+            var warnsHistory = d.warns.historico || [];
+            var warnsData = [
+                {
+                    name: 'Today',
+                    data: warnsHistory.length > 0 ? warnsHistory.map(function(h) { return h.hoje || 0; }) : [d.warns.hoje || 0, Math.max(0, (d.warns.hoje || 0) - 1)],
+                    labels: warnsHistory.length > 0 ? warnsHistory.map(function(h) { return h.data || ''; }) : ['Now', 'Prev']
+                },
+                {
+                    name: 'Week',
+                    data: warnsHistory.length > 0 ? warnsHistory.map(function(h) { return h.semana || 0; }) : [d.warns.semana || 0, Math.max(0, (d.warns.semana || 0) - 2)],
+                    labels: warnsHistory.length > 0 ? warnsHistory.map(function(h) { return h.data || ''; }) : ['Now', 'Prev']
+                }
+            ];
+            createLineChart('chart-warns', warnsData, ['#ff6b6b', 'rgba(255,107,107,0.3)']);
+
+            var pendingsHistory = d.pendings.historico || [];
+            var pendingsData = [
+                {
+                    name: 'Active',
+                    data: pendingsHistory.length > 0 ? pendingsHistory.map(function(h) { return h.ativas || 0; }) : [d.pendings.ativas || 0, Math.max(0, (d.pendings.ativas || 0) - 1)],
+                    labels: pendingsHistory.length > 0 ? pendingsHistory.map(function(h) { return h.data || ''; }) : ['Now', 'Prev']
+                },
+                {
+                    name: 'Done',
+                    data: pendingsHistory.length > 0 ? pendingsHistory.map(function(h) { return h.concluidas || 0; }) : [d.pendings.concluidas || 0, Math.max(0, (d.pendings.concluidas || 0) + 2)],
+                    labels: pendingsHistory.length > 0 ? pendingsHistory.map(function(h) { return h.data || ''; }) : ['Now', 'Prev']
+                }
+            ];
+            createLineChart('chart-pendings', pendingsData, ['#ffffff', 'rgba(255,255,255,0.3)']);
+
+            var activityHistory = d.activity.historico || [];
+            var activityData = [
+                {
+                    name: 'Messages',
+                    data: activityHistory.length > 0 ? activityHistory.map(function(h) { return h.mensagens || 0; }) : [d.activity.mensagens || 0, Math.max(0, (d.activity.mensagens || 0) - 5)],
+                    labels: activityHistory.length > 0 ? activityHistory.map(function(h) { return h.data || ''; }) : ['Now', 'Prev']
+                },
+                {
+                    name: 'Commands',
+                    data: activityHistory.length > 0 ? activityHistory.map(function(h) { return h.comandos || 0; }) : [d.activity.comandos || 0, Math.max(0, (d.activity.comandos || 0) - 2)],
+                    labels: activityHistory.length > 0 ? activityHistory.map(function(h) { return h.data || ''; }) : ['Now', 'Prev']
+                }
+            ];
+            createLineChart('chart-activity', activityData, ['#5865F2', 'rgba(88,101,242,0.3)']);
         }
 
         window.logout = function() { 
@@ -895,8 +932,20 @@
             window.location.href = '/'; 
         };
 
-        // Start the application
-        showLoading();
+        window.addEventListener('resize', function() {
+            load();
+        });
+
+        // ===== INICIAR ANIMAÇÃO DE LOADING =====
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('loading-canvas');
+            const welcomeElement = document.getElementById('welcome-text');
+            
+            if (canvas && welcomeElement) {
+                const animation = new SpiralAnimation(canvas, welcomeElement);
+                animation.start();
+            }
+        });
     </script>
 </body>
 </html>
