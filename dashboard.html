@@ -14,6 +14,9 @@
             --card-hover: rgba(255,255,255,0.06);
             --accent: #ffffff;
             --accent-blue: rgba(88,101,242,0.6);
+            --accent-blue-light: rgba(88,101,242,0.3);
+            --accent-red: #ff6b6b;
+            --accent-red-light: rgba(255,107,107,0.3);
             --text: #ffffff;
             --text-dim: rgba(255,255,255,0.5);
             --text-tertiary: rgba(255,255,255,0.25);
@@ -34,6 +37,107 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .loading-title {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 0.9;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .loading-bar-container {
+            width: 200px;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .loading-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), rgba(88,101,242,0.8), var(--accent-blue));
+            background-size: 200% 100%;
+            animation: loadingShimmer 1.5s ease-in-out infinite;
+            border-radius: 2px;
+            width: 60%;
+        }
+
+        .loading-status {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: var(--text-tertiary);
+            margin-top: 20px;
+            letter-spacing: 2px;
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+
+        .loading-dots {
+            display: inline-block;
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes loadingShimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* Main Stage */
         .stage {
             position: fixed;
             width: 100%;
@@ -68,6 +172,7 @@
             0%,100%{transform:translate(0,0) scale(1)} 20%{transform:translate(80px,40px) scale(1.1)} 40%{transform:translate(-50px,-60px) scale(0.9)} 60%{transform:translate(30px,80px) scale(1.15)} 80%{transform:translate(-70px,-30px) scale(0.95)}
         }
 
+        /* Main App */
         .app-container {
             position: relative;
             z-index: 10;
@@ -76,6 +181,12 @@
             width: 100vw;
             padding: 24px;
             gap: 24px;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .app-container.visible {
+            opacity: 1;
         }
 
         .sidebar { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
@@ -91,6 +202,7 @@
         .stat-card {
             background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
             padding: 22px 24px; transition: all 0.5s cubic-bezier(0.25,0.8,0.25,1.2); cursor: default;
+            backdrop-filter: blur(10px);
         }
         .stat-card:hover { background: var(--card-hover); border-color: var(--border-hover); transform: translateX(6px); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
 
@@ -101,7 +213,7 @@
 
         .stat-card-value { font-size: 48px; font-weight: 800; letter-spacing: -2px; line-height: 1; }
         .stat-card-value.accent-blue { color: var(--accent-blue); }
-        .stat-card-value.accent-red { color: #ff6b6b; }
+        .stat-card-value.accent-red { color: var(--accent-red); }
         .stat-card-value.accent-white { color: var(--text); }
 
         .stat-card-detail {
@@ -133,6 +245,7 @@
         .chart-panel {
             background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
             padding: 20px 22px; transition: all 0.3s;
+            backdrop-filter: blur(10px);
         }
         .chart-panel:hover { border-color: var(--border-hover); background: var(--card-hover); }
 
@@ -141,21 +254,196 @@
             letter-spacing: 2px; color: var(--text-dim); margin-bottom: 14px;
         }
 
-        .chart-inner { min-height: 160px; display: flex; align-items: center; justify-content: center; }
+        .chart-inner { 
+            min-height: 200px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            position: relative;
+        }
 
-        .loading-pulse { animation: pulse 2s ease-in-out infinite; color: var(--text-dim); font-family: 'Space Mono', monospace; font-size: 10px; }
+        .loading-pulse { 
+            animation: pulse 2s ease-in-out infinite; 
+            color: var(--text-dim); 
+            font-family: 'Space Mono', monospace; 
+            font-size: 10px; 
+        }
         @keyframes pulse { 0%,100%{opacity:0.2} 50%{opacity:0.6} }
 
-        /* Simple bar styles */
-        .simple-chart { display: flex; gap: 8px; align-items: flex-end; height: 100%; width: 100%; padding: 10px 0; }
-        .bar-container { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; }
-        .bar-wrapper { flex: 1; width: 100%; display: flex; align-items: flex-end; justify-content: center; position: relative; }
-        .bar { width: 40px; border-radius: 4px 4px 0 0; transition: height 0.8s cubic-bezier(0.25,0.8,0.25,1); position: relative; min-height: 4px; }
-        .bar.accent-blue { background: rgba(88,101,242,0.6); }
-        .bar.accent-red { background: #ff6b6b; }
-        .bar.accent-white { background: rgba(255,255,255,0.8); }
-        .bar-label { font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.4); text-align: center; }
-        .bar-value { font-family: 'Space Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.7); }
+        /* Chart Styles */
+        .bar-chart-vertical {
+            display: flex;
+            gap: 30px;
+            align-items: flex-end;
+            height: 180px;
+            width: 100%;
+            padding: 10px 20px;
+            position: relative;
+        }
+
+        .bar-group {
+            flex: 1;
+            display: flex;
+            gap: 6px;
+            align-items: flex-end;
+            justify-content: center;
+            height: 100%;
+            position: relative;
+        }
+
+        .bar-item {
+            width: 40px;
+            border-radius: 4px 4px 0 0;
+            transition: height 1s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            cursor: pointer;
+            min-width: 30px;
+        }
+
+        .bar-item:hover {
+            filter: brightness(1.3);
+            transform: scaleY(1.02);
+            transform-origin: bottom;
+        }
+
+        .bar-item.primary {
+            background: linear-gradient(180deg, var(--accent-blue) 0%, rgba(88,101,242,0.4) 100%);
+            box-shadow: 0 0 15px rgba(88,101,242,0.3);
+        }
+
+        .bar-item.secondary {
+            background: linear-gradient(180deg, rgba(88,101,242,0.3) 0%, rgba(88,101,242,0.1) 100%);
+            box-shadow: 0 0 10px rgba(88,101,242,0.15);
+        }
+
+        .bar-item.warn-primary {
+            background: linear-gradient(180deg, var(--accent-red) 0%, rgba(255,107,107,0.4) 100%);
+            box-shadow: 0 0 15px rgba(255,107,107,0.3);
+        }
+
+        .bar-item.warn-secondary {
+            background: linear-gradient(180deg, rgba(255,107,107,0.3) 0%, rgba(255,107,107,0.1) 100%);
+            box-shadow: 0 0 10px rgba(255,107,107,0.15);
+        }
+
+        .bar-item.white-primary {
+            background: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.3) 100%);
+            box-shadow: 0 0 15px rgba(255,255,255,0.2);
+        }
+
+        .bar-item.white-secondary {
+            background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%);
+            box-shadow: 0 0 10px rgba(255,255,255,0.1);
+        }
+
+        .bar-item .bar-tooltip {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-family: 'Space Mono', monospace;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .bar-item:hover .bar-tooltip {
+            opacity: 1;
+        }
+
+        .bar-label-group {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-top: 10px;
+            position: absolute;
+            bottom: -25px;
+            width: 100%;
+        }
+
+        .bar-label-item {
+            font-family: 'Space Mono', monospace;
+            font-size: 8px;
+            color: rgba(255,255,255,0.4);
+            text-align: center;
+            width: 40px;
+        }
+
+        .chart-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 25px;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 0;
+            pointer-events: none;
+        }
+
+        .grid-line {
+            flex: 1;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            position: relative;
+        }
+
+        .grid-label {
+            position: absolute;
+            left: -25px;
+            top: -7px;
+            font-family: 'Space Mono', monospace;
+            font-size: 8px;
+            color: rgba(255,255,255,0.2);
+            text-align: right;
+            width: 20px;
+        }
+
+        /* Donut Chart */
+        .donut-chart-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            width: 100%;
+            position: relative;
+        }
+
+        .donut-svg {
+            filter: drop-shadow(0 0 10px rgba(88,101,242,0.3));
+        }
+
+        .donut-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+        }
+
+        .legend-value {
+            margin-left: auto;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+        }
 
         @media (max-width: 1024px) {
             .app-container { flex-direction: column; overflow-y: auto; }
@@ -163,6 +451,7 @@
             .stat-card { flex: 1; min-width: 120px; padding: 16px; }
             .stat-card-value { font-size: 28px; }
             .charts-grid { grid-template-columns: 1fr; }
+            .bar-item { width: 30px; min-width: 25px; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -173,6 +462,21 @@
 </head>
 <body>
 
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-logo">System Node: HV-DASH</div>
+            <div class="loading-title">HOST<br/>VILLE</div>
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loadingBar"></div>
+            </div>
+            <div class="loading-status" id="loadingStatus">
+                INITIALIZING<span class="loading-dots"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Blobs -->
     <div class="stage">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
@@ -182,7 +486,8 @@
         <div class="blob blob-6"></div>
     </div>
 
-    <div class="app-container">
+    <!-- Main App -->
+    <div class="app-container" id="appContainer">
         <aside class="sidebar">
             <div class="sidebar-header">
                 <span class="brand-id">System Node: HV-DASH</span>
@@ -234,49 +539,129 @@
     </div>
 
     <script>
-        if (!localStorage.getItem('token')) window.location.href = '/';
+        // Check authentication
+        if (!localStorage.getItem('token')) {
+            window.location.href = '/';
+        }
 
+        // Blob animation
         var blobs = document.querySelectorAll('.blob');
         document.addEventListener('mousemove', function(e) {
             var x = (e.clientX / window.innerWidth - 0.5) * 2;
             var y = (e.clientY / window.innerHeight - 0.5) * 2;
-            blobs.forEach(function(b, i) { b.style.transform = 'translate(' + x*(i+1)*10 + 'px, ' + y*(i+1)*10 + 'px)'; });
+            blobs.forEach(function(b, i) { 
+                b.style.transform = 'translate(' + x*(i+1)*10 + 'px, ' + y*(i+1)*10 + 'px)'; 
+            });
         });
 
-        function createSimpleBarChart(data, containerId, barColor) {
+        // Loading sequence
+        function showLoading() {
+            var loadingScreen = document.getElementById('loadingScreen');
+            var loadingBar = document.getElementById('loadingBar');
+            var loadingStatus = document.getElementById('loadingStatus');
+            var appContainer = document.getElementById('appContainer');
+            
+            // Simulate loading progress
+            var progress = 0;
+            var statusMessages = [
+                'INITIALIZING',
+                'CONNECTING TO DATABASE',
+                'FETCHING ANALYTICS',
+                'RENDERING DASHBOARD',
+                'COMPLETE'
+            ];
+            
+            var interval = setInterval(function() {
+                progress += Math.random() * 30;
+                if (progress > 100) progress = 100;
+                
+                loadingBar.style.width = progress + '%';
+                
+                var statusIndex = Math.floor(progress / 25);
+                if (statusIndex < statusMessages.length) {
+                    loadingStatus.innerHTML = statusMessages[statusIndex] + '<span class="loading-dots"></span>';
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(function() {
+                        loadingScreen.classList.add('hidden');
+                        appContainer.classList.add('visible');
+                        loadDashboard();
+                    }, 500);
+                }
+            }, 500);
+        }
+
+        function createVerticalBarChart(data, containerId, primaryClass, secondaryClass) {
             var container = document.getElementById(containerId);
             if (!container) return;
             
-            var maxValue = Math.max(...data.map(d => d.value), 1);
-            var chartDiv = document.createElement('div');
-            chartDiv.className = 'simple-chart';
+            var maxValue = Math.max(data[0].value, data[1].value, 1);
+            var chartHeight = 160;
             
-            data.forEach(function(item) {
-                var barContainer = document.createElement('div');
-                barContainer.className = 'bar-container';
+            var chartDiv = document.createElement('div');
+            chartDiv.style.cssText = 'position:relative;width:100%;height:100%;display:flex;align-items:flex-end;justify-content:center;';
+            
+            // Grid lines
+            var gridDiv = document.createElement('div');
+            gridDiv.className = 'chart-grid';
+            for (var i = 0; i < 4; i++) {
+                var line = document.createElement('div');
+                line.className = 'grid-line';
+                var label = document.createElement('span');
+                label.className = 'grid-label';
+                label.textContent = Math.round(maxValue * (i + 1) / 4);
+                line.appendChild(label);
+                gridDiv.appendChild(line);
+            }
+            
+            // Bars container
+            var barsContainer = document.createElement('div');
+            barsContainer.className = 'bar-chart-vertical';
+            
+            // Create bar groups for each category
+            var categories = [data[0], data[1]];
+            var colors = [
+                [primaryClass, secondaryClass],
+                [primaryClass, secondaryClass]
+            ];
+            
+            categories.forEach(function(cat, catIndex) {
+                var barGroup = document.createElement('div');
+                barGroup.className = 'bar-group';
+                barGroup.style.position = 'relative';
                 
-                var barValue = document.createElement('div');
-                barValue.className = 'bar-value';
-                barValue.textContent = item.value;
+                // Primary bar (taller, lighter color)
+                var primaryBar = document.createElement('div');
+                primaryBar.className = 'bar-item ' + primaryClass;
+                primaryBar.style.height = (cat.value / maxValue * chartHeight) + 'px';
                 
-                var barWrapper = document.createElement('div');
-                barWrapper.className = 'bar-wrapper';
+                var tooltip = document.createElement('div');
+                tooltip.className = 'bar-tooltip';
+                tooltip.textContent = cat.value;
+                primaryBar.appendChild(tooltip);
                 
-                var bar = document.createElement('div');
-                bar.className = 'bar ' + barColor;
-                bar.style.height = (item.value / maxValue * 100) + '%';
+                // Secondary bar (shorter, darker color)
+                var secondaryValue = cat.value * 0.4; // 40% of primary for secondary effect
+                var secondaryBar = document.createElement('div');
+                secondaryBar.className = 'bar-item ' + secondaryClass;
+                secondaryBar.style.height = (secondaryValue / maxValue * chartHeight) + 'px';
                 
-                var barLabel = document.createElement('div');
-                barLabel.className = 'bar-label';
-                barLabel.textContent = item.name;
+                barGroup.appendChild(primaryBar);
+                barGroup.appendChild(secondaryBar);
                 
-                barWrapper.appendChild(bar);
-                barContainer.appendChild(barValue);
-                barContainer.appendChild(barWrapper);
-                barContainer.appendChild(barLabel);
-                chartDiv.appendChild(barContainer);
+                // Label
+                var labelDiv = document.createElement('div');
+                labelDiv.className = 'bar-label-group';
+                labelDiv.innerHTML = '<span class="bar-label-item">' + cat.name + '</span>';
+                
+                barGroup.appendChild(labelDiv);
+                barsContainer.appendChild(barGroup);
             });
             
+            chartDiv.appendChild(gridDiv);
+            chartDiv.appendChild(barsContainer);
             container.innerHTML = '';
             container.appendChild(chartDiv);
         }
@@ -285,90 +670,144 @@
             var container = document.getElementById(containerId);
             if (!container) return;
             
-            var total = data.reduce((sum, item) => sum + item.value, 0);
-            var colors = ['rgba(255,255,255,0.8)', 'rgba(88,101,242,0.6)'];
+            var total = data.reduce(function(sum, item) { return sum + item.value; }, 0) || 1;
             
-            var chartDiv = document.createElement('div');
-            chartDiv.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:20px;width:100%;';
+            var containerDiv = document.createElement('div');
+            containerDiv.className = 'donut-chart-container';
             
-            // Simple SVG donut
+            // SVG Donut
             var svgNS = "http://www.w3.org/2000/svg";
             var svg = document.createElementNS(svgNS, "svg");
-            svg.setAttribute("width", "120");
-            svg.setAttribute("height", "120");
-            svg.setAttribute("viewBox", "0 0 120 120");
+            svg.setAttribute("width", "140");
+            svg.setAttribute("height", "140");
+            svg.setAttribute("viewBox", "0 0 140 140");
+            svg.className = 'donut-svg';
             
-            var circumference = 2 * Math.PI * 45;
-            var offset = circumference;
+            var centerX = 70, centerY = 70, radius = 55;
+            var circumference = 2 * Math.PI * radius;
+            var offset = -Math.PI / 2; // Start from top
+            
+            var colors = [
+                { main: 'rgba(255,255,255,0.8)', glow: 'rgba(255,255,255,0.3)' },
+                { main: 'rgba(88,101,242,0.6)', glow: 'rgba(88,101,242,0.2)' }
+            ];
             
             data.forEach(function(item, index) {
-                if (total === 0) return;
+                if (item.value === 0) return;
+                
                 var percentage = item.value / total;
                 var dashLength = circumference * percentage;
                 
+                // Glow circle (background)
+                var glowCircle = document.createElementNS(svgNS, "circle");
+                glowCircle.setAttribute("cx", centerX);
+                glowCircle.setAttribute("cy", centerY);
+                glowCircle.setAttribute("r", radius);
+                glowCircle.setAttribute("fill", "none");
+                glowCircle.setAttribute("stroke", colors[index].glow);
+                glowCircle.setAttribute("stroke-width", "12");
+                glowCircle.setAttribute("stroke-dasharray", dashLength + " " + (circumference - dashLength));
+                glowCircle.setAttribute("stroke-dashoffset", -offset * radius + circumference * 0.25);
+                glowCircle.setAttribute("stroke-linecap", "round");
+                
+                // Main circle
                 var circle = document.createElementNS(svgNS, "circle");
-                circle.setAttribute("cx", "60");
-                circle.setAttribute("cy", "60");
-                circle.setAttribute("r", "45");
+                circle.setAttribute("cx", centerX);
+                circle.setAttribute("cy", centerY);
+                circle.setAttribute("r", radius);
                 circle.setAttribute("fill", "none");
-                circle.setAttribute("stroke", colors[index]);
+                circle.setAttribute("stroke", colors[index].main);
                 circle.setAttribute("stroke-width", "8");
                 circle.setAttribute("stroke-dasharray", dashLength + " " + (circumference - dashLength));
-                circle.setAttribute("stroke-dashoffset", offset);
+                circle.setAttribute("stroke-dashoffset", -offset * radius + circumference * 0.25);
                 circle.setAttribute("stroke-linecap", "round");
-                circle.style.transition = "all 1s ease";
+                circle.style.transition = "all 1.5s cubic-bezier(0.25, 0.8, 0.25, 1)";
                 
-                offset -= dashLength;
+                offset += (percentage * 2 * Math.PI);
+                
+                svg.appendChild(glowCircle);
                 svg.appendChild(circle);
             });
             
             // Center text
-            var text = document.createElementNS(svgNS, "text");
-            text.setAttribute("x", "60");
-            text.setAttribute("y", "60");
-            text.setAttribute("text-anchor", "middle");
-            text.setAttribute("dominant-baseline", "middle");
-            text.setAttribute("fill", "white");
-            text.setAttribute("font-size", "24");
-            text.setAttribute("font-weight", "bold");
-            text.setAttribute("font-family", "Inter, sans-serif");
-            text.textContent = total;
-            svg.appendChild(text);
+            var centerText = document.createElementNS(svgNS, "text");
+            centerText.setAttribute("x", centerX);
+            centerText.setAttribute("y", centerY);
+            centerText.setAttribute("text-anchor", "middle");
+            centerText.setAttribute("dominant-baseline", "middle");
+            centerText.setAttribute("fill", "white");
+            centerText.setAttribute("font-size", "28");
+            centerText.setAttribute("font-weight", "800");
+            centerText.setAttribute("font-family", "Inter, sans-serif");
+            centerText.setAttribute("letter-spacing", "-1");
+            centerText.textContent = total;
             
-            chartDiv.appendChild(svg);
+            var totalLabel = document.createElementNS(svgNS, "text");
+            totalLabel.setAttribute("x", centerX);
+            totalLabel.setAttribute("y", centerY + 18);
+            totalLabel.setAttribute("text-anchor", "middle");
+            totalLabel.setAttribute("dominant-baseline", "middle");
+            totalLabel.setAttribute("fill", "rgba(255,255,255,0.4)");
+            totalLabel.setAttribute("font-size", "8");
+            totalLabel.setAttribute("font-family", "Space Mono, monospace");
+            totalLabel.setAttribute("letter-spacing", "1");
+            totalLabel.textContent = "TOTAL";
+            
+            svg.appendChild(centerText);
+            svg.appendChild(totalLabel);
             
             // Legend
             var legendDiv = document.createElement('div');
-            legendDiv.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
+            legendDiv.className = 'donut-legend';
             
             data.forEach(function(item, index) {
                 var legendItem = document.createElement('div');
-                legendItem.style.cssText = 'display:flex;align-items:center;gap:8px;font-family:"Space Mono",monospace;font-size:10px;color:rgba(255,255,255,0.6);';
+                legendItem.className = 'legend-item';
                 
-                var colorDot = document.createElement('div');
-                colorDot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:' + colors[index] + ';';
+                var dot = document.createElement('div');
+                dot.className = 'legend-dot';
+                dot.style.background = colors[index].main;
                 
-                legendItem.appendChild(colorDot);
-                legendItem.appendChild(document.createTextNode(item.name + ': ' + item.value));
+                var name = document.createElement('span');
+                name.textContent = item.name;
+                
+                var value = document.createElement('span');
+                value.className = 'legend-value';
+                value.textContent = item.value;
+                
+                legendItem.appendChild(dot);
+                legendItem.appendChild(name);
+                legendItem.appendChild(value);
                 legendDiv.appendChild(legendItem);
             });
             
-            chartDiv.appendChild(legendDiv);
+            containerDiv.appendChild(svg);
+            containerDiv.appendChild(legendDiv);
             container.innerHTML = '';
-            container.appendChild(chartDiv);
+            container.appendChild(containerDiv);
         }
 
-        async function load() {
+        async function loadDashboard() {
             try {
-                var sr = await fetch('/api/status', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
-                var cr = await fetch('/api/dashboard/charts', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
-                var sd = await sr.json(); var s = sd.stats || sd;
-                document.getElementById('tickets').textContent = s.ticketsAtivos || 0;
-                document.getElementById('warns').textContent = s.warns || 0;
-                document.getElementById('pendings').textContent = s.pendentes || 0;
+                var sr = await fetch('/api/status', { 
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
+                });
+                var cr = await fetch('/api/dashboard/charts', { 
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
+                });
+                
+                var sd = await sr.json(); 
+                var s = sd.stats || sd;
+                
+                // Update stat cards with animation
+                animateValue('tickets', s.ticketsAtivos || 0);
+                animateValue('warns', s.warns || 0);
+                animateValue('pendings', s.pendentes || 0);
 
                 var cd;
-                try { cd = await cr.json(); } catch (e) {
+                try { 
+                    cd = await cr.json(); 
+                } catch (e) {
                     cd = { 
                         tickets: { ativos: s.ticketsAtivos||0, fechados:0 }, 
                         warns: { hoje:s.warns||0, semana:0 }, 
@@ -376,45 +815,88 @@
                         activity: { mensagens:0, comandos:0 } 
                     };
                 }
+                
                 renderCharts(cd);
+                
+                // Set up periodic refresh
+                setInterval(async function() {
+                    try {
+                        var refreshRes = await fetch('/api/status', { 
+                            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
+                        });
+                        var refreshData = await refreshRes.json();
+                        var rs = refreshData.stats || refreshData;
+                        
+                        document.getElementById('tickets').textContent = rs.ticketsAtivos || 0;
+                        document.getElementById('warns').textContent = rs.warns || 0;
+                        document.getElementById('pendings').textContent = rs.pendentes || 0;
+                    } catch (e) {
+                        console.error('Refresh error:', e);
+                    }
+                }, 30000);
+                
             } catch (e) {
-                console.error('Error loading data:', e);
+                console.error('Error loading dashboard:', e);
                 document.getElementById('tickets').textContent = '—';
                 document.getElementById('warns').textContent = '—';
                 document.getElementById('pendings').textContent = '—';
             }
         }
 
+        function animateValue(elementId, finalValue) {
+            var element = document.getElementById(elementId);
+            var startValue = 0;
+            var duration = 1000;
+            var startTime = null;
+            
+            function animation(currentTime) {
+                if (!startTime) startTime = currentTime;
+                var progress = (currentTime - startTime) / duration;
+                
+                if (progress < 1) {
+                    element.textContent = Math.floor(progress * finalValue);
+                    requestAnimationFrame(animation);
+                } else {
+                    element.textContent = finalValue;
+                }
+            }
+            
+            requestAnimationFrame(animation);
+        }
+
         function renderCharts(d) {
-            // Tickets bar chart
-            createSimpleBarChart([
+            // Tickets - vertical bars with blue theme
+            createVerticalBarChart([
                 {name: 'Active', value: d.tickets.ativos || 0},
                 {name: 'Closed', value: d.tickets.fechados || 0}
-            ], 'chart-tickets', 'accent-blue');
+            ], 'chart-tickets', 'primary', 'secondary');
             
-            // Warns bar chart
-            createSimpleBarChart([
+            // Warns - vertical bars with red theme
+            createVerticalBarChart([
                 {name: 'Today', value: d.warns.hoje || 0},
                 {name: 'Week', value: d.warns.semana || 0}
-            ], 'chart-warns', 'accent-red');
+            ], 'chart-warns', 'warn-primary', 'warn-secondary');
             
-            // Pending tasks donut
+            // Pending tasks - donut chart
             createDonutChart([
                 {name: 'Active', value: d.pendings.ativas || 0},
                 {name: 'Done', value: d.pendings.concluidas || 0}
             ], 'chart-pendings');
             
-            // Activity bar chart
-            createSimpleBarChart([
+            // Activity - vertical bars with white theme
+            createVerticalBarChart([
                 {name: 'Msgs', value: d.activity.mensagens || 0},
                 {name: 'Cmds', value: d.activity.comandos || 0}
-            ], 'chart-activity', 'accent-white');
+            ], 'chart-activity', 'white-primary', 'white-secondary');
         }
 
-        window.logout = function() { localStorage.clear(); window.location.href = '/'; };
+        window.logout = function() { 
+            localStorage.clear(); 
+            window.location.href = '/'; 
+        };
 
-        load();
-        setInterval(load, 30000);
+        // Start the application
+        showLoading();
     </script>
 </body>
 </html>
