@@ -7,9 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono&display=swap" rel="stylesheet">
-    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.10.3/Recharts.js"></script>
     <style>
         :root {
             --bg: #050505;
@@ -149,6 +146,17 @@
         .loading-pulse { animation: pulse 2s ease-in-out infinite; color: var(--text-dim); font-family: 'Space Mono', monospace; font-size: 10px; }
         @keyframes pulse { 0%,100%{opacity:0.2} 50%{opacity:0.6} }
 
+        /* Simple bar styles */
+        .simple-chart { display: flex; gap: 8px; align-items: flex-end; height: 100%; width: 100%; padding: 10px 0; }
+        .bar-container { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; }
+        .bar-wrapper { flex: 1; width: 100%; display: flex; align-items: flex-end; justify-content: center; position: relative; }
+        .bar { width: 40px; border-radius: 4px 4px 0 0; transition: height 0.8s cubic-bezier(0.25,0.8,0.25,1); position: relative; min-height: 4px; }
+        .bar.accent-blue { background: rgba(88,101,242,0.6); }
+        .bar.accent-red { background: #ff6b6b; }
+        .bar.accent-white { background: rgba(255,255,255,0.8); }
+        .bar-label { font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.4); text-align: center; }
+        .bar-value { font-family: 'Space Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.7); }
+
         @media (max-width: 1024px) {
             .app-container { flex-direction: column; overflow-y: auto; }
             .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; gap: 8px; }
@@ -235,6 +243,121 @@
             blobs.forEach(function(b, i) { b.style.transform = 'translate(' + x*(i+1)*10 + 'px, ' + y*(i+1)*10 + 'px)'; });
         });
 
+        function createSimpleBarChart(data, containerId, barColor) {
+            var container = document.getElementById(containerId);
+            if (!container) return;
+            
+            var maxValue = Math.max(...data.map(d => d.value), 1);
+            var chartDiv = document.createElement('div');
+            chartDiv.className = 'simple-chart';
+            
+            data.forEach(function(item) {
+                var barContainer = document.createElement('div');
+                barContainer.className = 'bar-container';
+                
+                var barValue = document.createElement('div');
+                barValue.className = 'bar-value';
+                barValue.textContent = item.value;
+                
+                var barWrapper = document.createElement('div');
+                barWrapper.className = 'bar-wrapper';
+                
+                var bar = document.createElement('div');
+                bar.className = 'bar ' + barColor;
+                bar.style.height = (item.value / maxValue * 100) + '%';
+                
+                var barLabel = document.createElement('div');
+                barLabel.className = 'bar-label';
+                barLabel.textContent = item.name;
+                
+                barWrapper.appendChild(bar);
+                barContainer.appendChild(barValue);
+                barContainer.appendChild(barWrapper);
+                barContainer.appendChild(barLabel);
+                chartDiv.appendChild(barContainer);
+            });
+            
+            container.innerHTML = '';
+            container.appendChild(chartDiv);
+        }
+
+        function createDonutChart(data, containerId) {
+            var container = document.getElementById(containerId);
+            if (!container) return;
+            
+            var total = data.reduce((sum, item) => sum + item.value, 0);
+            var colors = ['rgba(255,255,255,0.8)', 'rgba(88,101,242,0.6)'];
+            
+            var chartDiv = document.createElement('div');
+            chartDiv.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:20px;width:100%;';
+            
+            // Simple SVG donut
+            var svgNS = "http://www.w3.org/2000/svg";
+            var svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("width", "120");
+            svg.setAttribute("height", "120");
+            svg.setAttribute("viewBox", "0 0 120 120");
+            
+            var circumference = 2 * Math.PI * 45;
+            var offset = circumference;
+            
+            data.forEach(function(item, index) {
+                if (total === 0) return;
+                var percentage = item.value / total;
+                var dashLength = circumference * percentage;
+                
+                var circle = document.createElementNS(svgNS, "circle");
+                circle.setAttribute("cx", "60");
+                circle.setAttribute("cy", "60");
+                circle.setAttribute("r", "45");
+                circle.setAttribute("fill", "none");
+                circle.setAttribute("stroke", colors[index]);
+                circle.setAttribute("stroke-width", "8");
+                circle.setAttribute("stroke-dasharray", dashLength + " " + (circumference - dashLength));
+                circle.setAttribute("stroke-dashoffset", offset);
+                circle.setAttribute("stroke-linecap", "round");
+                circle.style.transition = "all 1s ease";
+                
+                offset -= dashLength;
+                svg.appendChild(circle);
+            });
+            
+            // Center text
+            var text = document.createElementNS(svgNS, "text");
+            text.setAttribute("x", "60");
+            text.setAttribute("y", "60");
+            text.setAttribute("text-anchor", "middle");
+            text.setAttribute("dominant-baseline", "middle");
+            text.setAttribute("fill", "white");
+            text.setAttribute("font-size", "24");
+            text.setAttribute("font-weight", "bold");
+            text.setAttribute("font-family", "Inter, sans-serif");
+            text.textContent = total;
+            svg.appendChild(text);
+            
+            chartDiv.appendChild(svg);
+            
+            // Legend
+            var legendDiv = document.createElement('div');
+            legendDiv.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
+            
+            data.forEach(function(item, index) {
+                var legendItem = document.createElement('div');
+                legendItem.style.cssText = 'display:flex;align-items:center;gap:8px;font-family:"Space Mono",monospace;font-size:10px;color:rgba(255,255,255,0.6);';
+                
+                var colorDot = document.createElement('div');
+                colorDot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:' + colors[index] + ';';
+                
+                legendItem.appendChild(colorDot);
+                legendItem.appendChild(document.createTextNode(item.name + ': ' + item.value));
+                legendDiv.appendChild(legendItem);
+            });
+            
+            chartDiv.appendChild(legendDiv);
+            container.innerHTML = '';
+            container.appendChild(chartDiv);
+        }
+
         async function load() {
             try {
                 var sr = await fetch('/api/status', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
@@ -246,67 +369,46 @@
 
                 var cd;
                 try { cd = await cr.json(); } catch (e) {
-                    cd = { tickets: { ativos: s.ticketsAtivos||0, fechados:0 }, warns: { hoje:s.warns||0, semana:0 }, pendings: { ativas:s.pendentes||0, concluidas:0 }, activity: { mensagens:0, comandos:0 } };
+                    cd = { 
+                        tickets: { ativos: s.ticketsAtivos||0, fechados:0 }, 
+                        warns: { hoje:s.warns||0, semana:0 }, 
+                        pendings: { ativas:s.pendentes||0, concluidas:0 }, 
+                        activity: { mensagens:0, comandos:0 } 
+                    };
                 }
-                charts(cd);
+                renderCharts(cd);
             } catch (e) {
+                console.error('Error loading data:', e);
                 document.getElementById('tickets').textContent = '—';
                 document.getElementById('warns').textContent = '—';
                 document.getElementById('pendings').textContent = '—';
             }
         }
 
-        function charts(d) {
-            var R = window.Recharts;
-            if (!R) { setTimeout(function() { charts(d); }, 500); return; }
-
-            var BarChart = R.BarChart, Bar = R.Bar, PieChart = R.PieChart, Pie = R.Pie, Cell = R.Cell;
-            var AreaChart = R.AreaChart, Area = R.Area, XAxis = R.XAxis, YAxis = R.YAxis;
-            var CartesianGrid = R.CartesianGrid, Tooltip = R.Tooltip, ResponsiveContainer = R.ResponsiveContainer, Legend = R.Legend;
-
-            var ts = { contentStyle: { background:'#0a0a0a', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'6px', fontSize:'10px', fontFamily:'Space Mono,monospace', color:'#fff', padding:'8px 12px' } };
-            var C = ['rgba(88,101,242,0.6)','#1a1a1a','#ff6b6b','#ffffff'];
-
-            function rc(id, el) { var c = document.getElementById(id); if(c) { c.innerHTML=''; ReactDOM.render(el, c); } }
-
-            rc('chart-tickets', React.createElement(ResponsiveContainer,{width:'100%',height:155},
-                React.createElement(BarChart,{data:[{name:'Active',value:d.tickets.ativos},{name:'Closed',value:d.tickets.fechados}],margin:{top:5,right:10,left:0,bottom:5}},
-                    React.createElement(CartesianGrid,{strokeDasharray:'3 3',stroke:'rgba(255,255,255,0.04)',vertical:false}),
-                    React.createElement(XAxis,{dataKey:'name',axisLine:false,tickLine:false,tick:{fill:'rgba(255,255,255,0.25)',fontSize:9}}),
-                    React.createElement(YAxis,{axisLine:false,tickLine:false,tick:{fill:'rgba(255,255,255,0.25)',fontSize:9}}),
-                    React.createElement(Tooltip,ts),
-                    React.createElement(Bar,{dataKey:'value',fill:C[0],radius:[3,3,0,0],maxBarSize:50,animationDuration:1000})
-                )));
-
-            rc('chart-warns', React.createElement(ResponsiveContainer,{width:'100%',height:155},
-                React.createElement(AreaChart,{data:[{name:'Today',value:d.warns.hoje},{name:'Week',value:d.warns.semana}],margin:{top:5,right:10,left:0,bottom:5}},
-                    React.createElement(defs,null,React.createElement('linearGradient',{id:'wG',x1:'0',y1:'0',x2:'0',y2:'1'},
-                        React.createElement('stop',{offset:'5%',stopColor:C[2],stopOpacity:0.25}),
-                        React.createElement('stop',{offset:'95%',stopColor:C[2],stopOpacity:0}))),
-                    React.createElement(CartesianGrid,{strokeDasharray:'3 3',stroke:'rgba(255,255,255,0.04)',vertical:false}),
-                    React.createElement(XAxis,{dataKey:'name',axisLine:false,tickLine:false,tick:{fill:'rgba(255,255,255,0.25)',fontSize:9}}),
-                    React.createElement(YAxis,{axisLine:false,tickLine:false,tick:{fill:'rgba(255,255,255,0.25)',fontSize:9}}),
-                    React.createElement(Tooltip,ts),
-                    React.createElement(Area,{type:'monotone',dataKey:'value',stroke:C[2],strokeWidth:2,fill:'url(#wG)',dot:{r:3,fill:C[2]},activeDot:{r:5,stroke:'#fff',strokeWidth:2},animationDuration:1200})
-                )));
-
-            var pd = [{name:'Active',value:d.pendings.ativas},{name:'Done',value:d.pendings.concluidas}];
-            rc('chart-pendings', React.createElement(ResponsiveContainer,{width:'100%',height:155},
-                React.createElement(PieChart,
-                    React.createElement(Pie,{data:pd,cx:'50%',cy:'50%',innerRadius:35,outerRadius:58,paddingAngle:3,dataKey:'value',stroke:'none',animationDuration:1000},
-                        pd.map(function(_,i){return React.createElement(Cell,{key:i,fill:[C[3],C[0]][i],stroke:'rgba(0,0,0,0.3)',strokeWidth:1})})),
-                    React.createElement(Tooltip,ts),
-                    React.createElement(Legend,{wrapperStyle:{fontSize:'9px',color:'rgba(255,255,255,0.4)',paddingTop:'6px',fontFamily:'Space Mono,monospace'},iconType:'circle',iconSize:6})
-                )));
-
-            rc('chart-activity', React.createElement(ResponsiveContainer,{width:'100%',height:155},
-                React.createElement(BarChart,{data:[{name:'Msgs',value:d.activity.mensagens},{name:'Cmds',value:d.activity.comandos}],margin:{top:5,right:10,left:0,bottom:5}},
-                    React.createElement(CartesianGrid,{strokeDasharray:'3 3',stroke:'rgba(255,255,255,0.04)',vertical:false}),
-                    React.createElement(XAxis,{dataKey:'name',axisLine:false,tickLine:false,tick:{fill:'rgba(255,255,255,0.25)',fontSize:9}}),
-                    React.createElement(YAxis,{axisLine:false,tickLine:false,tick:{fill:'rgba(255,255,255,0.25)',fontSize:9}}),
-                    React.createElement(Tooltip,ts),
-                    React.createElement(Bar,{dataKey:'value',fill:C[3],radius:[3,3,0,0],maxBarSize:50,animationDuration:1000})
-                )));
+        function renderCharts(d) {
+            // Tickets bar chart
+            createSimpleBarChart([
+                {name: 'Active', value: d.tickets.ativos || 0},
+                {name: 'Closed', value: d.tickets.fechados || 0}
+            ], 'chart-tickets', 'accent-blue');
+            
+            // Warns bar chart
+            createSimpleBarChart([
+                {name: 'Today', value: d.warns.hoje || 0},
+                {name: 'Week', value: d.warns.semana || 0}
+            ], 'chart-warns', 'accent-red');
+            
+            // Pending tasks donut
+            createDonutChart([
+                {name: 'Active', value: d.pendings.ativas || 0},
+                {name: 'Done', value: d.pendings.concluidas || 0}
+            ], 'chart-pendings');
+            
+            // Activity bar chart
+            createSimpleBarChart([
+                {name: 'Msgs', value: d.activity.mensagens || 0},
+                {name: 'Cmds', value: d.activity.comandos || 0}
+            ], 'chart-activity', 'accent-white');
         }
 
         window.logout = function() { localStorage.clear(); window.location.href = '/'; };
