@@ -1,77 +1,61 @@
 // api/pendings/list.js
 module.exports = async (req, res) => {
-    // CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
-    
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
     try {
-        // Tenta carregar mongoose apenas se MONGODB_URI existir
         const uri = process.env.MONGODB_URI;
-        
-        if (!uri) {
-            console.log('MONGODB_URI não configurada');
-            return res.status(200).json({ success: true, pendings: [] });
-        }
+        if (!uri) return res.status(200).json({ success: true, pendings: [] });
 
-        // Carrega mongoose dinamicamente
         const mongoose = require('mongoose');
+        if (mongoose.connection.readyState !== 1) await mongoose.connect(uri);
+
+        const db = mongoose.connection.db;
         
-        // Conecta se necessário
-        if (mongoose.connection.readyState !== 1) {
-            try {
-                await mongoose.connect(uri);
-                console.log('Conectado ao MongoDB');
-            } catch (err) {
-                console.error('Erro ao conectar:', err.message);
-                return res.status(200).json({ success: true, pendings: [] });
-            }
+        // 1. Tenta a coleção 'pendings' primeiro
+        const pendingsCol = db.collection('pendings');
+        let docs = await pendingsCol.find({}).sort({ createdAt: -1 }).limit(100).toArray();
+        
+        console.log('Coleção pendings:', docs.length, 'documentos');
+        
+        // 2. Se vazio, mostra 1 documento de exemplo para ver a estrutura
+        if (docs.length === 0) {
+            // Verifica se a coleção existe mas está vazia
+            const count = await pendingsCol.countDocuments({});
+            console.log('Contagem na coleção pendings:', count);
+            
+            // Tenta buscar sem limite pra ver se tem algum
+            docs = await pendingsCol.find({}).limit(100).toArray();
         }
 
-        // Schema
-        const PendingSchema = new mongoose.Schema({
-            type: String,
-            data: Object,
-            done: Boolean,
-            createdAt: Date
-        }, { strict: false });
-
-        // Usa modelo existente ou cria novo
-        const Pending = mongoose.models.Pending || mongoose.model('Pending', PendingSchema);
-
-        // Busca pendências
-        const pendings = await Pending.find({})
-            .sort({ createdAt: -1 })
-            .limit(100)
-            .lean()
-            .catch(err => {
-                console.error('Erro na query:', err.message);
-                return [];
-            });
-
-        console.log('Pendências encontradas:', pendings.length);
-
-        // Formata
-        const formatted = pendings.map(p => ({
-            id: p._id ? p._id.toString() : '0',
-            command: p.type || (p.data && p.data.command) || 'comando',
-            params: (p.data && p.data.params) || '',
-            result: (p.data && p.data.result) || '',
-            done: p.done === true || p.done === 'true',
-            createdAt: p.createdAt || new Date()
+        // Formata os documentos encontrados
+        const formatted = docs.map(doc => ({
+            id: doc._id ? doc._id.toString() : '0',
+            command: doc.type || doc.command || (doc.data && doc.data.command) || 'comando',
+            params: (doc.data && doc.data.params) || doc.params || '',
+            result: (doc.data && doc.data.result) || doc.result || '',
+            done: doc.done === true || doc.done === 'true' || doc.status === 'done',
+            createdAt: doc.createdAt || doc.created_at || new Date()
         }));
 
-        return res.status(200).json({ success: true, pendings: formatted });
+        return res.status(200).json({
+            success: true,
+            pendings: formatted,
+            debug: {
+                colecao: 'pendings',
+                totalDocumentos: docs.length,
+                exemplos: docs.slice(0, 2).map(d => JSON.stringify(d).substring(0, 400))
+            }
+        });
 
     } catch (error) {
-        console.error('Erro geral:', error.message);
-        // SEMPRE retorna 200 com array vazio
+        console.error('Erro:', error.message);
         return res.status(200).json({ 
             success: true, 
             pendings: [],
-            error: error.message 
+            debug: { erro: error.message }
         });
     }
 };
