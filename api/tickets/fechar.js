@@ -34,34 +34,29 @@ module.exports = async function handler(req, res) {
         const db = mongoose.connection.db;
         const collection = db.collection('pendings');
 
-        // Busca a pendência vinculada a este canal
-        const pending = await collection.findOne({
+        const result = await collection.deleteOne({
             $or: [
                 { 'data.channelId': channelId },
                 { channelId: channelId }
             ]
         });
 
-        if (!pending) {
+        if (result.deletedCount === 0) {
             return res.status(200).json({
                 success: false,
                 error: 'Nenhum ticket encontrado neste canal'
             });
         }
 
-        // Deleta o ticket do banco de dados
-        await collection.deleteOne({ _id: pending._id });
-
-        console.log('✅ Ticket deletado do MongoDB:', pending._id.toString(), '| Canal:', channelId);
+        console.log('✅ Ticket deletado do MongoDB | Canal:', channelId);
 
         return res.status(200).json({
             success: true,
-            message: 'Ticket deletado com sucesso',
-            deletedId: pending._id.toString()
+            message: 'Ticket deletado com sucesso'
         });
 
     } catch (error) {
-        console.error('❌ Erro ao deletar ticket:', error.message);
+        console.error('❌ Erro:', error.message);
         return res.status(200).json({ success: false, error: error.message });
     }
 };
