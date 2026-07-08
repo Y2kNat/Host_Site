@@ -12,6 +12,7 @@
             --bg: #050505;
             --card: rgba(255,255,255,0.03);
             --card-hover: rgba(255,255,255,0.06);
+            --accent-blue: rgba(88,101,242,0.6);
             --text: #ffffff;
             --text-dim: rgba(255,255,255,0.5);
             --text-tertiary: rgba(255,255,255,0.25);
@@ -23,8 +24,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background: var(--bg);
-            color: var(--text);
+            background: #050505;
+            color: #ffffff;
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
             width: 100vw;
@@ -32,6 +33,7 @@
             overflow-x: hidden;
         }
 
+        /* Blobs */
         .stage {
             position: fixed;
             width: 100%;
@@ -49,21 +51,32 @@
             transform: translateZ(0);
         }
 
-        .blob-1 { width:400px; height:400px; background:rgba(88,101,242,0.3); left:-5%; top:-10%; animation:float1 20s ease-in-out infinite; }
-        .blob-2 { width:350px; height:350px; background:rgba(255,255,255,0.15); left:55%; top:-5%; animation:float2 25s ease-in-out infinite; }
-        .blob-3 { width:500px; height:500px; background:rgba(88,101,242,0.2); left:25%; top:40%; animation:float3 30s ease-in-out infinite; }
-        .blob-4 { width:300px; height:300px; background:rgba(255,255,255,0.12); left:70%; top:35%; animation:float1 22s ease-in-out infinite reverse; }
-        .blob-5 { width:380px; height:380px; background:rgba(88,101,242,0.25); left:10%; top:55%; animation:float2 28s ease-in-out infinite reverse; }
-        .blob-6 { width:250px; height:250px; background:rgba(255,255,255,0.1); left:45%; top:0%; animation:float3 18s ease-in-out infinite; }
+        .blob-1 { width: 400px; height: 400px; background: rgba(88,101,242,0.3); left: -5%; top: -10%; animation: float1 20s ease-in-out infinite; }
+        .blob-2 { width: 350px; height: 350px; background: rgba(255,255,255,0.15); left: 55%; top: -5%; animation: float2 25s ease-in-out infinite; }
+        .blob-3 { width: 500px; height: 500px; background: rgba(88,101,242,0.2); left: 25%; top: 40%; animation: float3 30s ease-in-out infinite; }
+        .blob-4 { width: 300px; height: 300px; background: rgba(255,255,255,0.12); left: 70%; top: 35%; animation: float1 22s ease-in-out infinite reverse; }
+        .blob-5 { width: 380px; height: 380px; background: rgba(88,101,242,0.25); left: 10%; top: 55%; animation: float2 28s ease-in-out infinite reverse; }
+        .blob-6 { width: 250px; height: 250px; background: rgba(255,255,255,0.1); left: 45%; top: 0%; animation: float3 18s ease-in-out infinite; }
 
         @keyframes float1 {
-            0%,100%{transform:translate(0,0) scale(1)} 25%{transform:translate(100px,-50px) scale(1.15)} 50%{transform:translate(-40px,80px) scale(0.9)} 75%{transform:translate(-80px,-30px) scale(1.1)}
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(100px, -50px) scale(1.15); }
+            50% { transform: translate(-40px, 80px) scale(0.9); }
+            75% { transform: translate(-80px, -30px) scale(1.1); }
         }
+
         @keyframes float2 {
-            0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(-60px,60px) scale(1.2)} 66%{transform:translate(50px,-80px) scale(0.85)}
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-60px, 60px) scale(1.2); }
+            66% { transform: translate(50px, -80px) scale(0.85); }
         }
+
         @keyframes float3 {
-            0%,100%{transform:translate(0,0) scale(1)} 20%{transform:translate(80px,40px) scale(1.1)} 40%{transform:translate(-50px,-60px) scale(0.9)} 60%{transform:translate(30px,80px) scale(1.15)} 80%{transform:translate(-70px,-30px) scale(0.95)}
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            20% { transform: translate(80px, 40px) scale(1.1); }
+            40% { transform: translate(-50px, -60px) scale(0.9); }
+            60% { transform: translate(30px, 80px) scale(1.15); }
+            80% { transform: translate(-70px, -30px) scale(0.95); }
         }
 
         .container {
@@ -74,6 +87,7 @@
             padding: 24px;
         }
 
+        /* Header */
         .header {
             display: flex;
             align-items: center;
@@ -100,9 +114,15 @@
             white-space: nowrap;
         }
 
-        .back-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+        .back-btn:hover {
+            color: #fff;
+            border-color: rgba(255,255,255,0.3);
+        }
 
-        .header-info { flex: 1; min-width: 200px; }
+        .header-info {
+            flex: 1;
+            min-width: 200px;
+        }
 
         .brand-id {
             font-family: 'Space Mono', monospace;
@@ -122,7 +142,7 @@
             color: #fff;
         }
 
-        .badge-role {
+        .header .badge-role {
             font-family: 'Space Mono', monospace;
             font-size: 8px;
             letter-spacing: 3px;
@@ -131,7 +151,7 @@
             white-space: nowrap;
         }
 
-        /* Layout - PC: lado a lado, Mobile: toggle */
+        /* Main Layout */
         .main-layout {
             display: flex;
             gap: 16px;
@@ -154,12 +174,18 @@
             overflow: hidden;
         }
 
-        .terminal-panel:hover { border-color: var(--border-hover); background: var(--card-hover); }
+        .terminal-panel:hover {
+            border-color: var(--border-hover);
+            background: var(--card-hover);
+        }
 
         .terminal-panel::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; height: 1px;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
             background: linear-gradient(90deg, transparent, rgba(88,101,242,0.4), transparent);
         }
 
@@ -189,8 +215,15 @@
             margin-bottom: 12px;
         }
 
-        .cmd-btn:hover { background: rgba(88,101,242,0.22); border-color: rgba(88,101,242,0.45); }
-        .cmd-btn:active { transform: scale(0.97); }
+        .cmd-btn:hover {
+            background: rgba(88,101,242,0.22);
+            border-color: rgba(88,101,242,0.45);
+            box-shadow: 0 0 25px rgba(88,101,242,0.15);
+        }
+
+        .cmd-btn:active {
+            transform: scale(0.97);
+        }
 
         .cmds-list {
             display: none;
@@ -202,7 +235,13 @@
             padding: 6px;
         }
 
-        .cmds-list.show { display: block; }
+        .cmds-list.show {
+            display: block;
+        }
+
+        .cmds-list::-webkit-scrollbar { width: 3px; }
+        .cmds-list::-webkit-scrollbar-track { background: transparent; }
+        .cmds-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
 
         .cmds-list div {
             padding: 8px 12px;
@@ -212,9 +251,17 @@
             font-size: 9px;
             color: rgba(255,255,255,0.5);
             transition: all 0.2s;
+            letter-spacing: 0.5px;
         }
 
-        .cmds-list div:hover { background: rgba(88,101,242,0.2); color: #fff; }
+        .cmds-list div:hover {
+            background: rgba(88,101,242,0.2);
+            color: #fff;
+        }
+
+        .cmds-list div:active {
+            background: rgba(88,101,242,0.35);
+        }
 
         .chat-messages {
             flex: 1;
@@ -225,6 +272,10 @@
             gap: 6px;
             min-height: 0;
         }
+
+        .chat-messages::-webkit-scrollbar { width: 3px; }
+        .chat-messages::-webkit-scrollbar-track { background: transparent; }
+        .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
 
         .chat-messages .msg {
             padding: 9px 12px;
@@ -240,6 +291,7 @@
             background: rgba(88,101,242,0.3);
             align-self: flex-end;
             border-bottom-right-radius: 3px;
+            color: #fff;
         }
 
         .chat-messages .bot {
@@ -249,7 +301,10 @@
             color: rgba(255,255,255,0.7);
         }
 
-        .chat-input { display: flex; gap: 6px; }
+        .chat-input {
+            display: flex;
+            gap: 6px;
+        }
 
         .chat-input input {
             flex: 1;
@@ -265,8 +320,14 @@
             min-width: 0;
         }
 
-        .chat-input input:focus { border-color: rgba(88,101,242,0.5); }
-        .chat-input input::placeholder { color: rgba(255,255,255,0.2); }
+        .chat-input input:focus {
+            border-color: rgba(88,101,242,0.5);
+            box-shadow: 0 0 20px rgba(88,101,242,0.1);
+        }
+
+        .chat-input input::placeholder {
+            color: rgba(255,255,255,0.2);
+        }
 
         .chat-input button {
             padding: 10px 16px;
@@ -281,7 +342,14 @@
             white-space: nowrap;
         }
 
-        .chat-input button:hover { background: rgba(88,101,242,0.5); }
+        .chat-input button:hover {
+            background: rgba(88,101,242,0.5);
+            box-shadow: 0 0 25px rgba(88,101,242,0.3);
+        }
+
+        .chat-input button:active {
+            transform: scale(0.95);
+        }
 
         /* Pending Panel */
         .pending-panel {
@@ -296,14 +364,24 @@
             min-width: 0;
         }
 
-        .pending-panel:hover { border-color: var(--border-hover); background: var(--card-hover); }
+        .pending-panel:hover {
+            border-color: var(--border-hover);
+            background: var(--card-hover);
+        }
 
         .pending-panel::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; height: 1px;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
         }
+
+        .pending-panel::-webkit-scrollbar { width: 3px; }
+        .pending-panel::-webkit-scrollbar-track { background: transparent; }
+        .pending-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
 
         .pending-header {
             display: flex;
@@ -323,7 +401,11 @@
             font-weight: 600;
         }
 
-        .pending-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+        .pending-filters {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
 
         .filter-btn {
             font-family: 'Space Mono', monospace;
@@ -340,8 +422,17 @@
             white-space: nowrap;
         }
 
-        .filter-btn:hover { border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.8); }
-        .filter-btn.active { background: rgba(88,101,242,0.25); border-color: rgba(88,101,242,0.5); color: #fff; }
+        .filter-btn:hover {
+            border-color: rgba(255,255,255,0.25);
+            color: rgba(255,255,255,0.8);
+        }
+
+        .filter-btn.active {
+            background: rgba(88,101,242,0.25);
+            border-color: rgba(88,101,242,0.5);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(88,101,242,0.2);
+        }
 
         .pending-item {
             padding: 14px 16px;
@@ -362,8 +453,13 @@
             transform: translateX(4px);
         }
 
-        .pending-item.done-item { opacity: 0.5; }
-        .pending-item.done-item:hover { opacity: 0.75; }
+        .pending-item.done-item {
+            opacity: 0.5;
+        }
+
+        .pending-item.done-item:hover {
+            opacity: 0.75;
+        }
 
         .badge {
             padding: 4px 10px;
@@ -375,14 +471,54 @@
             flex-shrink: 0;
         }
 
-        .badge-active { background: rgba(255,107,107,0.2); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.3); }
-        .badge-done { background: rgba(46,204,113,0.2); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
+        .badge-active {
+            background: rgba(255,107,107,0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(255,107,107,0.3);
+        }
 
-        .pending-info { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 130px; }
-        .pending-command { font-family: 'Space Mono', monospace; font-size: 11px; color: #fff; font-weight: 600; word-break: break-all; }
-        .pending-params { font-size: 10px; color: rgba(255,255,255,0.35); word-break: break-all; }
-        .pending-result { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
-        .pending-time { font-family: 'Space Mono', monospace; font-size: 8px; color: rgba(255,255,255,0.2); letter-spacing: 1px; flex-shrink: 0; white-space: nowrap; }
+        .badge-done {
+            background: rgba(46,204,113,0.2);
+            color: #2ecc71;
+            border: 1px solid rgba(46,204,113,0.3);
+        }
+
+        .pending-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 130px;
+        }
+
+        .pending-command {
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            color: #fff;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .pending-params {
+            font-size: 10px;
+            color: rgba(255,255,255,0.35);
+            word-break: break-all;
+        }
+
+        .pending-result {
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 2px;
+        }
+
+        .pending-time {
+            font-family: 'Space Mono', monospace;
+            font-size: 8px;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 1px;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
 
         .empty-state {
             text-align: center;
@@ -394,33 +530,27 @@
             text-transform: uppercase;
         }
 
-        /* Mobile Toggle - SÓ APARECE NO MOBILE */
-        .mobile-tabs {
+        /* Mobile Toggle */
+        .mobile-toggle {
             display: none;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .mobile-tab {
-            flex: 1;
             font-family: 'Space Mono', monospace;
             font-size: 9px;
-            padding: 10px;
-            background: rgba(88,101,242,0.1);
-            border: 1px solid rgba(88,101,242,0.25);
+            padding: 10px 16px;
+            background: rgba(88,101,242,0.15);
+            border: 1px solid rgba(88,101,242,0.3);
             border-radius: 10px;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255,255,255,0.8);
             cursor: pointer;
             letter-spacing: 1px;
             text-transform: uppercase;
             transition: all 0.3s;
+            margin-bottom: 12px;
+            width: 100%;
             text-align: center;
         }
 
-        .mobile-tab.active {
+        .mobile-toggle:hover {
             background: rgba(88,101,242,0.25);
-            border-color: rgba(88,101,242,0.5);
-            color: #fff;
         }
 
         @keyframes fadeInUp {
@@ -428,18 +558,16 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* PC: mostra os dois lado a lado */
-        @media (min-width: 901px) {
-            .terminal-panel, .pending-panel { display: flex !important; }
+        /* PC: lado a lado */
+        @media (min-width: 769px) {
             .terminal-panel { display: flex !important; }
             .pending-panel { display: block !important; }
-            .mobile-tabs { display: none !important; }
         }
 
-        /* Mobile: toggle entre terminal e pendências */
-        @media (max-width: 900px) {
+        /* Mobile: toggle */
+        @media (max-width: 768px) {
             .container { padding: 12px; }
-            .mobile-tabs { display: flex; }
+            .mobile-toggle { display: block; }
             .main-layout { flex-direction: column; height: auto; gap: 10px; }
             .terminal-panel { width: 100%; height: auto; max-height: 55vh; display: none; }
             .terminal-panel.show-mobile { display: flex; }
@@ -448,6 +576,7 @@
             .chat-input input { font-size: 16px; }
             .header h1 { font-size: 1.2rem; }
             .badge-role { display: none; }
+            .pending-item { padding: 10px 12px; gap: 8px; }
         }
 
         @media (max-width: 480px) {
@@ -458,6 +587,11 @@
             .terminal-panel, .pending-panel { padding: 14px; border-radius: 10px; }
             .pending-item { flex-direction: column; align-items: flex-start; gap: 5px; }
             .pending-time { align-self: flex-end; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .blob { animation: none; }
+            .pending-item:hover { transform: none; }
         }
     </style>
 </head>
@@ -482,15 +616,12 @@
             <span class="badge-role" id="roleBadge">Role: FULL</span>
         </div>
 
-        <!-- TABS MOBILE (só aparece no mobile) -->
-        <div class="mobile-tabs" id="mobileTabs">
-            <button class="mobile-tab active" onclick="switchMobileTab('terminal')">💬 Terminal</button>
-            <button class="mobile-tab" onclick="switchMobileTab('pending')">📋 Pendências</button>
-        </div>
+        <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobileView()">
+            📋 Ver Pendências
+        </button>
 
         <div class="main-layout">
-            <!-- Terminal Panel -->
-            <div class="terminal-panel show-mobile" id="terminalPanel">
+            <div class="terminal-panel" id="terminalPanel">
                 <h3>🤖 Terminal</h3>
                 <button class="cmd-btn" onclick="toggleCmds()">📋 Listar Comandos</button>
                 <div class="cmds-list" id="cmdsList"></div>
@@ -503,7 +634,6 @@
                 </div>
             </div>
 
-            <!-- Pending Panel -->
             <div class="pending-panel" id="pendingPanel">
                 <div class="pending-header">
                     <h3>📋 Histórico</h3>
@@ -529,10 +659,14 @@
         document.addEventListener('mousemove', (e) => {
             const x = (e.clientX / window.innerWidth - 0.5) * 2;
             const y = (e.clientY / window.innerHeight - 0.5) * 2;
-            blobs.forEach((b, i) => b.style.transform = `translate(${x*(i+1)*10}px, ${y*(i+1)*10}px)`);
+            blobs.forEach((b, i) => {
+                b.style.transform = `translate(${x*(i+1)*10}px, ${y*(i+1)*10}px)`;
+            });
         });
 
-        let allPendings = [], currentFilter = 'all';
+        // Page state
+        let allPendings = [];
+        let currentFilter = 'all';
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         const userRole = user.role || 'full';
         document.getElementById('roleBadge').textContent = 'Role: ' + userRole.toUpperCase();
@@ -544,41 +678,53 @@
             tester: ['ping','uptime','bot']
         };
 
-        // Mobile tab switcher
-        window.switchMobileTab = function(tab) {
-            const terminal = document.getElementById('terminalPanel');
-            const pending = document.getElementById('pendingPanel');
-            const tabs = document.querySelectorAll('.mobile-tab');
-            
-            tabs.forEach(t => t.classList.remove('active'));
-            
-            if (tab === 'terminal') {
-                terminal.classList.add('show-mobile');
-                pending.classList.remove('show-mobile');
-                tabs[0].classList.add('active');
+        function init() {
+            if (!localStorage.getItem('token')) {
+                window.location.href = '/';
+                return;
+            }
+            loadPendings();
+            setInterval(loadPendings, 15000);
+            setupMobileView();
+        }
+
+        function setupMobileView() {
+            const isMobile = window.innerWidth <= 768;
+            const terminalPanel = document.getElementById('terminalPanel');
+            const pendingPanel = document.getElementById('pendingPanel');
+            const mobileToggle = document.getElementById('mobileToggle');
+
+            if (isMobile) {
+                mobileToggle.style.display = 'block';
+                terminalPanel.classList.add('show-mobile');
+                pendingPanel.classList.remove('show-mobile');
             } else {
-                terminal.classList.remove('show-mobile');
-                pending.classList.add('show-mobile');
-                tabs[1].classList.add('active');
+                mobileToggle.style.display = 'none';
+                terminalPanel.style.display = 'flex';
+                pendingPanel.style.display = 'block';
+            }
+        }
+
+        window.addEventListener('resize', setupMobileView);
+
+        window.toggleMobileView = function() {
+            const terminalPanel = document.getElementById('terminalPanel');
+            const pendingPanel = document.getElementById('pendingPanel');
+            const mobileToggle = document.getElementById('mobileToggle');
+
+            if (terminalPanel.classList.contains('show-mobile')) {
+                terminalPanel.classList.remove('show-mobile');
+                pendingPanel.classList.add('show-mobile');
+                mobileToggle.textContent = '💬 Terminal';
+            } else {
+                terminalPanel.classList.add('show-mobile');
+                pendingPanel.classList.remove('show-mobile');
+                mobileToggle.textContent = '📋 Ver Pendências';
             }
         };
 
-        // Init
-        function init() {
-            if (!localStorage.getItem('token')) { window.location.href = '/'; return; }
-            
-            // PC: mostra os dois
-            if (window.innerWidth > 900) {
-                document.getElementById('terminalPanel').style.display = 'flex';
-                document.getElementById('pendingPanel').style.display = 'block';
-            }
-            
-            loadPendings();
-            setInterval(loadPendings, 15000);
-        }
-
-        window.filterPendings = function(f, btn) {
-            currentFilter = f;
+        window.filterPendings = function(filter, btn) {
+            currentFilter = filter;
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             renderPendings();
@@ -586,22 +732,28 @@
 
         function renderPendings() {
             const list = document.getElementById('pendingList');
-            let f = allPendings;
-            if (currentFilter === 'active') f = allPendings.filter(p => !p.done);
-            else if (currentFilter === 'done') f = allPendings.filter(p => p.done);
-            
-            if (f.length === 0) {
+            let filtered = allPendings;
+
+            if (currentFilter === 'active') {
+                filtered = allPendings.filter(p => !p.done);
+            } else if (currentFilter === 'done') {
+                filtered = allPendings.filter(p => p.done);
+            }
+
+            if (filtered.length === 0) {
                 list.innerHTML = '<div class="empty-state">Nenhuma pendência</div>';
                 return;
             }
 
-            list.innerHTML = f.map(p => `
-                <div class="pending-item ${p.done?'done-item':''}">
-                    <span class="badge ${p.done?'badge-done':'badge-active'}">${p.done?'✓ Done':'⏳ Active'}</span>
+            list.innerHTML = filtered.map(p => `
+                <div class="pending-item ${p.done ? 'done-item' : ''}">
+                    <span class="badge ${p.done ? 'badge-done' : 'badge-active'}">
+                        ${p.done ? '✓ Done' : '⏳ Active'}
+                    </span>
                     <div class="pending-info">
                         <span class="pending-command">/${p.command}</span>
-                        ${p.params?'<span class="pending-params">'+p.params+'</span>':''}
-                        ${p.result?'<span class="pending-result">'+p.result+'</span>':''}
+                        ${p.params ? '<span class="pending-params">' + p.params + '</span>' : ''}
+                        ${p.result ? '<span class="pending-result">' + p.result + '</span>' : ''}
                     </div>
                     <span class="pending-time">${p.time}</span>
                 </div>
@@ -610,7 +762,10 @@
 
         window.toggleCmds = function() {
             const list = document.getElementById('cmdsList');
-            if (list.classList.contains('show')) { list.classList.remove('show'); return; }
+            if (list.classList.contains('show')) {
+                list.classList.remove('show');
+                return;
+            }
             const cmds = commandsByRole[userRole] || commandsByRole.full;
             list.innerHTML = cmds.map(c => 
                 `<div onclick="document.getElementById('chatInput').value='/${c}';document.getElementById('cmdsList').classList.remove('show');">/${c}</div>`
@@ -622,6 +777,7 @@
             const input = document.getElementById('chatInput');
             const msg = input.value.trim();
             if (!msg) return;
+
             addChatMsg('user', msg);
             input.value = '';
 
@@ -629,31 +785,41 @@
                 const parts = msg.substring(1).split(' ');
                 const command = parts[0];
                 const params = parts.slice(1).join(' ');
-                
-                const np = { command, params, result: '', time: new Date().toLocaleString('pt-BR'), done: false };
-                allPendings.unshift(np);
+
+                const newPending = {
+                    command: command,
+                    params: params,
+                    result: '',
+                    time: new Date().toLocaleString('pt-BR'),
+                    done: false
+                };
+
+                allPendings.unshift(newPending);
                 renderPendings();
-                
-                const md = addChatMsg('bot', '⏳ /' + command + '...');
-                
+
+                const msgDiv = addChatMsg('bot', '⏳ Executando /' + command + '...');
+
                 fetch('/api/pendings/executar', {
                     method: 'POST',
-                    headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+localStorage.getItem('token') },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
                     body: JSON.stringify({ command, params })
                 })
                 .then(r => r.json())
-                .then(d => {
-                    np.done = true;
-                    np.result = d.result || d.message || '✅ OK';
-                    md.textContent = np.result;
+                .then(data => {
+                    newPending.done = true;
+                    newPending.result = data.result || data.message || '✅ Executado';
+                    msgDiv.textContent = newPending.result;
                     renderPendings();
                     loadPendings();
                 })
                 .catch(() => {
                     setTimeout(() => {
-                        np.done = true;
-                        np.result = '✅ /' + command;
-                        md.textContent = np.result;
+                        newPending.done = true;
+                        newPending.result = '✅ /' + command + ' executado';
+                        msgDiv.textContent = newPending.result;
                         renderPendings();
                     }, 2000);
                 });
@@ -661,13 +827,15 @@
         };
 
         function addChatMsg(type, text) {
-            const msgs = document.getElementById('chatMessages');
-            const first = msgs.querySelector('.msg.bot');
-            if (first && first.textContent === 'Digite /comando para executar') first.remove();
+            const chatMessages = document.getElementById('chatMessages');
+            const firstMsg = chatMessages.querySelector('.msg.bot');
+            if (firstMsg && firstMsg.textContent === 'Digite /comando para executar') {
+                firstMsg.remove();
+            }
             const div = document.createElement('div');
             div.className = 'msg ' + type;
             div.textContent = text;
-            msgs.appendChild(div);
+            chatMessages.appendChild(div);
             div.scrollIntoView({ behavior: 'smooth' });
             return div;
         }
@@ -677,7 +845,7 @@
                 const res = await fetch('/api/pendings/list', {
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                 });
-                
+
                 if (res.ok) {
                     const data = await res.json();
                     if (data.pendings && Array.isArray(data.pendings)) {
@@ -691,7 +859,7 @@
                     }
                 }
             } catch (e) {
-                console.error('Erro:', e);
+                console.error('Erro ao carregar pendências:', e);
             }
             renderPendings();
         }
