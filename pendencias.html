@@ -12,7 +12,6 @@
             --bg: #050505;
             --card: rgba(255,255,255,0.03);
             --card-hover: rgba(255,255,255,0.06);
-            --accent-blue: rgba(88,101,242,0.6);
             --text: #ffffff;
             --text-dim: rgba(255,255,255,0.5);
             --text-tertiary: rgba(255,255,255,0.25);
@@ -33,7 +32,6 @@
             overflow-x: hidden;
         }
 
-        /* LOADING OVERLAY */
         #loading-overlay {
             position: fixed;
             top: 0;
@@ -74,16 +72,9 @@
             font-family: 'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif;
         }
 
-        #loading-overlay.fade-out {
-            opacity: 0;
-            pointer-events: none;
-        }
+        #loading-overlay.fade-out { opacity: 0; pointer-events: none; }
+        #loading-overlay.hidden { display: none; }
 
-        #loading-overlay.hidden {
-            display: none;
-        }
-
-        /* MAIN CONTENT */
         #main-content {
             opacity: 0;
             transition: opacity 0.8s ease-in;
@@ -92,9 +83,7 @@
             min-height: 100vh;
         }
 
-        #main-content.visible {
-            opacity: 1;
-        }
+        #main-content.visible { opacity: 1; }
 
         .stage {
             position: fixed;
@@ -162,10 +151,7 @@
             white-space: nowrap;
         }
 
-        .back-btn:hover {
-            color: #fff;
-            border-color: rgba(255,255,255,0.3);
-        }
+        .back-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
 
         .header h1 {
             font-weight: 800;
@@ -192,7 +178,6 @@
             min-height: 500px;
         }
 
-        /* CHAT PANEL */
         .chat-panel {
             width: 320px;
             flex-shrink: 0;
@@ -207,11 +192,7 @@
             overflow: hidden;
         }
 
-        .chat-panel:hover {
-            border-color: rgba(255,255,255,0.12);
-            background: rgba(255,255,255,0.06);
-        }
-
+        .chat-panel:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); }
         .chat-panel::before {
             content: '';
             position: absolute;
@@ -245,15 +226,8 @@
             margin-bottom: 10px;
         }
 
-        .cmd-btn:hover {
-            background: rgba(88,101,242,0.25);
-            border-color: rgba(88,101,242,0.5);
-            box-shadow: 0 0 20px rgba(88,101,242,0.2);
-        }
-        
-        .cmd-btn:active {
-            transform: scale(0.97);
-        }
+        .cmd-btn:hover { background: rgba(88,101,242,0.25); border-color: rgba(88,101,242,0.5); box-shadow: 0 0 20px rgba(88,101,242,0.2); }
+        .cmd-btn:active { transform: scale(0.97); }
 
         .cmds-list {
             display: none;
@@ -265,10 +239,7 @@
             padding: 6px;
         }
 
-        .cmds-list.show {
-            display: block;
-        }
-
+        .cmds-list.show { display: block; }
         .cmds-list::-webkit-scrollbar { width: 3px; }
         .cmds-list::-webkit-scrollbar-track { background: transparent; }
         .cmds-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
@@ -284,14 +255,8 @@
             letter-spacing: 0.5px;
         }
 
-        .cmds-list div:hover {
-            background: rgba(88,101,242,0.2);
-            color: #fff;
-        }
-        
-        .cmds-list div:active {
-            background: rgba(88,101,242,0.4);
-        }
+        .cmds-list div:hover { background: rgba(88,101,242,0.2); color: #fff; }
+        .cmds-list div:active { background: rgba(88,101,242,0.4); }
 
         .chat-messages {
             flex: 1;
@@ -317,24 +282,10 @@
             animation: fadeInUp 0.3s ease-out;
         }
 
-        .chat-messages .user {
-            background: rgba(88,101,242,0.3);
-            align-self: flex-end;
-            border-bottom-right-radius: 3px;
-            color: #fff;
-        }
+        .chat-messages .user { background: rgba(88,101,242,0.3); align-self: flex-end; border-bottom-right-radius: 3px; color: #fff; }
+        .chat-messages .bot { background: rgba(255,255,255,0.05); align-self: flex-start; border-bottom-left-radius: 3px; color: rgba(255,255,255,0.8); }
 
-        .chat-messages .bot {
-            background: rgba(255,255,255,0.05);
-            align-self: flex-start;
-            border-bottom-left-radius: 3px;
-            color: rgba(255,255,255,0.8);
-        }
-
-        .chat-input {
-            display: flex;
-            gap: 6px;
-        }
+        .chat-input { display: flex; gap: 6px; }
 
         .chat-input input {
             flex: 1;
@@ -350,14 +301,8 @@
             min-width: 0;
         }
 
-        .chat-input input:focus {
-            border-color: rgba(88,101,242,0.5);
-            box-shadow: 0 0 15px rgba(88,101,242,0.1);
-        }
-
-        .chat-input input::placeholder {
-            color: rgba(255,255,255,0.25);
-        }
+        .chat-input input:focus { border-color: rgba(88,101,242,0.5); box-shadow: 0 0 15px rgba(88,101,242,0.1); }
+        .chat-input input::placeholder { color: rgba(255,255,255,0.25); }
 
         .chat-input button {
             padding: 10px 14px;
@@ -372,16 +317,9 @@
             white-space: nowrap;
         }
 
-        .chat-input button:hover {
-            background: rgba(88,101,242,0.5);
-            box-shadow: 0 0 20px rgba(88,101,242,0.3);
-        }
-        
-        .chat-input button:active {
-            transform: scale(0.95);
-        }
+        .chat-input button:hover { background: rgba(88,101,242,0.5); box-shadow: 0 0 20px rgba(88,101,242,0.3); }
+        .chat-input button:active { transform: scale(0.95); }
 
-        /* PENDING PANEL */
         .pending-panel {
             flex: 1;
             background: rgba(255,255,255,0.03);
@@ -394,11 +332,7 @@
             min-width: 0;
         }
 
-        .pending-panel:hover {
-            border-color: rgba(255,255,255,0.12);
-            background: rgba(255,255,255,0.06);
-        }
-
+        .pending-panel:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); }
         .pending-panel::before {
             content: '';
             position: absolute;
@@ -442,16 +376,8 @@
             white-space: nowrap;
         }
 
-        .filter-btn:hover {
-            border-color: rgba(255,255,255,0.3);
-            color: #fff;
-        }
-
-        .filter-btn.active {
-            background: rgba(88,101,242,0.3);
-            border-color: rgba(88,101,242,0.5);
-            color: #fff;
-        }
+        .filter-btn:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+        .filter-btn.active { background: rgba(88,101,242,0.3); border-color: rgba(88,101,242,0.5); color: #fff; }
 
         .pending-item {
             padding: 12px 14px;
@@ -466,19 +392,9 @@
             flex-wrap: wrap;
         }
 
-        .pending-item:hover {
-            border-color: rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.3);
-            transform: translateX(4px);
-        }
-
-        .pending-item.done-item {
-            opacity: 0.6;
-        }
-
-        .pending-item.done-item:hover {
-            opacity: 0.8;
-        }
+        .pending-item:hover { border-color: rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); transform: translateX(4px); }
+        .pending-item.done-item { opacity: 0.6; }
+        .pending-item.done-item:hover { opacity: 0.8; }
 
         .badge {
             padding: 4px 8px;
@@ -490,47 +406,13 @@
             flex-shrink: 0;
         }
 
-        .badge-active {
-            background: rgba(231,76,60,0.2);
-            color: #e74c3c;
-            border: 1px solid rgba(231,76,60,0.3);
-        }
+        .badge-active { background: rgba(231,76,60,0.2); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); }
+        .badge-done { background: rgba(46,204,113,0.2); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
 
-        .badge-done {
-            background: rgba(46,204,113,0.2);
-            color: #2ecc71;
-            border: 1px solid rgba(46,204,113,0.3);
-        }
-
-        .pending-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            min-width: 120px;
-        }
-
-        .pending-command {
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            color: #fff;
-            font-weight: 600;
-            word-break: break-all;
-        }
-
-        .pending-params {
-            font-size: 10px;
-            color: rgba(255,255,255,0.4);
-            word-break: break-all;
-        }
-
-        .pending-result {
-            font-size: 10px;
-            color: rgba(255,255,255,0.5);
-            margin-top: 2px;
-            font-style: italic;
-        }
-
+        .pending-info { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 120px; }
+        .pending-command { font-family: 'Space Mono', monospace; font-size: 11px; color: #fff; font-weight: 600; word-break: break-all; }
+        .pending-params { font-size: 10px; color: rgba(255,255,255,0.4); word-break: break-all; }
+        .pending-result { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; font-style: italic; }
         .pending-time {
             font-family: 'Space Mono', monospace;
             font-size: 8px;
@@ -550,7 +432,6 @@
             text-transform: uppercase;
         }
 
-        /* Mobile toggle button */
         .mobile-toggle {
             display: none;
             font-family: 'Space Mono', monospace;
@@ -567,8 +448,19 @@
             margin-bottom: 10px;
         }
 
-        .mobile-toggle.active {
-            background: rgba(88,101,242,0.3);
+        .mobile-toggle.active { background: rgba(88,101,242,0.3); }
+
+        /* Debug panel */
+        .debug-info {
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(255,255,0,0.05);
+            border: 1px solid rgba(255,255,0,0.15);
+            border-radius: 8px;
+            font-family: 'Space Mono', monospace;
+            font-size: 9px;
+            color: rgba(255,255,0,0.5);
+            display: none;
         }
 
         @keyframes fadeInUp {
@@ -576,112 +468,31 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* MOBILE STYLES */
         @media (max-width: 768px) {
-            .container {
-                padding: 12px;
-            }
-            
-            .header {
-                gap: 8px;
-                margin-bottom: 16px;
-                padding-bottom: 12px;
-            }
-            
-            .header h1 {
-                font-size: 1.1rem;
-                min-width: auto;
-            }
-            
-            .brand-id {
-                display: none;
-            }
-
-            .mobile-toggle {
-                display: block;
-            }
-
-            .main-layout {
-                flex-direction: column;
-                height: auto;
-                gap: 10px;
-            }
-
-            .chat-panel {
-                width: 100%;
-                height: auto;
-                max-height: 60vh;
-                display: none;
-            }
-            
-            .chat-panel.show-mobile {
-                display: flex;
-            }
-
-            .pending-panel {
-                height: auto;
-                max-height: 60vh;
-                display: block;
-            }
-            
-            .pending-panel.hide-mobile {
-                display: none;
-            }
-
-            .chat-messages {
-                max-height: 30vh;
-            }
-            
-            .pending-item {
-                padding: 10px 12px;
-                gap: 8px;
-            }
-            
-            .chat-input input {
-                font-size: 16px;
-            }
+            .container { padding: 12px; }
+            .header { gap: 8px; margin-bottom: 16px; padding-bottom: 12px; }
+            .header h1 { font-size: 1.1rem; min-width: auto; }
+            .brand-id { display: none; }
+            .mobile-toggle { display: block; }
+            .main-layout { flex-direction: column; height: auto; gap: 10px; }
+            .chat-panel { width: 100%; height: auto; max-height: 60vh; display: none; }
+            .chat-panel.show-mobile { display: flex; }
+            .pending-panel { height: auto; max-height: 60vh; display: block; }
+            .pending-panel.hide-mobile { display: none; }
+            .chat-messages { max-height: 30vh; }
+            .pending-item { padding: 10px 12px; gap: 8px; }
+            .chat-input input { font-size: 16px; }
         }
 
         @media (max-width: 480px) {
-            .header h1 {
-                font-size: 1rem;
-            }
-            
-            .back-btn {
-                font-size: 8px;
-                padding: 6px 12px;
-                letter-spacing: 1px;
-            }
-            
-            .chat-panel {
-                padding: 12px;
-                border-radius: 10px;
-            }
-            
-            .pending-panel {
-                padding: 12px;
-                border-radius: 10px;
-            }
-            
-            .pending-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 6px;
-            }
-            
-            .pending-time {
-                align-self: flex-end;
-            }
-            
-            .badge {
-                font-size: 8px;
-                padding: 3px 6px;
-            }
-            
-            .chat-messages .msg {
-                font-size: 10px;
-                padding: 6px 8px;
-            }
+            .header h1 { font-size: 1rem; }
+            .back-btn { font-size: 8px; padding: 6px 12px; letter-spacing: 1px; }
+            .chat-panel { padding: 12px; border-radius: 10px; }
+            .pending-panel { padding: 12px; border-radius: 10px; }
+            .pending-item { flex-direction: column; align-items: flex-start; gap: 6px; }
+            .pending-time { align-self: flex-end; }
+            .badge { font-size: 8px; padding: 3px 6px; }
+            .chat-messages .msg { font-size: 10px; padding: 6px 8px; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -692,13 +503,11 @@
 </head>
 <body>
 
-    <!-- LOADING OVERLAY -->
     <div id="loading-overlay">
         <canvas id="loading-canvas"></canvas>
         <div class="welcome-text" id="loading-text">LOADING</div>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div id="main-content">
         <div class="stage">
             <div class="blob blob-1"></div>
@@ -744,6 +553,7 @@
                     <div id="pendingList">
                         <div class="empty-state">Carregando...</div>
                     </div>
+                    <div class="debug-info" id="debugInfo"></div>
                 </div>
             </div>
         </div>
@@ -754,29 +564,19 @@
         'use strict';
 
         // =============================================
-        // LOADING ANIMATION
+        // LOADING ANIMATION (simplificada)
         // =============================================
         class Particle {
             constructor(baseX, baseY, baseZ, size) {
-                this.baseX = baseX;
-                this.baseY = baseY;
-                this.baseZ = baseZ;
-                this.x = baseX;
-                this.y = baseY;
-                this.z = baseZ;
-                this.size = size;
+                this.baseX = baseX; this.baseY = baseY; this.baseZ = baseZ;
+                this.x = baseX; this.y = baseY; this.z = baseZ; this.size = size;
             }
-            reset() {
-                this.x = this.baseX;
-                this.y = this.baseY;
-                this.z = this.baseZ;
-            }
+            reset() { this.x = this.baseX; this.y = this.baseY; this.z = this.baseZ; }
         }
 
         class Camera {
             constructor() {
-                this.z = 0;
-                this.fov = 60;
+                this.z = 0; this.fov = 60;
                 this.focalLength = 1.0 / Math.tan((this.fov * 0.5) * Math.PI / 180.0);
                 this.near = 0.1;
             }
@@ -784,42 +584,22 @@
                 const dz = pz - this.z;
                 if (dz < this.near) return null;
                 const scale = this.focalLength / dz;
-                return {
-                    x: (px - 0) * scale * (sw / 2) + sw / 2,
-                    y: -py * scale * (sh / 2) + sh / 2,
-                    z: dz,
-                    scale: scale
-                };
+                return { x: px * scale * (sw / 2) + sw / 2, y: -py * scale * (sh / 2) + sh / 2, z: dz, scale: scale };
             }
         }
 
         class SpiralAnimation {
             constructor(canvas, textElement, onComplete) {
-                this.canvas = canvas;
-                this.ctx = canvas.getContext('2d');
-                this.textElement = textElement;
-                this.onComplete = onComplete;
-                this.particles = [];
-                this.camera = new Camera();
-                this.animationId = null;
-                this.startTime = null;
-                this.animDuration = 4000;
-                this.fadeOutDuration = 400;
-                this.holdDuration = 150;
-                this.isFinished = false;
-                this.fadeOutStart = null;
-                this.holdStart = null;
-                this.textOpacity = 0;
-                this.textFadeDelay = 1000;
-                this.textFadeDuration = 600;
-                this.spiralLoops = 5;
-                this.spiralRadius = 4.5;
-                this.spiralHeight = 14.0;
-                this.particleCount = 2000;
-                this.baseSize = 2.0;
-                this.sizeVar = 0.8;
-                this.initParticles();
-                this.resize();
+                this.canvas = canvas; this.ctx = canvas.getContext('2d');
+                this.textElement = textElement; this.onComplete = onComplete;
+                this.particles = []; this.camera = new Camera();
+                this.animationId = null; this.startTime = null;
+                this.animDuration = 3500; this.fadeOutDuration = 400; this.holdDuration = 150;
+                this.isFinished = false; this.fadeOutStart = null; this.holdStart = null;
+                this.textOpacity = 0; this.textFadeDelay = 800; this.textFadeDuration = 500;
+                this.spiralLoops = 5; this.spiralRadius = 4.5; this.spiralHeight = 14.0;
+                this.particleCount = 1500; this.baseSize = 2.0; this.sizeVar = 0.8;
+                this.initParticles(); this.resize();
                 window.addEventListener('resize', () => this.resize());
             }
 
@@ -827,8 +607,8 @@
                 for (let i = 0; i < this.particleCount; i++) {
                     const t = i / (this.particleCount - 1);
                     const angle = t * Math.PI * 2 * this.spiralLoops;
-                    const radiusVar = 0.3 * Math.sin(t * 30) + 0.2;
-                    const radius = this.spiralRadius * (0.7 + t * 0.3) + (Math.random() - 0.5) * radiusVar;
+                    const rv = 0.3 * Math.sin(t * 30) + 0.2;
+                    const radius = this.spiralRadius * (0.7 + t * 0.3) + (Math.random() - 0.5) * rv;
                     const x = Math.cos(angle) * radius;
                     const y = Math.sin(angle) * radius;
                     const z = -t * this.spiralHeight + (Math.random() - 0.5) * 0.8;
@@ -842,26 +622,18 @@
 
             resize() {
                 const dpr = window.devicePixelRatio || 1;
-                const dw = window.innerWidth;
-                const dh = window.innerHeight;
-                this.canvas.width = dw * dpr;
-                this.canvas.height = dh * dpr;
-                this.canvas.style.width = dw + 'px';
-                this.canvas.style.height = dh + 'px';
-                this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-                this.ctx.scale(dpr, dpr);
-                this.dw = dw;
-                this.dh = dh;
+                const dw = window.innerWidth, dh = window.innerHeight;
+                this.canvas.width = dw * dpr; this.canvas.height = dh * dpr;
+                this.canvas.style.width = dw + 'px'; this.canvas.style.height = dh + 'px';
+                this.ctx.setTransform(1, 0, 0, 1, 0, 0); this.ctx.scale(dpr, dpr);
+                this.dw = dw; this.dh = dh;
             }
 
             start() {
                 if (this.animationId) return;
                 this.startTime = performance.now();
-                this.holdStart = null;
-                this.fadeOutStart = null;
-                this.isFinished = false;
-                this.textOpacity = 0;
-                this.textElement.style.opacity = '0';
+                this.holdStart = null; this.fadeOutStart = null; this.isFinished = false;
+                this.textOpacity = 0; this.textElement.style.opacity = '0';
                 this.particles.forEach(p => p.reset());
                 this.camera.z = this.initialZ;
                 this.animate(performance.now());
@@ -870,12 +642,10 @@
             animate(timestamp) {
                 if (this.isFinished) return;
                 const elapsed = timestamp - this.startTime;
-
                 if (elapsed < this.animDuration) {
                     this.update(elapsed / this.animDuration);
                 } else if (!this.holdStart) {
-                    this.holdStart = timestamp;
-                    this.update(1.0);
+                    this.holdStart = timestamp; this.update(1.0);
                 } else if (elapsed < this.animDuration + this.holdDuration + this.fadeOutDuration) {
                     if (!this.fadeOutStart) this.fadeOutStart = timestamp;
                     const fe = timestamp - this.fadeOutStart;
@@ -883,21 +653,10 @@
                     const ef = this.easeInOutQuad(fp);
                     const co = 1.0 - ef;
                     this.ctx.clearRect(0, 0, this.dw, this.dh);
-                    if (co > 0.01) {
-                        this.ctx.globalAlpha = co;
-                        this.render(1.0);
-                        this.ctx.globalAlpha = 1.0;
-                    }
+                    if (co > 0.01) { this.ctx.globalAlpha = co; this.render(1.0); this.ctx.globalAlpha = 1.0; }
                     this.textElement.style.opacity = Math.max(0, this.textOpacity - ef);
-                } else {
-                    this.finish();
-                    return;
-                }
-
-                if (elapsed < this.animDuration + this.holdDuration) {
-                    this.updateText(elapsed);
-                }
-
+                } else { this.finish(); return; }
+                if (elapsed < this.animDuration + this.holdDuration) this.updateText(elapsed);
                 this.animationId = requestAnimationFrame((t) => this.animate(t));
             }
 
@@ -905,47 +664,26 @@
                 const ep = this.easeInOutCubic(progress);
                 this.camera.z = this.initialZ + (this.finalZ - this.initialZ) * ep;
                 const ef = 1.0 + progress * 0.5;
-                this.particles.forEach(p => {
-                    p.x = p.baseX * ef;
-                    p.y = p.baseY * ef;
-                });
+                this.particles.forEach(p => { p.x = p.baseX * ef; p.y = p.baseY * ef; });
                 this.ctx.clearRect(0, 0, this.dw, this.dh);
-                this.ctx.globalAlpha = 1.0;
-                this.render(progress);
+                this.ctx.globalAlpha = 1.0; this.render(progress);
             }
 
             render(progress) {
-                const ctx = this.ctx;
-                const cam = this.camera;
-                const w = this.dw;
-                const h = this.dh;
+                const ctx = this.ctx, cam = this.camera, w = this.dw, h = this.dh;
                 const projected = [];
-
                 for (let i = 0; i < this.particles.length; i++) {
                     const p = this.particles[i];
                     const proj = cam.project(p.x, p.y, p.z, w, h);
-                    if (proj) {
-                        projected.push({
-                            x: proj.x,
-                            y: proj.y,
-                            z: proj.z,
-                            size: p.size * proj.scale * 0.9,
-                            origSize: p.size
-                        });
-                    }
+                    if (proj) projected.push({ x: proj.x, y: proj.y, z: proj.z, size: p.size * proj.scale * 0.9, origSize: p.size });
                 }
-
                 projected.sort((a, b) => b.z - a.z);
-
                 for (let i = 0; i < projected.length; i++) {
                     const p = projected[i];
                     const df = Math.min(1.0, Math.max(0.2, 1.0 - (p.z / 18.0)));
                     const br = 0.7 + (p.origSize / (this.baseSize + this.sizeVar)) * 0.3;
-                    const alpha = df * br * 0.9;
-                    ctx.fillStyle = 'rgba(255, 255, 255, ' + alpha + ')';
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, Math.max(0.4, p.size * 0.5), 0, Math.PI * 2);
-                    ctx.fill();
+                    ctx.fillStyle = 'rgba(255, 255, 255, ' + (df * br * 0.9) + ')';
+                    ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(0.4, p.size * 0.5), 0, Math.PI * 2); ctx.fill();
                 }
             }
 
@@ -953,8 +691,7 @@
                 if (elapsed >= this.textFadeDelay) {
                     const fp = Math.min(1.0, (elapsed - this.textFadeDelay) / this.textFadeDuration);
                     const ef = this.easeInOutQuad(fp);
-                    const bp = 3200;
-                    const bph = (elapsed - this.textFadeDelay) / bp;
+                    const bp = 3200, bph = (elapsed - this.textFadeDelay) / bp;
                     const br = 0.7 + 0.3 * (0.5 + 0.5 * Math.sin(bph * Math.PI * 2));
                     this.textOpacity = ef * br;
                     this.textElement.style.opacity = this.textOpacity;
@@ -963,13 +700,9 @@
 
             finish() {
                 this.isFinished = true;
-                if (this.animationId) {
-                    cancelAnimationFrame(this.animationId);
-                    this.animationId = null;
-                }
+                if (this.animationId) { cancelAnimationFrame(this.animationId); this.animationId = null; }
                 this.ctx.clearRect(0, 0, this.dw, this.dh);
                 this.textElement.style.opacity = '0';
-
                 const overlay = document.getElementById('loading-overlay');
                 overlay.classList.add('fade-out');
                 setTimeout(() => {
@@ -983,7 +716,8 @@
             easeInOutCubic(t) { return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1; }
         }
 
-        // =============================================        // PAGE LOGIC
+        // =============================================
+        // PAGE LOGIC
         // =============================================
         let pageLoaded = false;
         let allPendings = [];
@@ -1058,14 +792,10 @@
             }
         };
 
-        // Filtro de pendências
         window.filterPendings = function(filter, btn) {
             currentFilter = filter;
-            
-            // Update active button
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
             renderFilteredPendings();
         };
 
@@ -1106,7 +836,6 @@
             }
         }
 
-        // Comandos
         const user = JSON.parse(localStorage.getItem('user') || '{}');
 
         const commandsByRole = {
@@ -1118,10 +847,7 @@
 
         window.toggleCmds = function() {
             const list = document.getElementById('cmdsList');
-            if (list.classList.contains('show')) { 
-                list.classList.remove('show'); 
-                return; 
-            }
+            if (list.classList.contains('show')) { list.classList.remove('show'); return; }
             const cmds = commandsByRole[user.role] || commandsByRole['tester'];
             list.innerHTML = cmds.map(c => '<div onclick="document.getElementById(\'chatInput\').value=\'/' + c + '\';document.getElementById(\'cmdsList\').classList.remove(\'show\');">/' + c + '</div>').join('');
             list.classList.add('show');
@@ -1147,40 +873,24 @@
                     });
                     
                     if (!res.ok) throw new Error('API error: ' + res.status);
-                    
                     const data = await res.json();
                     
                     if (data.pendingId) {
                         const msgDiv = addChatMsg('bot', '⏳ Executando...');
                         let attempts = 0;
-                        const maxAttempts = 30;
-                        
                         const checkResult = setInterval(async () => {
                             attempts++;
                             try {
                                 const checkRes = await fetch('/api/pendings/resultado?pendingId=' + data.pendingId, {
                                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                                 });
-                                
-                                if (!checkRes.ok) {
-                                    if (attempts >= maxAttempts) {
-                                        clearInterval(checkResult);
-                                        msgDiv.textContent = '⏱️ Tempo limite excedido';
-                                    }
-                                    return;
-                                }
-                                
+                                if (!checkRes.ok) { if (attempts >= 30) { clearInterval(checkResult); msgDiv.textContent = '⏱️ Tempo limite excedido'; } return; }
                                 const checkData = await checkRes.json();
-                                if (checkData.done || attempts >= maxAttempts) {
+                                if (checkData.done || attempts >= 30) {
                                     clearInterval(checkResult);
                                     msgDiv.textContent = checkData.result || checkData.message || '✅ Comando executado';
                                 }
-                            } catch (e) {
-                                if (attempts >= maxAttempts) {
-                                    clearInterval(checkResult);
-                                    msgDiv.textContent = '❌ Erro de conexão';
-                                }
-                            }
+                            } catch (e) { if (attempts >= 30) { clearInterval(checkResult); msgDiv.textContent = '❌ Erro de conexão'; } }
                         }, 1000);
                     } else {
                         addChatMsg('bot', data.message || data.result || '✅ Comando enviado');
@@ -1189,7 +899,6 @@
                     console.error('Erro ao executar:', e);
                     addChatMsg('bot', '❌ Erro ao executar comando');
                 }
-                
                 loadPendings();
             } else {
                 try {
@@ -1198,9 +907,7 @@
                         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                         body: JSON.stringify({ message: msg, role: user.role || 'tester' })
                     });
-                    
                     if (!res.ok) throw new Error('API error: ' + res.status);
-                    
                     const data = await res.json();
                     addChatMsg('bot', data.response || 'Sem resposta');
                 } catch (e) {
@@ -1213,9 +920,7 @@
         function addChatMsg(type, text) {
             const chatMessages = document.getElementById('chatMessages');
             const firstMsg = chatMessages.querySelector('.msg.bot');
-            if (firstMsg && firstMsg.textContent === 'Digite /comando ou converse com a IA') {
-                firstMsg.remove();
-            }
+            if (firstMsg && firstMsg.textContent === 'Digite /comando ou converse com a IA') firstMsg.remove();
             const div = document.createElement('div');
             div.className = 'msg ' + type;
             div.textContent = text;
@@ -1225,23 +930,81 @@
         }
 
         function loadPendings() {
+            const list = document.getElementById('pendingList');
+            const debugInfo = document.getElementById('debugInfo');
+            
+            console.log('🔄 Carregando pendências...');
+            
             fetch('/api/pendings/list', { 
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
             })
             .then(r => {
+                console.log('📡 Status da resposta:', r.status, r.statusText);
                 if (!r.ok) throw new Error('HTTP ' + r.status);
                 return r.json();
             })
             .then(data => {
-                const pendings = data.pendings || data || [];
+                console.log('📦 Dados recebidos:', data);
+                console.log('📋 Tipo:', typeof data);
+                console.log('🔑 Chaves:', Object.keys(data));
                 
-                if (Array.isArray(pendings) && pendings.length > 0) {
-                    allPendings = pendings.map(p => {
-                        const command = p.data?.command || p.command || p.type || 'comando';
-                        const params = p.data?.params || p.params || '';
-                        const result = p.data?.result || p.result || '';
-                        const createdAt = p.createdAt || p.created_at || new Date().toISOString();
-                        const isDone = p.done || p.status === 'done' || p.status === 'completed';
+                // Tenta extrair pendings de várias formas possíveis
+                let pendings = [];
+                
+                if (Array.isArray(data)) {
+                    // Resposta é um array direto
+                    pendings = data;
+                    console.log('✅ Encontrado array direto, length:', pendings.length);
+                } else if (data.pendings && Array.isArray(data.pendings)) {
+                    // Resposta tem campo pendings
+                    pendings = data.pendings;
+                    console.log('✅ Encontrado data.pendings, length:', pendings.length);
+                } else if (data.data && Array.isArray(data.data)) {
+                    // Resposta tem campo data
+                    pendings = data.data;
+                    console.log('✅ Encontrado data.data, length:', pendings.length);
+                } else if (data.pending && Array.isArray(data.pending)) {
+                    pendings = data.pending;
+                    console.log('✅ Encontrado data.pending, length:', pendings.length);
+                } else if (typeof data === 'object' && data !== null) {
+                    // Procura o primeiro array nas propriedades
+                    for (const key of Object.keys(data)) {
+                        if (Array.isArray(data[key]) && data[key].length > 0) {
+                            pendings = data[key];
+                            console.log('✅ Encontrado array em data.' + key + ', length:', pendings.length);
+                            break;
+                        }
+                    }
+                }
+                
+                // Debug info
+                debugInfo.style.display = 'block';
+                debugInfo.innerHTML = '🔍 Debug: ' + pendings.length + ' pendências encontradas<br>' +
+                    'Formato: ' + (Array.isArray(data) ? 'Array direto' : typeof data) + '<br>' +
+                    'Chaves: ' + JSON.stringify(Object.keys(data)).replace(/</g, '&lt;');
+                
+                if (pendings.length > 0) {
+                    allPendings = pendings.map((p, index) => {
+                        // Extrai campos de forma ultra-flexível
+                        const command = p.command || p.type || p.name || 
+                                       (p.data && (p.data.command || p.data.type)) || 
+                                       'item_' + index;
+                        
+                        const params = p.params || p.arguments || p.args ||
+                                      (p.data && (p.data.params || p.data.arguments)) || '';
+                        
+                        const result = p.result || p.output || p.response ||
+                                      (p.data && (p.data.result || p.data.output)) || '';
+                        
+                        const createdAt = p.createdAt || p.created_at || p.date || 
+                                        p.timestamp || p.time || new Date().toISOString();
+                        
+                        // Verifica se está concluído
+                        const isDone = p.done === true || 
+                                      p.status === 'done' || 
+                                      p.status === 'completed' ||
+                                      p.status === 'finished' ||
+                                      p.completed === true;
                         
                         return {
                             command,
@@ -1252,22 +1015,24 @@
                             raw: p
                         };
                     });
+                    
+                    console.log('✅ allPendings:', allPendings);
                 } else {
+                    console.log('⚠️ Nenhuma pendência encontrada');
                     allPendings = [];
                 }
                 
                 renderFilteredPendings();
             })
             .catch((err) => {
-                console.error('Erro ao carregar pendências:', err);
+                console.error('❌ Erro ao carregar pendências:', err);
+                debugInfo.style.display = 'block';
+                debugInfo.innerHTML = '❌ Erro: ' + err.message;
                 allPendings = [];
                 renderFilteredPendings();
             });
         }
 
-        // =============================================
-        // INIT
-        // =============================================
         document.addEventListener('DOMContentLoaded', () => {
             const canvas = document.getElementById('loading-canvas');
             const textElement = document.getElementById('loading-text');
