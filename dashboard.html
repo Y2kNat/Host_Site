@@ -116,7 +116,7 @@
         .blob-1 {
             width: 400px;
             height: 400px;
-            background: rgba(88,101,242,0.3);
+            background: rgba(130,140,255,0.35);
             left: -5%;
             top: -10%;
             animation: float1 20s ease-in-out infinite;
@@ -125,7 +125,7 @@
         .blob-2 {
             width: 350px;
             height: 350px;
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.2);
             left: 55%;
             top: -5%;
             animation: float2 25s ease-in-out infinite;
@@ -134,7 +134,7 @@
         .blob-3 {
             width: 500px;
             height: 500px;
-            background: rgba(88,101,242,0.2);
+            background: rgba(130,140,255,0.25);
             left: 25%;
             top: 40%;
             animation: float3 30s ease-in-out infinite;
@@ -143,7 +143,7 @@
         .blob-4 {
             width: 300px;
             height: 300px;
-            background: rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.18);
             left: 70%;
             top: 35%;
             animation: float1 22s ease-in-out infinite reverse;
@@ -152,7 +152,7 @@
         .blob-5 {
             width: 380px;
             height: 380px;
-            background: rgba(88,101,242,0.25);
+            background: rgba(130,140,255,0.3);
             left: 10%;
             top: 55%;
             animation: float2 28s ease-in-out infinite reverse;
@@ -161,7 +161,7 @@
         .blob-6 {
             width: 250px;
             height: 250px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.15);
             left: 45%;
             top: 0%;
             animation: float3 18s ease-in-out infinite;
@@ -532,7 +532,7 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(88,101,242,0.4), transparent);
+            background: linear-gradient(90deg, transparent, rgba(130,180,255,0.5), transparent);
         }
 
         .console-panel h3 {
@@ -541,73 +541,112 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             color: var(--text-dim);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             font-weight: 600;
         }
 
-        .console-inner {
-            min-height: 200px;
-            max-height: 280px;
+        .console-terminal {
+            background: #0a0a0f;
+            border: 1px solid rgba(130,180,255,0.2);
+            border-radius: 10px;
+            padding: 14px;
+            min-height: 220px;
+            max-height: 300px;
             overflow-y: auto;
             font-family: 'Space Mono', monospace;
             font-size: 8px;
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 2px;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.5), 0 0 15px rgba(130,180,255,0.05);
         }
 
-        .console-inner::-webkit-scrollbar {
+        .console-terminal::-webkit-scrollbar {
             width: 3px;
         }
 
-        .console-inner::-webkit-scrollbar-track {
+        .console-terminal::-webkit-scrollbar-track {
             background: transparent;
         }
 
-        .console-inner::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.06);
+        .console-terminal::-webkit-scrollbar-thumb {
+            background: rgba(130,180,255,0.15);
             border-radius: 10px;
         }
 
         .console-line {
-            padding: 5px 8px;
-            border-radius: 4px;
-            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 3px;
             display: flex;
             gap: 8px;
             align-items: flex-start;
-            animation: fadeInUp 0.2s ease-out;
+            animation: consoleFadeIn 0.3s ease-out;
+            line-height: 1.5;
         }
 
         .console-line.welcome-line {
-            background: rgba(88,101,242,0.15);
-            border: 1px solid rgba(88,101,242,0.3);
+            background: rgba(130,180,255,0.08);
+            border-left: 2px solid rgba(130,180,255,0.5);
+            padding: 6px 10px;
+            margin-bottom: 4px;
+        }
+
+        .console-prompt {
+            color: rgba(130,180,255,0.7);
+            white-space: nowrap;
+            font-size: 8px;
+            user-select: none;
         }
 
         .console-time {
-            color: rgba(255,255,255,0.25);
+            color: rgba(255,255,255,0.3);
             white-space: nowrap;
             min-width: 50px;
             font-size: 7px;
+            user-select: none;
         }
 
-        .console-type {
+        .console-tag {
             text-transform: uppercase;
             font-weight: 600;
-            min-width: 55px;
+            min-width: 60px;
             font-size: 7px;
+            padding: 1px 4px;
+            border-radius: 2px;
+            text-align: center;
+            letter-spacing: 0.5px;
         }
 
-        .console-type.info { color: #5865F2; }
-        .console-type.success { color: #2ecc71; }
-        .console-type.warn { color: #f39c12; }
-        .console-type.error { color: #ff6b6b; }
-        .console-type.welcome { color: #5865F2; }
+        .console-tag.info { 
+            color: #82b4ff; 
+            background: rgba(130,180,255,0.1); 
+        }
+        .console-tag.success { 
+            color: #7bed9f; 
+            background: rgba(123,237,159,0.1); 
+        }
+        .console-tag.warn { 
+            color: #ffa502; 
+            background: rgba(255,165,2,0.1); 
+        }
+        .console-tag.error { 
+            color: #ff6b6b; 
+            background: rgba(255,107,107,0.1); 
+        }
+        .console-tag.welcome { 
+            color: #82b4ff; 
+            background: rgba(130,180,255,0.15); 
+        }
+        .console-tag.connected { 
+            color: #7bed9f; 
+            background: rgba(123,237,159,0.15); 
+        }
 
         .console-msg {
-            color: rgba(255,255,255,0.65);
+            color: rgba(220,225,240,0.75);
             word-break: break-all;
             font-size: 8px;
+            flex: 1;
         }
 
         .console-placeholder {
@@ -617,10 +656,10 @@
             font-size: 9px;
         }
 
-        @keyframes fadeInUp {
+        @keyframes consoleFadeIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(4px);
             }
             to {
                 opacity: 1;
@@ -729,7 +768,7 @@
                     </div>
                     <div class="console-panel">
                         <h3>🤖 Bot Console</h3>
-                        <div class="console-inner" id="bot-console">
+                        <div class="console-terminal" id="bot-console">
                             <div class="console-placeholder">Aguardando conexão com o bot...</div>
                         </div>
                     </div>
@@ -1133,30 +1172,32 @@
         // =============================================
         function initBotConsole() {
             var consoleDiv = document.getElementById('bot-console');
-            var maxLogs = 100;
-            var logCount = 0;
+            var maxLogs = 80;
 
-            // Adiciona mensagem de boas-vindas
+            function addConsoleLine(time, tag, msg, extraClass) {
+                var line = document.createElement('div');
+                line.className = 'console-line';
+                if (extraClass) line.classList.add(extraClass);
+                line.innerHTML = '<span class="console-prompt">❯</span>' +
+                    '<span class="console-time">' + time + '</span>' +
+                    '<span class="console-tag ' + tag.toLowerCase() + '">' + tag + '</span>' +
+                    '<span class="console-msg">' + msg + '</span>';
+                return line;
+            }
+
             function addWelcomeMessage() {
                 consoleDiv.innerHTML = '';
-                var welcomeLine = document.createElement('div');
-                welcomeLine.className = 'console-line welcome-line';
-                welcomeLine.innerHTML = '<span class="console-time">' + new Date().toLocaleTimeString('pt-BR') + '</span>' +
-                    '<span class="console-type welcome">HELLO</span>' +
-                    '<span class="console-msg">👋 Hello <strong>' + userName + '</strong>, your role is <strong>' + userRole.toUpperCase() + '</strong></span>';
+                var now = new Date().toLocaleTimeString('pt-BR');
+
+                var welcomeLine = addConsoleLine(now, 'WELCOME', '👋 Hello <strong>' + userName + '</strong>, your role is <strong>' + userRole.toUpperCase() + '</strong>', 'welcome-line');
                 consoleDiv.appendChild(welcomeLine);
 
-                var infoLine = document.createElement('div');
-                infoLine.className = 'console-line';
-                infoLine.innerHTML = '<span class="console-time">' + new Date().toLocaleTimeString('pt-BR') + '</span>' +
-                    '<span class="console-type info">INFO</span>' +
-                    '<span class="console-msg">Conectando ao bot em tempo real...</span>';
+                var infoLine = addConsoleLine(now, 'INFO', '⏳ Connecting to bot realtime...');
                 consoleDiv.appendChild(infoLine);
             }
 
             addWelcomeMessage();
 
-            // Busca a chave Pusher da API
             fetch('/api/pusher-key')
                 .then(function(res) { return res.json(); })
                 .then(function(data) {
@@ -1172,77 +1213,62 @@
                     var channel = pusher.subscribe('bot-logs');
 
                     channel.bind('new-log', function(data) {
-                        logCount++;
-
-                        var time = data.timestamp ? new Date(data.timestamp).toLocaleTimeString('pt-BR') : '';
-                        var type = data.type || 'info';
+                        var time = data.timestamp ? new Date(data.timestamp).toLocaleTimeString('pt-BR') : new Date().toLocaleTimeString('pt-BR');
+                        var type = data.type || 'INFO';
                         var msg = data.message || '';
 
-                        var line = document.createElement('div');
-                        line.className = 'console-line';
-                        line.innerHTML = '<span class="console-time">' + time + '</span>' +
-                            '<span class="console-type ' + type + '">' + type.toUpperCase() + '</span>' +
-                            '<span class="console-msg">' + msg + '</span>';
+                        var line = addConsoleLine(time, type, msg);
 
-                        if (consoleDiv.firstChild) {
-                            consoleDiv.insertBefore(line, consoleDiv.firstChild.nextSibling || consoleDiv.firstChild);
+                        var welcomeLine = consoleDiv.querySelector('.welcome-line');
+                        if (welcomeLine && welcomeLine.nextSibling) {
+                            consoleDiv.insertBefore(line, welcomeLine.nextSibling.nextSibling || welcomeLine.nextSibling);
                         } else {
                             consoleDiv.appendChild(line);
                         }
 
-                        if (logCount > maxLogs) {
-                            var lines = consoleDiv.querySelectorAll('.console-line:not(.welcome-line)');
-                            if (lines.length > maxLogs) {
-                                consoleDiv.removeChild(lines[lines.length - 1]);
+                        var allLines = consoleDiv.querySelectorAll('.console-line:not(.welcome-line)');
+                        if (allLines.length > maxLogs) {
+                            for (var i = maxLogs; i < allLines.length; i++) {
+                                allLines[i].remove();
                             }
-                            logCount--;
                         }
                     });
 
                     channel.bind('pusher:subscription_succeeded', function() {
-                        var line = document.createElement('div');
-                        line.className = 'console-line';
-                        line.innerHTML = '<span class="console-time">' + new Date().toLocaleTimeString('pt-BR') + '</span>' +
-                            '<span class="console-type success">CONNECTED</span>' +
-                            '<span class="console-msg">✅ Conectado ao bot em tempo real</span>';
-                        
+                        var now = new Date().toLocaleTimeString('pt-BR');
+                        var connectedLine = addConsoleLine(now, 'CONNECTED', '✅ Connected to bot realtime stream');
+
                         var welcomeLine = consoleDiv.querySelector('.welcome-line');
                         if (welcomeLine && welcomeLine.nextSibling) {
-                            consoleDiv.insertBefore(line, welcomeLine.nextSibling);
+                            consoleDiv.insertBefore(connectedLine, welcomeLine.nextSibling);
                         } else {
-                            consoleDiv.appendChild(line);
+                            consoleDiv.appendChild(connectedLine);
                         }
                     });
 
                     channel.bind('pusher:subscription_error', function() {
-                        var line = document.createElement('div');
-                        line.className = 'console-line';
-                        line.innerHTML = '<span class="console-time">' + new Date().toLocaleTimeString('pt-BR') + '</span>' +
-                            '<span class="console-type error">ERROR</span>' +
-                            '<span class="console-msg">❌ Erro ao conectar com o bot</span>';
-                        
+                        var now = new Date().toLocaleTimeString('pt-BR');
+                        var errorLine = addConsoleLine(now, 'ERROR', '❌ Failed to connect to bot stream');
+
                         var welcomeLine = consoleDiv.querySelector('.welcome-line');
                         if (welcomeLine && welcomeLine.nextSibling) {
-                            consoleDiv.insertBefore(line, welcomeLine.nextSibling);
+                            consoleDiv.insertBefore(errorLine, welcomeLine.nextSibling);
                         } else {
-                            consoleDiv.appendChild(line);
+                            consoleDiv.appendChild(errorLine);
                         }
                     });
 
                 })
                 .catch(function(e) {
                     console.error('Erro ao carregar Pusher key:', e.message);
-                    var line = document.createElement('div');
-                    line.className = 'console-line';
-                    line.innerHTML = '<span class="console-time">' + new Date().toLocaleTimeString('pt-BR') + '</span>' +
-                        '<span class="console-type error">ERROR</span>' +
-                        '<span class="console-msg">❌ Pusher key não configurada no servidor</span>';
-                    
+                    var now = new Date().toLocaleTimeString('pt-BR');
+                    var errorLine = addConsoleLine(now, 'ERROR', '❌ Pusher key not configured on server');
+
                     var welcomeLine = consoleDiv.querySelector('.welcome-line');
                     if (welcomeLine && welcomeLine.nextSibling) {
-                        consoleDiv.insertBefore(line, welcomeLine.nextSibling);
+                        consoleDiv.insertBefore(errorLine, welcomeLine.nextSibling);
                     } else {
-                        consoleDiv.appendChild(line);
+                        consoleDiv.appendChild(errorLine);
                     }
                 });
         }
@@ -1472,12 +1498,7 @@
                     var sd = await sr.json();
                     s = sd.stats || sd;
                 } catch (e) {
-                    console.log('Status API indisponível, usando dados mock');
-                    s = {
-                        ticketsAtivos: 12,
-                        warns: 5,
-                        pendentes: 8
-                    };
+                    s = { ticketsAtivos: 12, warns: 5, pendentes: 8 };
                 }
 
                 try {
@@ -1486,41 +1507,10 @@
                     });
                     cd = await cr.json();
                 } catch (e) {
-                    console.log('Charts API indisponível, usando dados mock');
                     cd = {
-                        tickets: {
-                            ativos: s.ticketsAtivos || 12,
-                            fechados: 45,
-                            historico: [
-                                { data: 'Seg', ativos: 15, fechados: 40 },
-                                { data: 'Ter', ativos: 13, fechados: 42 },
-                                { data: 'Qua', ativos: 14, fechados: 43 },
-                                { data: 'Qui', ativos: 12, fechados: 45 },
-                                { data: 'Sex', ativos: 10, fechados: 47 }
-                            ]
-                        },
-                        warns: {
-                            hoje: s.warns || 5,
-                            semana: 12,
-                            historico: [
-                                { data: 'Seg', hoje: 8, semana: 10 },
-                                { data: 'Ter', hoje: 6, semana: 11 },
-                                { data: 'Qua', hoje: 7, semana: 12 },
-                                { data: 'Qui', hoje: 5, semana: 13 },
-                                { data: 'Sex', hoje: 3, semana: 12 }
-                            ]
-                        },
-                        pendings: {
-                            ativas: s.pendentes || 8,
-                            concluidas: 32,
-                            historico: [
-                                { data: 'Seg', ativas: 10, concluidas: 28 },
-                                { data: 'Ter', ativas: 9, concluidas: 30 },
-                                { data: 'Qua', ativas: 8, concluidas: 31 },
-                                { data: 'Qui', ativas: 7, concluidas: 32 },
-                                { data: 'Sex', ativas: 6, concluidas: 34 }
-                            ]
-                        }
+                        tickets: { ativos: s.ticketsAtivos || 12, fechados: 45, historico: [{ data: 'Seg', ativos: 15, fechados: 40 }, { data: 'Ter', ativos: 13, fechados: 42 }, { data: 'Qua', ativos: 14, fechados: 43 }, { data: 'Qui', ativos: 12, fechados: 45 }, { data: 'Sex', ativos: 10, fechados: 47 }] },
+                        warns: { hoje: s.warns || 5, semana: 12, historico: [{ data: 'Seg', hoje: 8, semana: 10 }, { data: 'Ter', hoje: 6, semana: 11 }, { data: 'Qua', hoje: 7, semana: 12 }, { data: 'Qui', hoje: 5, semana: 13 }, { data: 'Sex', hoje: 3, semana: 12 }] },
+                        pendings: { ativas: s.pendentes || 8, concluidas: 32, historico: [{ data: 'Seg', ativas: 10, concluidas: 28 }, { data: 'Ter', ativas: 9, concluidas: 30 }, { data: 'Qua', ativas: 8, concluidas: 31 }, { data: 'Qui', ativas: 7, concluidas: 32 }, { data: 'Sex', ativas: 6, concluidas: 34 }] }
                     };
                 }
 
@@ -1529,9 +1519,7 @@
                 document.getElementById('pendings').textContent = s.pendentes || cd.pendings?.ativas || 0;
 
                 renderCharts(cd);
-
             } catch (e) {
-                console.error('Error loading data:', e);
                 document.getElementById('tickets').textContent = '—';
                 document.getElementById('warns').textContent = '—';
                 document.getElementById('pendings').textContent = '—';
@@ -1541,7 +1529,6 @@
         function renderCharts(d) {
             var ticketsHistory = d.tickets?.historico || [];
             var ticketsActiveData, ticketsClosedData, ticketsLabels;
-
             if (ticketsHistory.length > 0) {
                 ticketsActiveData = ticketsHistory.map(function(h) { return h.ativos || 0; });
                 ticketsClosedData = ticketsHistory.map(function(h) { return h.fechados || 0; });
@@ -1553,15 +1540,10 @@
                 ticketsClosedData = [Math.max(0, fechados - 3), fechados];
                 ticketsLabels = ['Ant', 'Atual'];
             }
-
-            createLineChart('chart-tickets', [
-                { name: 'Active', data: ticketsActiveData, labels: ticketsLabels },
-                { name: 'Closed', data: ticketsClosedData, labels: ticketsLabels }
-            ], ['#5865F2', 'rgba(88,101,242,0.4)']);
+            createLineChart('chart-tickets', [{ name: 'Active', data: ticketsActiveData, labels: ticketsLabels }, { name: 'Closed', data: ticketsClosedData, labels: ticketsLabels }], ['#5865F2', 'rgba(88,101,242,0.4)']);
 
             var warnsHistory = d.warns?.historico || [];
             var warnsTodayData, warnsWeekData, warnsLabels;
-
             if (warnsHistory.length > 0) {
                 warnsTodayData = warnsHistory.map(function(h) { return h.hoje || 0; });
                 warnsWeekData = warnsHistory.map(function(h) { return h.semana || 0; });
@@ -1573,15 +1555,10 @@
                 warnsWeekData = [Math.max(0, semana - 2), semana];
                 warnsLabels = ['Ant', 'Atual'];
             }
-
-            createLineChart('chart-warns', [
-                { name: 'Today', data: warnsTodayData, labels: warnsLabels },
-                { name: 'Week', data: warnsWeekData, labels: warnsLabels }
-            ], ['#ff6b6b', 'rgba(255,107,107,0.4)']);
+            createLineChart('chart-warns', [{ name: 'Today', data: warnsTodayData, labels: warnsLabels }, { name: 'Week', data: warnsWeekData, labels: warnsLabels }], ['#ff6b6b', 'rgba(255,107,107,0.4)']);
 
             var pendingsHistory = d.pendings?.historico || [];
             var pendingsActiveData, pendingsDoneData, pendingsLabels;
-
             if (pendingsHistory.length > 0) {
                 pendingsActiveData = pendingsHistory.map(function(h) { return h.ativas || 0; });
                 pendingsDoneData = pendingsHistory.map(function(h) { return h.concluidas || 0; });
@@ -1593,11 +1570,7 @@
                 pendingsDoneData = [Math.max(0, concluidas - 2), concluidas];
                 pendingsLabels = ['Ant', 'Atual'];
             }
-
-            createLineChart('chart-pendings', [
-                { name: 'Active', data: pendingsActiveData, labels: pendingsLabels },
-                { name: 'Done', data: pendingsDoneData, labels: pendingsLabels }
-            ], ['#ffffff', 'rgba(255,255,255,0.4)']);
+            createLineChart('chart-pendings', [{ name: 'Active', data: pendingsActiveData, labels: pendingsLabels }, { name: 'Done', data: pendingsDoneData, labels: pendingsLabels }], ['#ffffff', 'rgba(255,255,255,0.4)']);
         }
 
         window.logout = function() {
@@ -1605,20 +1578,15 @@
             window.location.href = '/';
         };
 
-        // =============================================
-        // INIT
-        // =============================================
         document.addEventListener('DOMContentLoaded', function() {
             var canvas = document.getElementById('loading-canvas');
             var loadingElement = document.getElementById('loading-text');
-
             if (!canvas || !loadingElement) {
                 document.getElementById('loading-overlay').classList.add('hidden');
                 document.getElementById('dashboard').classList.add('visible');
                 initDashboard();
                 return;
             }
-
             var animation = new SpiralAnimation(canvas, loadingElement, initDashboard);
             animation.start();
         });
