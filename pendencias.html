@@ -109,6 +109,7 @@
         }
 
         .main-layout { display: flex; gap: 16px; height: calc(100vh - 160px); min-height: 500px; }
+        
         .chat-panel {
             width: 320px; flex-shrink: 0; background: var(--card);
             border: 1px solid var(--border); border-radius: var(--radius);
@@ -210,7 +211,6 @@
         }
         .pending-item:hover { border-color: rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); }
         .pending-item.done-item { opacity: 0.6; }
-        .pending-item.done-item:hover { opacity: 0.8; }
         .badge {
             padding: 4px 8px; border-radius: 6px; font-size: 9px;
             font-family: 'Space Mono', monospace; letter-spacing: 1px;
@@ -253,10 +253,6 @@
             .pending-panel.hide-mobile { display: none; }
             .chat-input input { font-size: 16px; }
         }
-
-        @media (prefers-reduced-motion: reduce) {
-            .blob { animation: none; }
-        }
     </style>
 </head>
 <body>
@@ -280,7 +276,7 @@
             <div class="header">
                 <a href="/dashboard" class="back-btn">← Voltar</a>
                 <h1>⚡ Pendências & Comandos</h1>
-                <span class="brand-id" id="roleDisplay">System Node: HV-CMD</span>
+                <span class="brand-id">System Node: HV-CMD</span>
             </div>
             
             <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobileView()">📋 Ver Pendências</button>
@@ -307,7 +303,7 @@
                         <button class="filter-btn" onclick="filterPendings('done', this)">✓ Concluídas</button>
                     </div>
                     <div id="pendingList">
-                        <div class="empty-state">Nenhuma pendência ainda</div>
+                        <div class="empty-state">Carregando...</div>
                     </div>
                 </div>
             </div>
@@ -463,8 +459,6 @@
                 return;
             }
 
-            document.getElementById('roleDisplay').textContent = 'Role: ' + userRole.toUpperCase() + ' | HV-CMD';
-
             const blobs = document.querySelectorAll('.blob');
             document.addEventListener('mousemove', function(e) {
                 const x = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -474,8 +468,10 @@
                 });
             });
 
-            loadPendings();
-            setInterval(loadPendings, 15000);
+            // Puxa dados da MESMA API que a dashboard usa
+            loadPendingsFromDashboardAPI();
+            setInterval(loadPendingsFromDashboardAPI, 15000);
+            
             window.addEventListener('resize', handleResize);
             handleResize();
         }
@@ -593,6 +589,7 @@
                 
                 const msgDiv = addChatMsg('bot', '⏳ Executando /' + command + '...');
                 
+                // Tenta enviar para API de execução
                 fetch('/api/pendings/executar', {
                     method: 'POST',
                     headers: {
@@ -607,7 +604,6 @@
                     newPending.result = data.result || data.message || '✅ Executado';
                     msgDiv.textContent = newPending.result;
                     renderPendings();
-                    loadPendings();
                 })
                 .catch(() => {
                     setTimeout(() => {
@@ -632,27 +628,69 @@
             return div;
         }
 
-        async function loadPendings() {
+        // =============================================
+        // USA A MESMA API DA DASHBOARD
+        // =============================================
+        async function loadPendingsFromDashboardAPI() {
+            console.log('🔄 Buscando pendências da API da dashboard...');
+            
             try {
-                const res = await fetch('/api/pending/list', {
+                // Usa a MESMA API que a dashboard usa: /api/dashboard/charts
+                const res = await fetch('/api/dashboard/charts', {
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                 });
                 
                 if (res.ok) {
                     const data = await res.json();
-                    if (data.pendings && Array.isArray(data.pendings)) {
-                        allPendings = data.pendings.map(p => ({
-                            command: p.command || p.type || 'comando',
-                            params: p.params || (p.data && p.data.params) || '',
-                            result: p.result || (p.data && p.data.result) || '',
-                            time: p.createdAt ? new Date(p.createdAt).toLocaleString('pt-BR') : '',
-                            done: p.done === true || p.status === 'done'
+                    console.log('📦 Dados recebidos:', data);
+                    
+                    // Extrai as pendências do mesmo formato que a dashboard
+                    const pendingsData = data.pendings || {};
+                    const historico = pendingsData.historico || [];
+                    
+                    if (historico.length > 0) {
+                        // Usa o histórico se existir
+                        allPendings = historico.map(h => ({
+                            command: 'task',
+                            params: 'Ativas: ' + (h.ativas || 0) + ' | Concluídas: ' + (h.concluidas || 0),
+                            result: '',
+                            time: h.data || '',
+                            done: (h.ativas || 0) === 0
                         }));
+                    } else {
+                        // Usa os valores atuais
+                        const ativas = pendingsData.ativas || 0;
+                        const concluidas = pendingsData.concluidas || 0;
+                        
+                        allPendings = [
+                            { command: 'tasks', params: 'Ativas', result: String(ativas), time: 'Agora', done: ativas === 0 },
+                            { command: 'tasks', params: 'Concluídas', result: String(concluidas), time: 'Agora', done: true }
+                        ];
+                    }
+                    
+                    console.log('✅ ' + allPendings.length + ' pendências carregadas');
+                } else {
+                    // Fallback: usa /api/status
+                    console.log('⚠️ /api/dashboard/charts falhou, tentando /api/status...');
+                    
+                    const statusRes = await fetch('/api/status', {
+                        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                    });
+                    
+                    if (statusRes.ok) {
+                        const statusData = await statusRes.json();
+                        const s = statusData.stats || statusData;
+                        const pendentes = s.pendentes || 0;
+                        
+                        allPendings = [
+                            { command: 'tasks', params: 'Pendentes', result: String(pendentes), time: 'Agora', done: pendentes === 0 }
+                        ];
                     }
                 }
             } catch (e) {
-                // API indisponível, mantém dados atuais
+                console.error('❌ Erro ao carregar:', e.message);
             }
+            
             renderPendings();
         }
 
