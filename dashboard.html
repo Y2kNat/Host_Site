@@ -3,425 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HostVille BOT - Login</title>
+    <title>HostVille BOT - Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;800&family=Space+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #050505;
-            --accent: #ffffff;
-            --text-dim: rgba(255, 255, 255, 0.5);
+            --card: rgba(255,255,255,0.03);
+            --card-hover: rgba(255,255,255,0.06);
+            --accent-blue: rgba(88,101,242,0.6);
+            --text: #ffffff;
+            --text-dim: rgba(255,255,255,0.5);
+            --text-tertiary: rgba(255,255,255,0.25);
+            --border: rgba(255,255,255,0.06);
+            --border-hover: rgba(255,255,255,0.12);
+            --radius: 14px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
-            background-color: var(--bg);
-            color: var(--accent);
+            background: var(--bg);
+            color: var(--text);
             font-family: 'Inter', sans-serif;
-            height: 100vh;
+            min-height: 100vh;
             width: 100vw;
-            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* LOADING OVERLAY */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 9999;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            -webkit-font-smoothing: antialiased;
+            transition: opacity 0.6s ease-out;
         }
 
-        /* Background Blobs - NO FILTER, visible */
-        .stage {
+        #loading-overlay canvas {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
         }
 
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(60px);
-            will-change: transform;
-            transform: translateZ(0);
-            backface-visibility: hidden;
-        }
-
-        .blob-1 {
-            width: 400px;
-            height: 400px;
-            background: rgba(88, 101, 242, 0.3);
-            left: -5%;
-            top: -10%;
-            animation: float1 20s ease-in-out infinite;
-        }
-
-        .blob-2 {
-            width: 350px;
-            height: 350px;
-            background: rgba(255, 255, 255, 0.15);
-            left: 55%;
-            top: -5%;
-            animation: float2 25s ease-in-out infinite;
-        }
-
-        .blob-3 {
-            width: 500px;
-            height: 500px;
-            background: rgba(88, 101, 242, 0.2);
-            left: 25%;
-            top: 40%;
-            animation: float3 30s ease-in-out infinite;
-        }
-
-        .blob-4 {
-            width: 300px;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.12);
-            left: 70%;
-            top: 35%;
-            animation: float1 22s ease-in-out infinite reverse;
-        }
-
-        .blob-5 {
-            width: 380px;
-            height: 380px;
-            background: rgba(88, 101, 242, 0.25);
-            left: 10%;
-            top: 55%;
-            animation: float2 28s ease-in-out infinite reverse;
-        }
-
-        .blob-6 {
-            width: 250px;
-            height: 250px;
-            background: rgba(255, 255, 255, 0.1);
-            left: 45%;
-            top: 0%;
-            animation: float3 18s ease-in-out infinite;
-        }
-
-        @keyframes float1 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(100px, -50px) scale(1.15); }
-            50% { transform: translate(-40px, 80px) scale(0.9); }
-            75% { transform: translate(-80px, -30px) scale(1.1); }
-        }
-
-        @keyframes float2 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(-60px, 60px) scale(1.2); }
-            66% { transform: translate(50px, -80px) scale(0.85); }
-        }
-
-        @keyframes float3 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            20% { transform: translate(80px, 40px) scale(1.1); }
-            40% { transform: translate(-50px, -60px) scale(0.9); }
-            60% { transform: translate(30px, 80px) scale(1.15); }
-            80% { transform: translate(-70px, -30px) scale(0.95); }
-        }
-
-        /* Auth Container */
-        .auth-container {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            max-width: 440px;
-            padding: 40px;
-        }
-
-        .header {
-            margin-bottom: 60px;
-            text-align: left;
-        }
-
-        .brand-id {
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: var(--text-dim);
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .header h1 {
-            font-weight: 800;
-            font-size: 3rem;
-            line-height: 0.9;
-            letter-spacing: -2px;
-            margin-left: -4px;
-            margin-top: 0;
-            color: var(--accent);
-        }
-
-        .form-group {
-            position: relative;
-            margin-bottom: 30px;
-            transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1.2);
-        }
-
-        .form-group:focus-within {
-            transform: translateX(8px);
-        }
-
-        .form-group label {
-            display: block;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            color: var(--text-dim);
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
-
-        .form-group input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            color: var(--accent);
-            padding: 12px 0;
-            font-size: 18px;
-            outline: none;
-            transition: border-color 0.5s ease;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.15);
-        }
-
-        .input-glow {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0%;
-            height: 1.5px;
-            background: var(--accent);
-            transition: width 0.8s cubic-bezier(0.25, 0.8, 0.25, 1.2);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-        }
-
-        .form-group input:focus + .input-glow {
-            width: 100%;
-        }
-
-        .submit-wrap {
-            margin-top: 50px;
-            position: relative;
-            filter: url('#gooey');
-        }
-
-        .btn-base {
-            background: var(--accent);
-            color: #050505;
-            border: none;
-            padding: 20px 40px;
-            font-size: 14px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            width: 100%;
-            position: relative;
-            z-index: 2;
-            transition: letter-spacing 0.4s ease, background 0.3s ease, transform 0.3s ease;
-            border-radius: 50px;
-        }
-
-        .btn-base:hover {
-            letter-spacing: 5px;
-            background: #f0f0f0;
-        }
-
-        .btn-base:active {
-            transform: scale(0.98);
-        }
-
-        .btn-base:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .mercury-drop {
+        #loading-overlay .welcome-text {
             position: absolute;
             top: 50%;
             left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: 200;
+            font-size: 2rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            opacity: 0;
+            z-index: 10;
+            pointer-events: none;
+            user-select: none;
+            font-family: 'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif;
+        }
+
+        #loading-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #loading-overlay.hidden {
+            display: none;
+        }
+
+        /* DASHBOARD */
+        #dashboard {
+            opacity: 0;
+            transition: opacity 0.8s ease-in;
+        }
+
+        #dashboard.visible {
+            opacity: 1;
+        }
+
+        .stage {
+            position: fixed;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            z-index: 1;
-            border-radius: 50px;
-            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .submit-wrap:hover .mercury-drop {
-            transform: translate(-50%, -50%) scale(1.08, 1.25);
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .error-msg {
-            color: #ff6b6b;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            text-align: left;
-            margin-top: 20px;
-            display: none;
-            letter-spacing: 1px;
-        }
-
-        .error-msg.show {
-            display: block;
-        }
-
-        .footer-nav {
-            margin-top: 40px;
-            display: flex;
-            justify-content: space-between;
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-        }
-
-        .footer-nav a {
-            color: var(--text-dim);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer-nav a:hover {
-            color: var(--accent);
-        }
-
-        .svg-filter-hidden {
-            position: absolute;
-            width: 0;
-            height: 0;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border: 2px solid rgba(0, 0, 0, 0.2);
-            border-top-color: #050505;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
-</head>
-<body>
-    <svg class="svg-filter-hidden">
-        <defs>
-            <filter id="gooey">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
-                <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
-            </filter>
-        </defs>
-    </svg>
-
-    <!-- Blobs SEM filtro gooey, com blur e opacidade visível -->
-    <div class="stage">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-        <div class="blob blob-4"></div>
-        <div class="blob blob-5"></div>
-        <div class="blob blob-6"></div>
-    </div>
-
-    <main class="auth-container">
-        <header class="header">
-            <span class="brand-id">System Node: HV-01</span>
-            <h1>HOST<br/>VILLE</h1>
-        </header>
-
-        <form id="loginForm" autocomplete="off">
-            <div class="form-group">
-                <label>User Identity</label>
-                <input type="text" id="username" placeholder="USER" required />
-                <div class="input-glow"></div>
-            </div>
-
-            <div class="form-group">
-                <label>Sequence Key</label>
-                <input type="password" id="password" placeholder="••••••••" required />
-                <div class="input-glow"></div>
-            </div>
-
-            <div class="submit-wrap">
-                <div class="mercury-drop"></div>
-                <button type="submit" class="btn-base" id="submitBtn">Get Started</button>
-            </div>
-        </form>
-
-        <p class="error-msg" id="errorMsg">Invalid credentials. Access denied.</p>
-
-        
-    </main>
-
-    <script>
-        const blobs = document.querySelectorAll('.blob');
-        
-        document.addEventListener('mousemove', (e) => {
-            const x = (e.clientX / window.innerWidth - 0.5) * 2;
-            const y = (e.clientY / window.innerHeight - 0.5) * 2;
-            blobs.forEach((blob, i) => {
-                blob.style.transform = `translate(${x * (i + 1) * 10}px, ${y * (i + 1) * 10}px)`;
-            });
-        });
-
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            const err = document.getElementById('errorMsg');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Authenticating...';
-            err.classList.remove('show');
-
-            try {
-                const res = await fetch('/api/auth', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        username: document.getElementById('username').value,
-                        password: document.getElementById('password').value
-                    })
-                });
-                const data = await res.json();
-                if (data.token) {
-                    btn.textContent = 'Access Granted';
-                    btn.style.background = '#2ecc71';
-                    btn.style.color = '#fff';
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    setTimeout(() => window.location.href = '/dashboard', 500);
-                } else {
-                    err.textContent = data.error || 'Invalid credentials.';
-                    err.classList.add('show');
-                    btn.disabled = false;
-                    btn.textContent = 'Get Started';
-                }
-            } catch (err) {
-                document.getElementById('errorMsg').textContent = 'Connection error.';
-                document.getElementById('errorMsg').classList.add('show');
-                btn.disabled = false;
-                btn.textContent = 'Get Started';
-            }
-        });
-    </script>
-</body>
-</html>
+            z-index: 0;
             pointer-events: none;
             overflow: hidden;
         }
@@ -533,309 +213,182 @@
             }
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
+        .app-container {
+            position: relative;
+            z-index: 10;
             display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
+            min-height: 100vh;
+            width: 100vw;
+            padding: 24px;
+            gap: 24px;
         }
 
-        .back-btn {
+        .sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sidebar-header {
+            padding: 0 0 28px 0;
+        }
+
+        .sidebar-header .brand-id {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .sidebar-header h1 {
+            font-weight: 800;
+            font-size: 1.6rem;
+            line-height: 0.9;
+            letter-spacing: -1.5px;
+            color: var(--text);
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px 24px;
+            transition: all 0.5s cubic-bezier(0.25,0.8,0.25,1.2);
+            cursor: default;
+        }
+
+        .stat-card:hover {
+            background: var(--card-hover);
+            border-color: var(--border-hover);
+            transform: translateX(6px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+
+        .stat-card-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+        }
+
+        .stat-card-value {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+
+        .stat-card-value.accent-blue {
+            color: #5865F2;
+        }
+
+        .stat-card-value.accent-red {
+            color: #ff6b6b;
+        }
+
+        .stat-card-value.accent-white {
+            color: var(--text);
+        }
+
+        .stat-card-detail {
+            font-family: 'Space Mono', monospace;
+            font-size: 9px;
+            color: var(--text-tertiary);
+            margin-top: 6px;
+            letter-spacing: 1px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+        }
+
+        .main-content::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .main-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.06);
+            border-radius: 10px;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: flex-end;
+            gap: 24px;
+            align-items: center;
+            padding-bottom: 4px;
+        }
+
+        .top-nav a {
             font-family: 'Space Mono', monospace;
             font-size: 10px;
             color: var(--text-dim);
             text-decoration: none;
             letter-spacing: 2px;
             text-transform: uppercase;
-            transition: all 0.3s;
-            padding: 8px 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 25px;
+            transition: color 0.3s;
+        }
+
+        .top-nav a:hover {
+            color: var(--text);
+        }
+
+        .btn-logout {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
             background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+            padding: 8px 18px;
+            border-radius: 25px;
             cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .back-btn:hover {
-            color: #fff;
-            border-color: rgba(255,255,255,0.3);
-        }
-
-        .header-info {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .brand-id {
-            font-family: 'Space Mono', monospace;
-            font-size: 9px;
-            letter-spacing: 4px;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            color: var(--text-dim);
-            display: block;
-            margin-bottom: 4px;
+            transition: all 0.3s;
         }
 
-        .header h1 {
-            font-weight: 800;
-            font-size: clamp(1.3rem, 4vw, 2rem);
-            line-height: 0.9;
-            letter-spacing: -1.5px;
-            color: #fff;
+        .btn-logout:hover {
+            border-color: rgba(255,107,107,0.5);
+            color: #ff6b6b;
         }
 
-        .role-badge {
-            font-family: 'Space Mono', monospace;
-            font-size: 8px;
-            letter-spacing: 3px;
-            color: rgba(255,255,255,0.3);
-            text-transform: uppercase;
-            white-space: nowrap;
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
         }
 
-        .main-layout {
-            display: flex;
-            gap: 16px;
-            height: calc(100vh - 220px);
-            min-height: 450px;
-        }
-
-        .terminal-panel {
-            width: 340px;
-            flex-shrink: 0;
+        .chart-panel {
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
+            padding: 24px;
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
         }
 
-        .terminal-panel:hover {
+        .chart-panel:hover {
             border-color: var(--border-hover);
             background: var(--card-hover);
         }
 
-        .terminal-panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(88,101,242,0.4), transparent);
-        }
-
-        .terminal-panel h3 {
-            font-family: 'Space Mono', monospace;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-dim);
-            margin-bottom: 14px;
-            font-weight: 600;
-        }
-
-        .cmd-btn {
-            font-family: 'Space Mono', monospace;
-            font-size: 9px;
-            padding: 10px 14px;
-            background: rgba(88,101,242,0.12);
-            border: 1px solid rgba(88,101,242,0.25);
-            border-radius: 8px;
-            color: rgba(255,255,255,0.8);
-            cursor: pointer;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: all 0.3s;
-            width: 100%;
-            margin-bottom: 12px;
-        }
-
-        .cmd-btn:hover {
-            background: rgba(88,101,242,0.22);
-            border-color: rgba(88,101,242,0.45);
-            box-shadow: 0 0 25px rgba(88,101,242,0.15);
-        }
-
-        .cmd-btn:active {
-            transform: scale(0.97);
-        }
-
-        .cmds-list {
-            display: none;
-            margin-bottom: 12px;
-            max-height: 180px;
-            overflow-y: auto;
-            background: rgba(0,0,0,0.35);
-            border-radius: 8px;
-            padding: 6px;
-        }
-
-        .cmds-list.show {
-            display: block;
-        }
-
-        .cmds-list::-webkit-scrollbar {
-            width: 3px;
-        }
-
-        .cmds-list::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .cmds-list::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.06);
-            border-radius: 10px;
-        }
-
-        .cmds-list div {
-            padding: 8px 12px;
-            cursor: pointer;
-            border-radius: 6px;
-            font-family: 'Space Mono', monospace;
-            font-size: 9px;
-            color: rgba(255,255,255,0.5);
-            transition: all 0.2s;
-            letter-spacing: 0.5px;
-        }
-
-        .cmds-list div:hover {
-            background: rgba(88,101,242,0.2);
-            color: #fff;
-        }
-
-        .cmds-list div:active {
-            background: rgba(88,101,242,0.35);
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            margin-bottom: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            min-height: 0;
-        }
-
-        .chat-messages::-webkit-scrollbar {
-            width: 3px;
-        }
-
-        .chat-messages::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.06);
-            border-radius: 10px;
-        }
-
-        .chat-messages .msg {
-            padding: 9px 12px;
-            border-radius: 10px;
-            font-size: 11px;
-            line-height: 1.4;
-            max-width: 85%;
-            word-wrap: break-word;
-            animation: fadeInUp 0.3s ease-out;
-        }
-
-        .chat-messages .user {
-            background: rgba(88,101,242,0.3);
-            align-self: flex-end;
-            border-bottom-right-radius: 3px;
-            color: #fff;
-        }
-
-        .chat-messages .bot {
-            background: rgba(255,255,255,0.04);
-            align-self: flex-start;
-            border-bottom-left-radius: 3px;
-            color: rgba(255,255,255,0.7);
-        }
-
-        .chat-input {
-            display: flex;
-            gap: 6px;
-        }
-
-        .chat-input input {
-            flex: 1;
-            padding: 10px 14px;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 8px;
-            background: rgba(0,0,0,0.35);
-            color: #fff;
-            font-size: 11px;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.3s;
-            outline: none;
-            min-width: 0;
-        }
-
-        .chat-input input:focus {
-            border-color: rgba(88,101,242,0.5);
-            box-shadow: 0 0 20px rgba(88,101,242,0.1);
-        }
-
-        .chat-input input::placeholder {
-            color: rgba(255,255,255,0.2);
-        }
-
-        .chat-input button {
-            padding: 10px 16px;
-            background: rgba(88,101,242,0.3);
-            border: 1px solid rgba(88,101,242,0.4);
-            border-radius: 8px;
-            color: #fff;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.3s;
-            font-family: 'Space Mono', monospace;
-            white-space: nowrap;
-        }
-
-        .chat-input button:hover {
-            background: rgba(88,101,242,0.5);
-            box-shadow: 0 0 25px rgba(88,101,242,0.3);
-        }
-
-        .chat-input button:active {
-            transform: scale(0.95);
-        }
-
-        .pending-panel {
-            flex: 1;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 20px;
-            overflow-y: auto;
-            transition: all 0.3s;
-            position: relative;
-            min-width: 0;
-        }
-
-        .pending-panel:hover {
-            border-color: var(--border-hover);
-            background: var(--card-hover);
-        }
-
-        .pending-panel::before {
+        .chart-panel::before {
             content: '';
             position: absolute;
             top: 0;
@@ -845,227 +398,116 @@
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
         }
 
-        .pending-panel::-webkit-scrollbar {
-            width: 3px;
-        }
-
-        .pending-panel::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .pending-panel::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.06);
-            border-radius: 10px;
-        }
-
-        .pending-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .pending-header h3 {
+        .chart-panel h3 {
             font-family: 'Space Mono', monospace;
-            font-size: 10px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 2px;
             color: var(--text-dim);
+            margin-bottom: 20px;
             font-weight: 600;
         }
 
-        .pending-filters {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            font-family: 'Space Mono', monospace;
-            font-size: 8px;
-            padding: 6px 12px;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px;
-            background: transparent;
-            color: rgba(255,255,255,0.4);
-            cursor: pointer;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-
-        .filter-btn:hover {
-            border-color: rgba(255,255,255,0.25);
-            color: rgba(255,255,255,0.8);
-        }
-
-        .filter-btn.active {
-            background: rgba(88,101,242,0.25);
-            border-color: rgba(88,101,242,0.5);
-            color: #fff;
-            box-shadow: 0 0 15px rgba(88,101,242,0.2);
-        }
-
-        .pending-item {
-            padding: 14px 16px;
-            border: 1px solid rgba(255,255,255,0.04);
-            border-radius: 10px;
-            margin-bottom: 8px;
+        .chart-inner {
+            min-height: 200px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            transition: all 0.3s;
-            background: rgba(0,0,0,0.2);
-            flex-wrap: wrap;
+            justify-content: center;
+            position: relative;
         }
 
-        .pending-item:hover {
-            border-color: rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.35);
-            transform: translateX(4px);
-        }
-
-        .pending-item.done-item {
-            opacity: 0.5;
-        }
-
-        .pending-item.done-item:hover {
-            opacity: 0.75;
-        }
-
-        .badge {
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 8px;
-            font-family: 'Space Mono', monospace;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            flex-shrink: 0;
-        }
-
-        .badge-active {
-            background: rgba(255,107,107,0.2);
-            color: #ff6b6b;
-            border: 1px solid rgba(255,107,107,0.3);
-        }
-
-        .badge-done {
-            background: rgba(46,204,113,0.2);
-            color: #2ecc71;
-            border: 1px solid rgba(46,204,113,0.3);
-        }
-
-        .pending-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            min-width: 130px;
-        }
-
-        .pending-command {
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            color: #fff;
-            font-weight: 600;
-            word-break: break-all;
-        }
-
-        .pending-params {
-            font-size: 10px;
-            color: rgba(255,255,255,0.35);
-            word-break: break-all;
-        }
-
-        .pending-result {
-            font-size: 10px;
-            color: rgba(255,255,255,0.5);
-            margin-top: 2px;
-        }
-
-        .pending-time {
-            font-family: 'Space Mono', monospace;
-            font-size: 8px;
-            color: rgba(255,255,255,0.2);
-            letter-spacing: 1px;
-            flex-shrink: 0;
-            white-space: nowrap;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: rgba(255,255,255,0.2);
+        .loading-pulse {
+            animation: pulse 2s ease-in-out infinite;
+            color: var(--text-dim);
             font-family: 'Space Mono', monospace;
             font-size: 10px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .mobile-toggle {
-            display: none;
-            font-family: 'Space Mono', monospace;
-            font-size: 9px;
-            padding: 10px 16px;
-            background: rgba(88,101,242,0.15);
-            border: 1px solid rgba(88,101,242,0.3);
-            border-radius: 10px;
-            color: rgba(255,255,255,0.8);
-            cursor: pointer;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: all 0.3s;
-            margin-bottom: 12px;
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.2;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .line-chart-wrapper {
             width: 100%;
-            text-align: center;
         }
 
-        .mobile-toggle:hover {
-            background: rgba(88,101,242,0.25);
+        .line-chart {
+            width: 100%;
+            position: relative;
         }
 
-        .log-panel {
+        .line-chart svg {
+            width: 100%;
+            height: auto;
+            overflow: visible;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 20px;
             margin-top: 16px;
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,0,0.3);
-            border-radius: 10px;
-            padding: 14px;
-            max-height: 120px;
-            overflow-y: auto;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+            box-shadow: 0 0 12px currentColor;
+        }
+
+        .legend-value {
+            color: rgba(255,255,255,0.9);
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .grid-line {
+            stroke: rgba(255,255,255,0.06);
+            stroke-width: 1;
+        }
+
+        .grid-line-vertical {
+            stroke: rgba(255,255,255,0.04);
+            stroke-width: 1;
+            stroke-dasharray: 3,3;
+        }
+
+        .data-point {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .data-point:hover {
+            filter: brightness(1.8);
+        }
+
+        .axis-label {
             font-family: 'Space Mono', monospace;
             font-size: 9px;
+            fill: rgba(255,255,255,0.35);
         }
 
-        .log-panel h3 {
-            color: rgba(255,255,0,0.6);
-            font-size: 9px;
-            margin-bottom: 8px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .log-line {
-            padding: 2px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-
-        .log-success {
-            color: #2ecc71;
-        }
-
-        .log-error {
-            color: #ff6b6b;
-        }
-
-        .log-info {
-            color: rgba(255,255,255,0.5);
-        }
-
-        .log-warn {
-            color: #f39c12;
+        .data-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            fill: rgba(255,255,255,0.8);
+            font-weight: 600;
         }
 
         @keyframes fadeInUp {
@@ -1079,86 +521,26 @@
             }
         }
 
-        @media (min-width: 769px) {
-            .terminal-panel {
-                display: flex !important;
-            }
-            .pending-panel {
-                display: block !important;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 12px;
-            }
-            .mobile-toggle {
-                display: block;
-            }
-            .main-layout {
+        @media (max-width: 1024px) {
+            .app-container {
                 flex-direction: column;
-                height: auto;
-                gap: 10px;
             }
-            .terminal-panel {
+            .sidebar {
                 width: 100%;
-                height: auto;
-                max-height: 55vh;
-                display: none;
-            }
-            .terminal-panel.show-mobile {
-                display: flex;
-            }
-            .pending-panel {
-                height: auto;
-                max-height: 55vh;
-                display: none;
-            }
-            .pending-panel.show-mobile {
-                display: block;
-            }
-            .chat-input input {
-                font-size: 16px;
-            }
-            .header h1 {
-                font-size: 1.2rem;
-            }
-            .role-badge {
-                display: none;
-            }
-            .pending-item {
-                padding: 10px 12px;
+                flex-direction: row;
+                flex-wrap: wrap;
                 gap: 8px;
             }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 10px;
+            .stat-card {
+                flex: 1;
+                min-width: 120px;
+                padding: 16px;
             }
-            .header {
-                gap: 8px;
-                padding-bottom: 12px;
+            .stat-card-value {
+                font-size: 28px;
             }
-            .back-btn {
-                font-size: 8px;
-                padding: 6px 10px;
-            }
-            .header h1 {
-                font-size: 1.1rem;
-            }
-            .terminal-panel,
-            .pending-panel {
-                padding: 14px;
-                border-radius: 10px;
-            }
-            .pending-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-            .pending-time {
-                align-self: flex-end;
+            .charts-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -1166,7 +548,7 @@
             .blob {
                 animation: none;
             }
-            .pending-item:hover {
+            .stat-card:hover {
                 transform: none;
             }
         }
@@ -1174,12 +556,14 @@
 </head>
 <body>
 
+    <!-- LOADING OVERLAY -->
     <div id="loading-overlay">
         <canvas id="loading-canvas"></canvas>
-        <div class="loading-text" id="loading-text">LOADING</div>
+        <div class="welcome-text" id="welcome-text">WELCOME</div>
     </div>
 
-    <div id="main-content">
+    <!-- DASHBOARD -->
+    <div id="dashboard">
         <div class="stage">
             <div class="blob blob-1"></div>
             <div class="blob blob-2"></div>
@@ -1188,47 +572,64 @@
             <div class="blob blob-5"></div>
             <div class="blob blob-6"></div>
         </div>
-        <div class="container">
-            <div class="header">
-                <a href="/dashboard" class="back-btn">← Voltar</a>
-                <div class="header-info">
-                    <span class="brand-id">System Node: HV-CMD</span>
-                    <h1>Pendências</h1>
+
+        <div class="app-container">
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <span class="brand-id">System Node: HV-DASH</span>
+                    <h1>HOST<br/>VILLE</h1>
                 </div>
-                <span class="role-badge" id="roleBadge">Carregando...</span>
-            </div>
-            <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobileView()">📋 Ver Pendências</button>
-            <div class="main-layout">
-                <div class="terminal-panel" id="terminalPanel">
-                    <h3>🤖 Terminal</h3>
-                    <button class="cmd-btn" onclick="toggleCmds()">📋 Listar Comandos</button>
-                    <div class="cmds-list" id="cmdsList"></div>
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="msg bot">Digite /comando para executar</div>
-                    </div>
-                    <div class="chat-input">
-                        <input type="text" id="chatInput" placeholder="/comando..." onkeypress="if(event.key==='Enter')sendChat()">
-                        <button onclick="sendChat()">▶</button>
-                    </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Active Tickets</div>
+                    <div class="stat-card-value accent-blue" id="tickets">-</div>
+                    <div class="stat-card-detail">Open requests</div>
                 </div>
-                <div class="pending-panel" id="pendingPanel">
-                    <div class="pending-header">
-                        <h3>📋 Histórico</h3>
-                        <div class="pending-filters">
-                            <button class="filter-btn active" onclick="filterPendings('all',this)">Todas</button>
-                            <button class="filter-btn" onclick="filterPendings('active',this)">⏳ Ativas</button>
-                            <button class="filter-btn" onclick="filterPendings('done',this)">✓ Concluídas</button>
+                <div class="stat-card">
+                    <div class="stat-card-label">Total Warns</div>
+                    <div class="stat-card-value accent-red" id="warns">-</div>
+                    <div class="stat-card-detail">Infractions logged</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Pending Tasks</div>
+                    <div class="stat-card-value accent-white" id="pendings">-</div>
+                    <div class="stat-card-detail">Awaiting execution</div>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <nav class="top-nav">
+                    <a href="/pendencias">Command Center</a>
+                    <a href="/credenciais">Credentials</a>
+                    <button class="btn-logout" onclick="logout()">Disconnect</button>
+                </nav>
+
+                <div class="charts-grid">
+                    <div class="chart-panel">
+                        <h3>Tickets Overview</h3>
+                        <div class="chart-inner" id="chart-tickets">
+                            <span class="loading-pulse">Loading…</span>
                         </div>
                     </div>
-                    <div id="pendingList">
-                        <div class="empty-state">Carregando...</div>
+                    <div class="chart-panel">
+                        <h3>Warnings History</h3>
+                        <div class="chart-inner" id="chart-warns">
+                            <span class="loading-pulse">Loading…</span>
+                        </div>
+                    </div>
+                    <div class="chart-panel">
+                        <h3>Pending Tasks</h3>
+                        <div class="chart-inner" id="chart-pendings">
+                            <span class="loading-pulse">Loading…</span>
+                        </div>
+                    </div>
+                    <div class="chart-panel">
+                        <h3>System Activity</h3>
+                        <div class="chart-inner" id="chart-activity">
+                            <span class="loading-pulse">Loading…</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="log-panel" id="logPanel">
-                <h3>📋 Logs</h3>
-                <div id="logContent"></div>
-            </div>
+            </main>
         </div>
     </div>
 
@@ -1534,7 +935,7 @@
                 var self = this;
                 setTimeout(function() {
                     overlay.classList.add('hidden');
-                    document.getElementById('main-content').classList.add('visible');
+                    document.getElementById('dashboard').classList.add('visible');
                     if (self.onComplete) {
                         self.onComplete();
                     }
@@ -1551,678 +952,441 @@
         }
 
         // =============================================
-        // PAGE LOGIC
+        // DASHBOARD FUNCTIONS
         // =============================================
-        var MAX_LOGS = 50;
+        var dashboardLoaded = false;
 
-        function addLog(msg, type) {
-            var logContent = document.getElementById('logContent');
-            var div = document.createElement('div');
-            div.className = 'log-line log-' + (type || 'info');
-            div.textContent = '[' + new Date().toLocaleTimeString('pt-BR') + '] ' + msg;
-            logContent.appendChild(div);
-            while (logContent.children.length > MAX_LOGS) {
-                logContent.removeChild(logContent.firstChild);
+        function initDashboard() {
+            if (dashboardLoaded) {
+                return;
             }
-            logContent.scrollTop = logContent.scrollHeight;
-        }
+            dashboardLoaded = true;
 
-        var allPendings = [];
-        var currentFilter = 'all';
-
-        // Extrai o role diretamente do token JWT
-        function getUserRoleFromToken() {
-            var token = localStorage.getItem('token');
-            if (!token) {
-                return 'tester';
-            }
-
-            try {
-                // O token JWT tem 3 partes: header.payload.signature
-                var parts = token.split('.');
-                if (parts.length !== 3) {
-                    return 'tester';
-                }
-
-                // Decodifica o payload (parte do meio)
-                var payload = parts[1];
-                // Substitui caracteres para base64 válido
-                payload = payload.replace(/-/g, '+').replace(/_/g, '/');
-                // Adiciona padding se necessário
-                while (payload.length % 4 !== 0) {
-                    payload += '=';
-                }
-                // Decodifica de base64
-                var decoded = atob(payload);
-                var data = JSON.parse(decoded);
-
-                addLog('🔑 Token decodificado. Role: ' + (data.role || 'não encontrado'), 'success');
-                return data.role || 'tester';
-            } catch (e) {
-                addLog('❌ Erro ao decodificar token: ' + e.message, 'error');
-                return 'tester';
-            }
-        }
-
-        var userRole = getUserRoleFromToken();
-        document.getElementById('roleBadge').textContent = 'Role: ' + userRole.toUpperCase();
-        addLog('✅ Página carregada | Role: ' + userRole.toUpperCase() + ' (extraído do token JWT)', 'success');
-
-        var commandsByRole = {
-            full: ['ping', 'uptime', 'stats', 'servidor', 'bot', 'say mensagem', 'anuncio mensagem', 'modo normal/savage/hacker/respeitoso/boiola', 'voicemode on/off', 'mencionar @user', 'autointervalo 30m', 'automsg on/off'],
-            owner: ['ping', 'uptime', 'stats', 'say mensagem', 'anuncio mensagem', 'autointervalo 30m', 'automsg on/off'],
-            admin: ['ping', 'say mensagem', 'automsg on/off'],
-            tester: ['ping', 'uptime', 'bot']
-        };
-
-        function initPage() {
             if (!localStorage.getItem('token')) {
                 window.location.href = '/';
                 return;
             }
-            loadPendings();
-            setInterval(loadPendings, 15000);
-            setupMobile();
-            window.addEventListener('resize', setupMobile);
-        }
 
-        function setupMobile() {
-            var isMobile = window.innerWidth <= 768;
-            var toggle = document.getElementById('mobileToggle');
-            var terminalPanel = document.getElementById('terminalPanel');
-            var pendingPanel = document.getElementById('pendingPanel');
-
-            if (isMobile) {
-                toggle.style.display = 'block';
-                if (!toggle.dataset.initialized) {
-                    toggle.dataset.initialized = 'true';
-                    terminalPanel.classList.add('show-mobile');
-                    pendingPanel.classList.remove('show-mobile');
-                }
-            } else {
-                toggle.style.display = 'none';
-                terminalPanel.style.display = 'flex';
-                pendingPanel.style.display = 'block';
-            }
-        }
-
-        window.toggleMobileView = function() {
-            var terminalPanel = document.getElementById('terminalPanel');
-            var pendingPanel = document.getElementById('pendingPanel');
-            var toggle = document.getElementById('mobileToggle');
-
-            if (terminalPanel.classList.contains('show-mobile')) {
-                terminalPanel.classList.remove('show-mobile');
-                pendingPanel.classList.add('show-mobile');
-                toggle.textContent = '💬 Terminal';
-            } else {
-                terminalPanel.classList.add('show-mobile');
-                pendingPanel.classList.remove('show-mobile');
-                toggle.textContent = '📋 Ver Pendências';
-            }
-        };
-
-        window.filterPendings = function(filter, btn) {
-            currentFilter = filter;
-            var allBtns = document.querySelectorAll('.filter-btn');
-            for (var i = 0; i < allBtns.length; i++) {
-                allBtns[i].classList.remove('active');
-            }
-            btn.classList.add('active');
-            renderPendings();
-        };
-
-        function renderPendings() {
-            var list = document.getElementById('pendingList');
-            var filtered = allPendings;
-
-            if (currentFilter === 'active') {
-                filtered = allPendings.filter(function(p) {
-                    return !p.done;
+            var blobs = document.querySelectorAll('.blob');
+            document.addEventListener('mousemove', function(e) {
+                var x = (e.clientX / window.innerWidth - 0.5) * 2;
+                var y = (e.clientY / window.innerHeight - 0.5) * 2;
+                blobs.forEach(function(b, i) {
+                    b.style.transform = 'translate(' + x * (i + 1) * 10 + 'px, ' + y * (i + 1) * 10 + 'px)';
                 });
-            } else if (currentFilter === 'done') {
-                filtered = allPendings.filter(function(p) {
-                    return p.done;
-                });
-            }
-
-            if (filtered.length === 0) {
-                list.innerHTML = '<div class="empty-state">Nenhuma pendência</div>';
-                return;
-            }
-
-            var html = '';
-            for (var i = 0; i < filtered.length; i++) {
-                var p = filtered[i];
-                html += '<div class="pending-item ' + (p.done ? 'done-item' : '') + '">';
-                html += '<span class="badge ' + (p.done ? 'badge-done' : 'badge-active') + '">' + (p.done ? '✓ Done' : '⏳ Active') + '</span>';
-                html += '<div class="pending-info">';
-                html += '<span class="pending-command">/' + p.command + '</span>';
-                if (p.params) {
-                    html += '<span class="pending-params">' + p.params + '</span>';
-                }
-                if (p.result) {
-                    html += '<span class="pending-result">' + p.result + '</span>';
-                }
-                html += '</div>';
-                html += '<span class="pending-time">' + p.time + '</span>';
-                html += '</div>';
-            }
-            list.innerHTML = html;
-        }
-
-        window.toggleCmds = function() {
-            var list = document.getElementById('cmdsList');
-            if (list.classList.contains('show')) {
-                list.classList.remove('show');
-                return;
-            }
-            var cmds = commandsByRole[userRole] || commandsByRole.tester;
-            addLog('📋 ' + cmds.length + ' comandos para role: ' + userRole, 'info');
-            var html = '';
-            for (var i = 0; i < cmds.length; i++) {
-                var c = cmds[i];
-                html += '<div onclick="document.getElementById(\'chatInput\').value=\'/' + c + '\';document.getElementById(\'cmdsList\').classList.remove(\'show\')">/' + c + '</div>';
-            }
-            list.innerHTML = html;
-            list.classList.add('show');
-        };
-
-        window.sendChat = function() {
-            var input = document.getElementById('chatInput');
-            var msg = input.value.trim();
-            if (!msg) {
-                return;
-            }
-
-            addChatMsg('user', msg);
-            input.value = '';
-
-            if (msg.startsWith('/')) {
-                var parts = msg.substring(1).split(' ');
-                var command = parts[0];
-                var params = parts.slice(1).join(' ');
-
-                addLog('⚡ Comando: /' + command + ' ' + params, 'warn');
-
-                var newPending = {
-                    command: command,
-                    params: params,
-                    result: '',
-                    time: new Date().toLocaleString('pt-BR'),
-                    done: false
-                };
-
-                allPendings.unshift(newPending);
-                renderPendings();
-
-                var msgDiv = addChatMsg('bot', '⏳ Executando /' + command + '...');
-
-                fetch('/api/pendings/executar', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    },
-                    body: JSON.stringify({
-                        command: command,
-                        params: params
-                    })
-                })
-                .then(function(r) {
-                    return r.json();
-                })
-                .then(function(data) {
-                    addLog('📦 Resposta da API: ' + JSON.stringify(data).substring(0, 200), 'info');
-                    newPending.done = true;
-                    newPending.result = data.result || data.message || '✅ Executado';
-                    // ATUALIZA A MENSAGEM NO CHAT COM O RESULTADO
-                    msgDiv.textContent = newPending.result;
-                    addLog('✅ Resultado: ' + newPending.result, 'success');
-                    renderPendings();
-                    loadPendings();
-                })
-                .catch(function(e) {
-                    addLog('❌ Erro: ' + e.message, 'error');
-                    newPending.done = true;
-                    newPending.result = '❌ Erro ao executar /' + command;
-                    msgDiv.textContent = newPending.result;
-                    renderPendings();
-                });
-            }
-        };
-
-        function addChatMsg(type, text) {
-            var chatMessages = document.getElementById('chatMessages');
-            var firstMsg = chatMessages.querySelector('.msg.bot');
-            if (firstMsg && firstMsg.textContent === 'Digite /comando para executar') {
-                firstMsg.remove();
-            }
-            var div = document.createElement('div');
-            div.className = 'msg ' + type;
-            div.textContent = text;
-            chatMessages.appendChild(div);
-            div.scrollIntoView({
-                behavior: 'smooth'
             });
-            return div;
+
+            loadDashboardData();
+            setInterval(loadDashboardData, 30000);
         }
 
-        function loadPendings() {
-            addLog('🔄 Buscando pendências...', 'info');
+        function createLineChart(containerId, data, colors) {
+            var container = document.getElementById(containerId);
+            if (!container) {
+                return;
+            }
 
-            fetch('/api/pendings/list', {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+            var width = container.offsetWidth || 500;
+            var height = 220;
+            var padding = { top: 25, right: 30, bottom: 40, left: 45 };
+            var chartWidth = width - padding.left - padding.right;
+            var chartHeight = height - padding.top - padding.bottom;
+
+            var allValues = [];
+            data.forEach(function(series) {
+                allValues = allValues.concat(series.data);
+            });
+            var maxValue = Math.max.apply(null, allValues.length > 0 ? allValues : [1]);
+            var minValue = 0;
+            maxValue = Math.ceil(maxValue / 5) * 5;
+            if (maxValue === 0) {
+                maxValue = 5;
+            }
+            var valueRange = maxValue - minValue;
+
+            var svgNS = "http://www.w3.org/2000/svg";
+            var svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("viewBox", "0 0 " + width + " " + height);
+            svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+            var gridLines = 5;
+            for (var i = 0; i <= gridLines; i++) {
+                var y = padding.top + (chartHeight / gridLines) * i;
+
+                var gridLine = document.createElementNS(svgNS, "line");
+                gridLine.setAttribute("x1", padding.left);
+                gridLine.setAttribute("y1", y);
+                gridLine.setAttribute("x2", width - padding.right);
+                gridLine.setAttribute("y2", y);
+                gridLine.setAttribute("class", "grid-line");
+                svg.appendChild(gridLine);
+
+                var label = document.createElementNS(svgNS, "text");
+                label.setAttribute("x", padding.left - 10);
+                label.setAttribute("y", y + 4);
+                label.setAttribute("text-anchor", "end");
+                label.setAttribute("class", "axis-label");
+                label.textContent = Math.round(maxValue - (valueRange / gridLines) * i);
+                svg.appendChild(label);
+            }
+
+            if (data[0] && data[0].data.length > 1) {
+                var numPoints = data[0].data.length;
+                for (var i = 0; i < numPoints; i++) {
+                    var x = padding.left + (chartWidth / (numPoints - 1)) * i;
+                    var vLine = document.createElementNS(svgNS, "line");
+                    vLine.setAttribute("x1", x);
+                    vLine.setAttribute("y1", padding.top);
+                    vLine.setAttribute("x2", x);
+                    vLine.setAttribute("y2", padding.top + chartHeight);
+                    vLine.setAttribute("class", "grid-line-vertical");
+                    svg.appendChild(vLine);
                 }
-            })
-            .then(function(response) {
-                if (!response.ok) {
-                    throw new Error('HTTP ' + response.status);
-                }
-                return response.json();
-            })
-            .then(function(data) {
-                var pendings = data.pendings || data || [];
+            }
 
-                if (Array.isArray(pendings) && pendings.length > 0) {
-                    allPendings = pendings.map(function(p) {
-                        var command = (p.data && p.data.command) || p.command || p.type || 'comando';
-                        var params = (p.data && p.data.params) || p.params || '';
-                        var result = (p.data && p.data.result) || p.result || '';
-                        var createdAt = p.createdAt || p.created_at || new Date().toISOString();
-                        var isDone = p.done || p.status === 'done' || p.status === 'completed';
+            data.forEach(function(series, seriesIndex) {
+                var points = series.data.map(function(value, index) {
+                    var x = padding.left + (chartWidth / (series.data.length - 1 || 1)) * index;
+                    var y = padding.top + chartHeight - ((value - minValue) / valueRange) * chartHeight;
+                    return { x: x, y: y, value: value };
+                });
 
-                        return {
-                            command: command,
-                            params: params,
-                            result: result,
-                            time: new Date(createdAt).toLocaleString('pt-BR'),
-                            done: isDone
-                        };
+                var gradientId = 'gradient-' + containerId + '-' + seriesIndex;
+                var defs = document.createElementNS(svgNS, "defs");
+                var gradient = document.createElementNS(svgNS, "linearGradient");
+                gradient.setAttribute("id", gradientId);
+                gradient.setAttribute("x1", "0");
+                gradient.setAttribute("y1", "0");
+                gradient.setAttribute("x2", "0");
+                gradient.setAttribute("y2", "1");
+
+                var stop1 = document.createElementNS(svgNS, "stop");
+                stop1.setAttribute("offset", "0%");
+                stop1.setAttribute("stop-color", colors[seriesIndex]);
+                stop1.setAttribute("stop-opacity", "0.35");
+
+                var stop2 = document.createElementNS(svgNS, "stop");
+                stop2.setAttribute("offset", "100%");
+                stop2.setAttribute("stop-color", colors[seriesIndex]);
+                stop2.setAttribute("stop-opacity", "0.02");
+
+                gradient.appendChild(stop1);
+                gradient.appendChild(stop2);
+                defs.appendChild(gradient);
+                svg.appendChild(defs);
+
+                var d = '';
+                points.forEach(function(p, i) {
+                    if (i === 0) {
+                        d += 'M ' + p.x + ',' + p.y;
+                    } else {
+                        var prev = points[i - 1];
+                        var cp1x = prev.x + (p.x - prev.x) / 3;
+                        var cp2x = p.x - (p.x - prev.x) / 3;
+                        d += ' C ' + cp1x + ',' + prev.y + ' ' + cp2x + ',' + p.y + ' ' + p.x + ',' + p.y;
+                    }
+                });
+
+                var areaPath = document.createElementNS(svgNS, "path");
+                var areaD = d + ' L ' + points[points.length - 1].x + ',' + (padding.top + chartHeight) +
+                    ' L ' + points[0].x + ',' + (padding.top + chartHeight) + ' Z';
+                areaPath.setAttribute("d", areaD);
+                areaPath.setAttribute("fill", 'url(#' + gradientId + ')');
+                areaPath.style.animation = 'fadeInUp 1s ease-out';
+                svg.appendChild(areaPath);
+
+                var linePath = document.createElementNS(svgNS, "path");
+                linePath.setAttribute("d", d);
+                linePath.setAttribute("fill", "none");
+                linePath.setAttribute("stroke", colors[seriesIndex]);
+                linePath.setAttribute("stroke-width", "2.5");
+                linePath.setAttribute("stroke-linecap", "round");
+                linePath.setAttribute("stroke-linejoin", "round");
+                linePath.style.filter = 'drop-shadow(0 0 8px ' + colors[seriesIndex] + ')';
+                svg.appendChild(linePath);
+
+                points.forEach(function(point) {
+                    var glow = document.createElementNS(svgNS, "circle");
+                    glow.setAttribute("cx", point.x);
+                    glow.setAttribute("cy", point.y);
+                    glow.setAttribute("r", "8");
+                    glow.setAttribute("fill", "none");
+                    glow.setAttribute("stroke", colors[seriesIndex]);
+                    glow.setAttribute("stroke-width", "1");
+                    glow.setAttribute("opacity", "0.3");
+                    svg.appendChild(glow);
+
+                    var circle = document.createElementNS(svgNS, "circle");
+                    circle.setAttribute("cx", point.x);
+                    circle.setAttribute("cy", point.y);
+                    circle.setAttribute("r", "4.5");
+                    circle.setAttribute("fill", "#000");
+                    circle.setAttribute("stroke", colors[seriesIndex]);
+                    circle.setAttribute("stroke-width", "2.5");
+                    circle.setAttribute("class", "data-point");
+                    circle.style.filter = 'drop-shadow(0 0 6px ' + colors[seriesIndex] + ')';
+
+                    var title = document.createElementNS(svgNS, "title");
+                    title.textContent = series.name + ': ' + point.value;
+                    circle.appendChild(title);
+                    svg.appendChild(circle);
+
+                    var valueLabel = document.createElementNS(svgNS, "text");
+                    valueLabel.setAttribute("x", point.x);
+                    valueLabel.setAttribute("y", point.y - 12);
+                    valueLabel.setAttribute("text-anchor", "middle");
+                    valueLabel.setAttribute("class", "data-label");
+                    valueLabel.setAttribute("fill", colors[seriesIndex]);
+                    valueLabel.textContent = point.value;
+                    svg.appendChild(valueLabel);
+                });
+            });
+
+            if (data[0] && data[0].labels) {
+                data[0].labels.forEach(function(label, index) {
+                    var x = padding.left + (chartWidth / (data[0].labels.length - 1 || 1)) * index;
+                    var text = document.createElementNS(svgNS, "text");
+                    text.setAttribute("x", x);
+                    text.setAttribute("y", padding.top + chartHeight + 20);
+                    text.setAttribute("text-anchor", "middle");
+                    text.setAttribute("class", "axis-label");
+                    text.textContent = label;
+                    svg.appendChild(text);
+                });
+            }
+
+            container.innerHTML = '';
+
+            var wrapper = document.createElement('div');
+            wrapper.className = 'line-chart-wrapper';
+
+            var chartDiv = document.createElement('div');
+            chartDiv.className = 'line-chart';
+            chartDiv.appendChild(svg);
+            wrapper.appendChild(chartDiv);
+
+            var legendDiv = document.createElement('div');
+            legendDiv.className = 'chart-legend';
+            data.forEach(function(series, index) {
+                var legendItem = document.createElement('div');
+                legendItem.className = 'legend-item';
+
+                var dot = document.createElement('div');
+                dot.className = 'legend-dot';
+                dot.style.backgroundColor = colors[index];
+                dot.style.color = colors[index];
+
+                var span = document.createElement('span');
+                span.textContent = series.name;
+
+                var value = document.createElement('span');
+                value.className = 'legend-value';
+                value.textContent = series.data[series.data.length - 1] || 0;
+
+                legendItem.appendChild(dot);
+                legendItem.appendChild(span);
+                legendItem.appendChild(value);
+                legendDiv.appendChild(legendItem);
+            });
+            wrapper.appendChild(legendDiv);
+
+            container.appendChild(wrapper);
+        }
+
+        async function loadDashboardData() {
+            try {
+                var s = {};
+                var cd = {};
+
+                try {
+                    var sr = await fetch('/api/status', {
+                        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                     });
-                    addLog('✅ ' + allPendings.length + ' pendências carregadas', 'success');
-                } else {
-                    allPendings = [];
-                    addLog('⚠️ Nenhuma pendência encontrada', 'warn');
+                    var sd = await sr.json();
+                    s = sd.stats || sd;
+                } catch (e) {
+                    console.log('Status API indisponível, usando dados mock');
+                    s = {
+                        ticketsAtivos: 12,
+                        warns: 5,
+                        pendentes: 8
+                    };
                 }
 
-                renderPendings();
-            })
-            .catch(function(error) {
-                addLog('❌ Erro ao carregar: ' + error.message, 'error');
-                allPendings = [];
-                renderPendings();
-            });
+                try {
+                    var cr = await fetch('/api/dashboard/charts', {
+                        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                    });
+                    cd = await cr.json();
+                } catch (e) {
+                    console.log('Charts API indisponível, usando dados mock');
+                    cd = {
+                        tickets: {
+                            ativos: s.ticketsAtivos || 12,
+                            fechados: 45,
+                            historico: [
+                                { data: 'Seg', ativos: 15, fechados: 40 },
+                                { data: 'Ter', ativos: 13, fechados: 42 },
+                                { data: 'Qua', ativos: 14, fechados: 43 },
+                                { data: 'Qui', ativos: 12, fechados: 45 },
+                                { data: 'Sex', ativos: 10, fechados: 47 }
+                            ]
+                        },
+                        warns: {
+                            hoje: s.warns || 5,
+                            semana: 12,
+                            historico: [
+                                { data: 'Seg', hoje: 8, semana: 10 },
+                                { data: 'Ter', hoje: 6, semana: 11 },
+                                { data: 'Qua', hoje: 7, semana: 12 },
+                                { data: 'Qui', hoje: 5, semana: 13 },
+                                { data: 'Sex', hoje: 3, semana: 12 }
+                            ]
+                        },
+                        pendings: {
+                            ativas: s.pendentes || 8,
+                            concluidas: 32,
+                            historico: [
+                                { data: 'Seg', ativas: 10, concluidas: 28 },
+                                { data: 'Ter', ativas: 9, concluidas: 30 },
+                                { data: 'Qua', ativas: 8, concluidas: 31 },
+                                { data: 'Qui', ativas: 7, concluidas: 32 },
+                                { data: 'Sex', ativas: 6, concluidas: 34 }
+                            ]
+                        },
+                        activity: {
+                            mensagens: 156,
+                            comandos: 89,
+                            historico: [
+                                { data: 'Seg', mensagens: 120, comandos: 70 },
+                                { data: 'Ter', mensagens: 135, comandos: 75 },
+                                { data: 'Qua', mensagens: 145, comandos: 82 },
+                                { data: 'Qui', mensagens: 150, comandos: 85 },
+                                { data: 'Sex', mensagens: 156, comandos: 89 }
+                            ]
+                        }
+                    };
+                }
+
+                document.getElementById('tickets').textContent = s.ticketsAtivos || cd.tickets?.ativos || 0;
+                document.getElementById('warns').textContent = s.warns || cd.warns?.hoje || 0;
+                document.getElementById('pendings').textContent = s.pendentes || cd.pendings?.ativas || 0;
+
+                renderCharts(cd);
+
+            } catch (e) {
+                console.error('Error loading data:', e);
+                document.getElementById('tickets').textContent = '—';
+                document.getElementById('warns').textContent = '—';
+                document.getElementById('pendings').textContent = '—';
+            }
         }
+
+        function renderCharts(d) {
+            var ticketsHistory = d.tickets?.historico || [];
+            var ticketsActiveData, ticketsClosedData, ticketsLabels;
+
+            if (ticketsHistory.length > 0) {
+                ticketsActiveData = ticketsHistory.map(function(h) { return h.ativos || 0; });
+                ticketsClosedData = ticketsHistory.map(function(h) { return h.fechados || 0; });
+                ticketsLabels = ticketsHistory.map(function(h) { return h.data || ''; });
+            } else {
+                var ativos = d.tickets?.ativos || 0;
+                var fechados = d.tickets?.fechados || 0;
+                ticketsActiveData = [Math.max(0, ativos - 2), ativos];
+                ticketsClosedData = [Math.max(0, fechados - 3), fechados];
+                ticketsLabels = ['Ant', 'Atual'];
+            }
+
+            createLineChart('chart-tickets', [
+                { name: 'Active', data: ticketsActiveData, labels: ticketsLabels },
+                { name: 'Closed', data: ticketsClosedData, labels: ticketsLabels }
+            ], ['#5865F2', 'rgba(88,101,242,0.4)']);
+
+            var warnsHistory = d.warns?.historico || [];
+            var warnsTodayData, warnsWeekData, warnsLabels;
+
+            if (warnsHistory.length > 0) {
+                warnsTodayData = warnsHistory.map(function(h) { return h.hoje || 0; });
+                warnsWeekData = warnsHistory.map(function(h) { return h.semana || 0; });
+                warnsLabels = warnsHistory.map(function(h) { return h.data || ''; });
+            } else {
+                var hoje = d.warns?.hoje || 0;
+                var semana = d.warns?.semana || 0;
+                warnsTodayData = [Math.max(0, hoje - 1), hoje];
+                warnsWeekData = [Math.max(0, semana - 2), semana];
+                warnsLabels = ['Ant', 'Atual'];
+            }
+
+            createLineChart('chart-warns', [
+                { name: 'Today', data: warnsTodayData, labels: warnsLabels },
+                { name: 'Week', data: warnsWeekData, labels: warnsLabels }
+            ], ['#ff6b6b', 'rgba(255,107,107,0.4)']);
+
+            var pendingsHistory = d.pendings?.historico || [];
+            var pendingsActiveData, pendingsDoneData, pendingsLabels;
+
+            if (pendingsHistory.length > 0) {
+                pendingsActiveData = pendingsHistory.map(function(h) { return h.ativas || 0; });
+                pendingsDoneData = pendingsHistory.map(function(h) { return h.concluidas || 0; });
+                pendingsLabels = pendingsHistory.map(function(h) { return h.data || ''; });
+            } else {
+                var ativas = d.pendings?.ativas || 0;
+                var concluidas = d.pendings?.concluidas || 0;
+                pendingsActiveData = [Math.max(0, ativas - 1), ativas];
+                pendingsDoneData = [Math.max(0, concluidas - 2), concluidas];
+                pendingsLabels = ['Ant', 'Atual'];
+            }
+
+            createLineChart('chart-pendings', [
+                { name: 'Active', data: pendingsActiveData, labels: pendingsLabels },
+                { name: 'Done', data: pendingsDoneData, labels: pendingsLabels }
+            ], ['#ffffff', 'rgba(255,255,255,0.4)']);
+
+            var activityHistory = d.activity?.historico || [];
+            var activityMsgsData, activityCmdsData, activityLabels;
+
+            if (activityHistory.length > 0) {
+                activityMsgsData = activityHistory.map(function(h) { return h.mensagens || 0; });
+                activityCmdsData = activityHistory.map(function(h) { return h.comandos || 0; });
+                activityLabels = activityHistory.map(function(h) { return h.data || ''; });
+            } else {
+                var mensagens = d.activity?.mensagens || 0;
+                var comandos = d.activity?.comandos || 0;
+                activityMsgsData = [Math.max(0, mensagens - 10), mensagens];
+                activityCmdsData = [Math.max(0, comandos - 5), comandos];
+                activityLabels = ['Ant', 'Atual'];
+            }
+
+            createLineChart('chart-activity', [
+                { name: 'Messages', data: activityMsgsData, labels: activityLabels },
+                { name: 'Commands', data: activityCmdsData, labels: activityLabels }
+            ], ['#5865F2', 'rgba(88,101,242,0.4)']);
+        }
+
+        window.logout = function() {
+            localStorage.clear();
+            window.location.href = '/';
+        };
 
         // =============================================
         // INIT
         // =============================================
         document.addEventListener('DOMContentLoaded', function() {
             var canvas = document.getElementById('loading-canvas');
-            var textElement = document.getElementById('loading-text');
+            var welcomeElement = document.getElementById('welcome-text');
 
-            if (!canvas || !textElement) {
+            if (!canvas || !welcomeElement) {
                 document.getElementById('loading-overlay').classList.add('hidden');
-                document.getElementById('main-content').classList.add('visible');
-                initPage();
+                document.getElementById('dashboard').classList.add('visible');
+                initDashboard();
                 return;
             }
 
-            var animation = new SpiralAnimation(canvas, textElement, initPage);
+            var animation = new SpiralAnimation(canvas, welcomeElement, initDashboard);
             animation.start();
         });
 
-    })();
-    </script>
-</body>
-</html>            .pending-panel { height: auto; max-height: 55vh; display: none; }
-            .pending-panel.show-mobile { display: block; }
-            .chat-input input { font-size: 16px; }
-            .header h1 { font-size: 1.2rem; }
-            .role-badge { display: none; }
-        }
-    </style>
-</head>
-<body>
-
-    <div id="loading-overlay">
-        <canvas id="loading-canvas"></canvas>
-        <div class="loading-text" id="loading-text">LOADING</div>
-    </div>
-
-    <div id="main-content">
-        <div class="stage">
-            <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
-            <div class="blob blob-4"></div><div class="blob blob-5"></div><div class="blob blob-6"></div>
-        </div>
-        <div class="container">
-            <div class="header">
-                <a href="/dashboard" class="back-btn">← Voltar</a>
-                <div class="header-info">
-                    <span class="brand-id">System Node: HV-CMD</span>
-                    <h1>Pendências</h1>
-                </div>
-                <span class="role-badge" id="roleBadge">Carregando...</span>
-            </div>
-            <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobileView()">📋 Ver Pendências</button>
-            <div class="main-layout">
-                <div class="terminal-panel" id="terminalPanel">
-                    <h3>🤖 Terminal</h3>
-                    <button class="cmd-btn" onclick="toggleCmds()">📋 Listar Comandos</button>
-                    <div class="cmds-list" id="cmdsList"></div>
-                    <div class="chat-messages" id="chatMessages"><div class="msg bot">Digite /comando para executar</div></div>
-                    <div class="chat-input">
-                        <input type="text" id="chatInput" placeholder="/comando..." onkeypress="if(event.key==='Enter')sendChat()">
-                        <button onclick="sendChat()">▶</button>
-                    </div>
-                </div>
-                <div class="pending-panel" id="pendingPanel">
-                    <div class="pending-header">
-                        <h3>📋 Histórico</h3>
-                        <div class="pending-filters">
-                            <button class="filter-btn active" onclick="filterPendings('all',this)">Todas</button>
-                            <button class="filter-btn" onclick="filterPendings('active',this)">⏳ Ativas</button>
-                            <button class="filter-btn" onclick="filterPendings('done',this)">✓ Concluídas</button>
-                        </div>
-                    </div>
-                    <div id="pendingList"><div class="empty-state">Carregando...</div></div>
-                </div>
-            </div>
-            <div class="log-panel" id="logPanel">
-                <h3>📋 Logs</h3>
-                <div id="logContent"></div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-    (function(){
-        'use strict';
-
-        // Loading animation
-        class Particle { constructor(bx,by,bz,s){this.bx=bx;this.by=by;this.bz=bz;this.x=bx;this.y=by;this.z=bz;this.s=s} reset(){this.x=this.bx;this.y=this.by;this.z=this.bz} }
-        class Camera { constructor(){this.z=0;this.fl=1/Math.tan(30*Math.PI/180);this.near=0.1} project(px,py,pz,sw,sh){const dz=pz-this.z;if(dz<this.near)return null;const sc=this.fl/dz;return{x:px*sc*(sw/2)+sw/2,y:-py*sc*(sh/2)+sh/2,z:dz,scale:sc}} }
-        class SpiralAnimation {
-            constructor(cv,txt,cb){this.cv=cv;this.ctx=cv.getContext('2d');this.txt=txt;this.cb=cb;this.ps=[];this.cam=new Camera();this.ad=3000;this.fod=400;this.hd=150;this.sl=5;this.sr=4.5;this.sh=14;this.pc=1500;this.bs=2;this.sv=0.8;this.init();this.resize();window.addEventListener('resize',()=>this.resize())}
-            init(){for(let i=0;i<this.pc;i++){const t=i/(this.pc-1),a=t*Math.PI*2*this.sl,rv=0.3*Math.sin(t*30)+0.2,r=this.sr*(0.7+t*0.3)+(Math.random()-0.5)*rv;this.ps.push(new Particle(Math.cos(a)*r,Math.sin(a)*r,-t*this.sh+(Math.random()-0.5)*0.8,Math.max(0.6,this.bs+(Math.random()-0.5)*this.sv)))}this.cam.z=2.5;this.iz=this.cam.z;this.fz=-this.sh-2}
-            resize(){const dpr=window.devicePixelRatio||1,dw=window.innerWidth,dh=window.innerHeight;this.cv.width=dw*dpr;this.cv.height=dh*dpr;this.cv.style.width=dw+'px';this.cv.style.height=dh+'px';this.ctx.setTransform(1,0,0,1,0,0);this.ctx.scale(dpr,dpr);this.dw=dw;this.dh=dh}
-            start(){this.st=performance.now();this.done=false;this.to=0;this.txt.style.opacity='0';this.ps.forEach(p=>p.reset());this.cam.z=this.iz;this.animate(performance.now())}
-            animate(ts){if(this.done)return;const e=ts-this.st;if(e<this.ad)this.update(e/this.ad);else if(!this.hs){this.hs=ts;this.update(1)}else if(e<this.ad+this.hd+this.fod){if(!this.fos)this.fos=ts;const fe=ts-this.fos,fp=Math.min(1,fe/this.fod),ef=fp<0.5?2*fp*fp:-1+(4-2*fp)*fp,co=1-ef;this.ctx.clearRect(0,0,this.dw,this.dh);if(co>0.01){this.ctx.globalAlpha=co;this.render(1);this.ctx.globalAlpha=1}this.txt.style.opacity=Math.max(0,this.to-ef)}else{this.finish();return}if(e<this.ad+this.hd)this.updateText(e);this.aid=requestAnimationFrame(t=>this.animate(t))}
-            update(prog){const ep=prog<0.5?4*prog*prog*prog:(prog-1)*(2*prog-2)*(2*prog-2)+1;this.cam.z=this.iz+(this.fz-this.iz)*ep;const ef=1+prog*0.5;this.ps.forEach(p=>{p.x=p.bx*ef;p.y=p.by*ef});this.ctx.clearRect(0,0,this.dw,this.dh);this.ctx.globalAlpha=1;this.render(prog)}
-            render(prog){const ctx=this.ctx,cam=this.cam,w=this.dw,h=this.dh,proj=[];for(let i=0;i<this.ps.length;i++){const p=this.ps[i],pr=cam.project(p.x,p.y,p.z,w,h);if(pr)proj.push({x:pr.x,y:pr.y,z:pr.z,s:p.s*pr.scale*0.9,os:p.s})}proj.sort((a,b)=>b.z-a.z);for(let i=0;i<proj.length;i++){const p=proj[i],df=Math.min(1,Math.max(0.2,1-p.z/18)),br=0.7+(p.os/(this.bs+this.sv))*0.3;ctx.fillStyle='rgba(255,255,255,'+(df*br*0.9)+')';ctx.beginPath();ctx.arc(p.x,p.y,Math.max(0.4,p.s*0.5),0,Math.PI*2);ctx.fill()}}
-            updateText(e){if(e>=this.tfd){const fp=Math.min(1,(e-this.tfd)/this.tfdu),ef=fp<0.5?2*fp*fp:-1+(4-2*fp)*fp,br=0.7+0.3*(0.5+0.5*Math.sin(((e-this.tfd)/3200)*Math.PI*2));this.to=ef*br;this.txt.style.opacity=this.to}}
-            finish(){this.done=true;if(this.aid){cancelAnimationFrame(this.aid);this.aid=null}this.ctx.clearRect(0,0,this.dw,this.dh);this.txt.style.opacity='0';const ov=document.getElementById('loading-overlay');ov.classList.add('fade-out');setTimeout(()=>{ov.classList.add('hidden');document.getElementById('main-content').classList.add('visible');if(this.cb)this.cb()},600)}
-        }
-
-        // Logs
-        const MAX_LOGS = 50;
-        function addLog(msg, type) {
-            const lc = document.getElementById('logContent');
-            const d = document.createElement('div');
-            d.className = 'log-line log-' + (type || 'info');
-            d.textContent = '[' + new Date().toLocaleTimeString('pt-BR') + '] ' + msg;
-            lc.appendChild(d);
-            while (lc.children.length > MAX_LOGS) lc.removeChild(lc.firstChild);
-            lc.scrollTop = lc.scrollHeight;
-        }
-
-        var allPendings = [];
-        var currentFilter = 'all';
-        var userRole = 'full'; // Valor padrão
-
-        var commandsByRole = {
-            full: ['ping','uptime','stats','servidor','bot','say mensagem','anuncio mensagem','modo normal/savage/hacker/respeitoso/boiola','voicemode on/off','mencionar @user','autointervalo 30m','automsg on/off'],
-            owner: ['ping','uptime','stats','say mensagem','anuncio mensagem','autointervalo 30m','automsg on/off'],
-            admin: ['ping','say mensagem','automsg on/off'],
-            tester: ['ping','uptime','bot']
-        };
-
-        // Busca o role REAL da API de credenciais
-        async function fetchUserRole() {
-            try {
-                var token = localStorage.getItem('token');
-                if (!token) {
-                    addLog('❌ Sem token, redirecionando...', 'error');
-                    window.location.href = '/';
-                    return;
-                }
-
-                addLog('🔄 Buscando credenciais do usuário...', 'info');
-
-                var res = await fetch('/api/credenciais', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-
-                if (res.ok) {
-                    var data = await res.json();
-                    addLog('📦 Dados recebidos: ' + JSON.stringify(data).substring(0, 200), 'info');
-
-                    // Tenta extrair o role de várias formas
-                    var role = 'tester';
-                    if (data.role) {
-                        role = data.role;
-                    } else if (data.user && data.user.role) {
-                        role = data.user.role;
-                    } else if (data.credentials && data.credentials.role) {
-                        role = data.credentials.role;
-                    }
-
-                    userRole = role;
-                    addLog('✅ Role detectado: ' + userRole.toUpperCase(), 'success');
-                } else {
-                    // Fallback para localStorage
-                    var localUser = JSON.parse(localStorage.getItem('user') || '{}');
-                    userRole = localUser.role || 'full';
-                    addLog('⚠️ API de credenciais falhou, usando localStorage: ' + userRole, 'warn');
-                }
-            } catch (e) {
-                var localUser = JSON.parse(localStorage.getItem('user') || '{}');
-                userRole = localUser.role || 'full';
-                addLog('⚠️ Erro ao buscar credenciais: ' + e.message + ' | Usando localStorage: ' + userRole, 'warn');
-            }
-
-            document.getElementById('roleBadge').textContent = 'Role: ' + userRole.toUpperCase();
-            addLog('👤 Role final: ' + userRole.toUpperCase(), 'success');
-        }
-
-        function initPage() {
-            if (!localStorage.getItem('token')) {
-                window.location.href = '/';
-                return;
-            }
-
-            // Primeiro busca o role, depois carrega as pendências
-            fetchUserRole().then(function() {
-                loadPendings();
-                setInterval(loadPendings, 15000);
-            });
-
-            setupMobile();
-            window.addEventListener('resize', setupMobile);
-        }
-
-        function setupMobile() {
-            var isM = window.innerWidth <= 768;
-            var tg = document.getElementById('mobileToggle');
-            var tp = document.getElementById('terminalPanel');
-            var pp = document.getElementById('pendingPanel');
-            if (isM) {
-                tg.style.display = 'block';
-                if (!tg.dataset.i) { tg.dataset.i = '1'; tp.classList.add('show-mobile'); pp.classList.remove('show-mobile'); }
-            } else {
-                tg.style.display = 'none';
-                tp.style.display = 'flex';
-                pp.style.display = 'block';
-            }
-        }
-
-        window.toggleMobileView = function() {
-            var tp = document.getElementById('terminalPanel');
-            var pp = document.getElementById('pendingPanel');
-            var tg = document.getElementById('mobileToggle');
-            if (tp.classList.contains('show-mobile')) {
-                tp.classList.remove('show-mobile');
-                pp.classList.add('show-mobile');
-                tg.textContent = '💬 Terminal';
-            } else {
-                tp.classList.add('show-mobile');
-                pp.classList.remove('show-mobile');
-                tg.textContent = '📋 Ver Pendências';
-            }
-        };
-
-        window.filterPendings = function(f, btn) {
-            currentFilter = f;
-            document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
-            btn.classList.add('active');
-            render();
-        };
-
-        function render() {
-            var list = document.getElementById('pendingList');
-            var f = allPendings;
-            if (currentFilter === 'active') f = allPendings.filter(function(p) { return !p.done; });
-            else if (currentFilter === 'done') f = allPendings.filter(function(p) { return p.done; });
-
-            if (f.length === 0) {
-                list.innerHTML = '<div class="empty-state">Nenhuma pendência</div>';
-                return;
-            }
-
-            list.innerHTML = f.map(function(p) {
-                return '<div class="pending-item ' + (p.done ? 'done-item' : '') + '">' +
-                    '<span class="badge ' + (p.done ? 'badge-done' : 'badge-active') + '">' + (p.done ? '✓ Done' : '⏳ Active') + '</span>' +
-                    '<div class="pending-info">' +
-                    '<span class="pending-command">/' + p.command + '</span>' +
-                    (p.params ? '<span class="pending-params">' + p.params + '</span>' : '') +
-                    (p.result ? '<span class="pending-result">' + p.result + '</span>' : '') +
-                    '</div>' +
-                    '<span class="pending-time">' + p.time + '</span>' +
-                    '</div>';
-            }).join('');
-        }
-
-        window.toggleCmds = function() {
-            var list = document.getElementById('cmdsList');
-            if (list.classList.contains('show')) {
-                list.classList.remove('show');
-                return;
-            }
-            var cmds = commandsByRole[userRole] || commandsByRole.tester;
-            addLog('📋 ' + cmds.length + ' comandos para role: ' + userRole, 'info');
-            list.innerHTML = cmds.map(function(c) {
-                return '<div onclick="document.getElementById(\'chatInput\').value=\'/' + c + '\';document.getElementById(\'cmdsList\').classList.remove(\'show\')">/' + c + '</div>';
-            }).join('');
-            list.classList.add('show');
-        };
-
-        window.sendChat = function() {
-            var input = document.getElementById('chatInput');
-            var msg = input.value.trim();
-            if (!msg) return;
-
-            addChatMsg('user', msg);
-            input.value = '';
-
-            if (msg.startsWith('/')) {
-                var parts = msg.substring(1).split(' ');
-                var command = parts[0];
-                var params = parts.slice(1).join(' ');
-
-                addLog('⚡ /' + command + ' ' + params, 'warn');
-
-                var np = { command: command, params: params, result: '', time: new Date().toLocaleString('pt-BR'), done: false };
-                allPendings.unshift(np);
-                render();
-
-                var msgDiv = addChatMsg('bot', '⏳ Executando /' + command + '...');
-
-                fetch('/api/pendings/executar', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    },
-                    body: JSON.stringify({ command: command, params: params })
-                })
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    addLog('📦 Resposta da API: ' + JSON.stringify(data).substring(0, 200), 'info');
-                    np.done = true;
-                    np.result = data.result || data.message || '✅ Executado';
-                    // ATUALIZA A MENSAGEM NO CHAT
-                    msgDiv.textContent = np.result;
-                    addLog('✅ Resultado: ' + np.result, 'success');
-                    render();
-                    loadPendings();
-                })
-                .catch(function(e) {
-                    addLog('❌ Erro: ' + e.message, 'error');
-                    np.done = true;
-                    np.result = '❌ Erro ao executar /' + command;
-                    msgDiv.textContent = np.result;
-                    render();
-                });
-            }
-        };
-
-        function addChatMsg(type, text) {
-            var msgs = document.getElementById('chatMessages');
-            var first = msgs.querySelector('.msg.bot');
-            if (first && first.textContent === 'Digite /comando para executar') first.remove();
-            var div = document.createElement('div');
-            div.className = 'msg ' + type;
-            div.textContent = text;
-            msgs.appendChild(div);
-            div.scrollIntoView({ behavior: 'smooth' });
-            return div;
-        }
-
-        function loadPendings() {
-            addLog('🔄 Buscando...', 'info');
-            fetch('/api/pendings/list', {
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-            })
-            .then(function(r) {
-                if (!r.ok) throw new Error('HTTP ' + r.status);
-                return r.json();
-            })
-            .then(function(data) {
-                var pendings = data.pendings || data || [];
-                if (Array.isArray(pendings) && pendings.length > 0) {
-                    allPendings = pendings.map(function(p) {
-                        var command = (p.data && p.data.command) || p.command || p.type || 'comando';
-                        var params = (p.data && p.data.params) || p.params || '';
-                        var result = (p.data && p.data.result) || p.result || '';
-                        var createdAt = p.createdAt || p.created_at || new Date().toISOString();
-                        var isDone = p.done || p.status === 'done' || p.status === 'completed';
-                        return { command: command, params: params, result: result, time: new Date(createdAt).toLocaleString('pt-BR'), done: isDone };
-                    });
-                    addLog('✅ ' + allPendings.length + ' pendências', 'success');
-                } else {
-                    allPendings = [];
-                }
-                render();
-            })
-            .catch(function(e) {
-                addLog('❌ ' + e.message, 'error');
-                render();
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            var canvas = document.getElementById('loading-canvas');
-            var textEl = document.getElementById('loading-text');
-            if (!canvas || !textEl) {
-                document.getElementById('loading-overlay').classList.add('hidden');
-                document.getElementById('main-content').classList.add('visible');
-                initPage();
-                return;
-            }
-            new SpiralAnimation(canvas, textEl, initPage).start();
-        });
     })();
     </script>
 </body>
