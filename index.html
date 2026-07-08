@@ -422,7 +422,7 @@
         (function() {
             'use strict';
 
-            const blobs = document.querySelectorAll('.blob');
+            var blobs = document.querySelectorAll('.blob');
 
             document.addEventListener('mousemove', function(e) {
                 var x = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -435,71 +435,38 @@
             // =============================================
             // VERIFICA SE JÁ EXISTE TOKEN SALVO (AUTO-LOGIN)
             // =============================================
-            function checkAutoLogin() {
-                var token = localStorage.getItem('token');
-                var user = localStorage.getItem('user');
+            var token = localStorage.getItem('token');
 
-                if (token && user) {
-                    // Verifica se o token ainda é válido (não expirou)
+            if (token) {
+                // Tem token salvo - vai direto pra dashboard
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('autoLoginScreen').style.display = 'block';
+
+                var userData = localStorage.getItem('user');
+                if (userData) {
                     try {
-                        var parts = token.split('.');
-                        if (parts.length === 3) {
-                            var payload = parts[1];
-                            payload = payload.replace(/-/g, '+').replace(/_/g, '/');
-                            while (payload.length % 4 !== 0) payload += '=';
-                            var decoded = JSON.parse(atob(payload));
-
-                            // Verifica se o token expirou
-                            var now = Math.floor(Date.now() / 1000);
-                            if (decoded.exp && decoded.exp > now) {
-                                // Token ainda válido - auto login
-                                showAutoLogin(JSON.parse(user));
-                                return;
-                            }
-                        }
-                    } catch (e) {
-                        // Token inválido, continua para login normal
+                        var user = JSON.parse(userData);
+                        document.getElementById('autoLoginUser').textContent = user.name || user.user || 'User';
+                    } catch(e) {
+                        document.getElementById('autoLoginUser').textContent = 'User';
                     }
                 }
 
-                // Mostra formulário de login normal
-                document.getElementById('loginForm').style.display = '';
-                document.getElementById('autoLoginScreen').style.display = 'none';
-            }
-
-            function showAutoLogin(userData) {
-                // Esconde o formulário de login
-                document.getElementById('loginForm').style.display = 'none';
-                // Mostra a tela de auto-login
-                document.getElementById('autoLoginScreen').style.display = 'block';
-                document.getElementById('autoLoginUser').textContent = userData.name || userData.user || 'User';
-
-                // Redireciona para a dashboard após 1.5 segundos
+                // Redireciona após 1 segundo
                 setTimeout(function() {
                     window.location.href = '/dashboard';
-                }, 1500);
+                }, 1000);
             }
 
-            function forceLogout() {
-                // Limpa o localStorage e cookies
+            // =============================================
+            // LOGOUT FORÇADO
+            // =============================================
+            window.forceLogout = function() {
                 localStorage.clear();
-
-                // Limpa cookies também
-                document.cookie.split(';').forEach(function(c) {
-                    document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
-                });
-
-                // Mostra o formulário de login
-                document.getElementById('loginForm').style.display = '';
-                document.getElementById('autoLoginScreen').style.display = 'none';
-
-                // Limpa os campos
-                document.getElementById('username').value = '';
-                document.getElementById('password').value = '';
-            }
-
-            // Expõe a função globalmente
-            window.forceLogout = forceLogout;
+                document.cookie = 'hv_token=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/';
+                document.cookie = 'hv_user=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/';
+                window.location.reload();
+            };
 
             // =============================================
             // LOGIN NORMAL
@@ -537,12 +504,6 @@
                         localStorage.setItem('token', data.token);
                         localStorage.setItem('user', JSON.stringify(data.user));
 
-                        // Salva também em cookie para maior persistência
-                        var expires = new Date();
-                        expires.setDate(expires.getDate() + 7); // 7 dias
-                        document.cookie = 'hv_token=' + data.token + ';expires=' + expires.toUTCString() + ';path=/;SameSite=Lax';
-                        document.cookie = 'hv_user=' + JSON.stringify(data.user) + ';expires=' + expires.toUTCString() + ';path=/;SameSite=Lax';
-
                         setTimeout(function() {
                             window.location.href = '/dashboard';
                         }, 500);
@@ -560,9 +521,6 @@
                     btn.textContent = 'Get Started';
                 }
             });
-
-            // Inicia a verificação de auto-login
-            checkAutoLogin();
 
         })();
     </script>
