@@ -759,7 +759,7 @@
                         </div>
                     </div>
                     <div class="console-panel">
-                        <h3>🤖 Bot Console</h3>
+                        <h3>Bot Console</h3>
                         <div class="console-terminal" id="bot-console">
                             <div class="console-placeholder">Aguardando conexão com o bot...</div>
                         </div>
@@ -1202,7 +1202,7 @@
 
                 // Mensagem de boas-vindas sempre no topo
                 var now = new Date().toLocaleTimeString('pt-BR');
-                var welcomeLine = addConsoleLine(now, 'WELCOME', '👋 Hello <strong>' + userName + '</strong>, your role is <strong>' + userRole.toUpperCase() + '</strong>', 'welcome-line');
+                var welcomeLine = addConsoleLine(now, 'WELCOME', 'Hello <strong>' + userName + '</strong>, your role is <strong>' + userRole.toUpperCase() + '</strong>', 'welcome-line');
                 consoleDiv.appendChild(welcomeLine);
 
                 // Logs normais (mais recentes primeiro)
@@ -1212,7 +1212,7 @@
                 }
 
                 if (consoleLogs.length === 0) {
-                    var infoLine = addConsoleLine(now, 'INFO', '⏳ Connecting to bot realtime...');
+                    var infoLine = addConsoleLine(now, 'INFO', 'Connecting to bot realtime...');
                     consoleDiv.appendChild(infoLine);
                 }
 
@@ -1266,12 +1266,12 @@
 
                     channel.bind('pusher:subscription_succeeded', function() {
                         var now = new Date().toLocaleTimeString('pt-BR');
-                        addNewLog(now, 'CONNECTED', '✅ Connected to bot realtime stream');
+                        addNewLog(now, 'CONNECTED', 'Connected to bot realtime stream');
                     });
 
                     channel.bind('pusher:subscription_error', function() {
                         var now = new Date().toLocaleTimeString('pt-BR');
-                        addNewLog(now, 'ERROR', '❌ Failed to connect to bot stream');
+                        addNewLog(now, 'ERROR', 'Failed to connect to bot stream');
                     });
 
                 })
