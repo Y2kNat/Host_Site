@@ -276,7 +276,6 @@
         var allPendings = [];
         var currentFilter = 'all';
 
-        // Extrai o role diretamente do token JWT
         function getUserRoleFromToken() {
             var token = localStorage.getItem('token');
             if (!token) return 'tester';
@@ -289,9 +288,7 @@
                 var decoded = atob(payload);
                 var data = JSON.parse(decoded);
                 return data.role || 'tester';
-            } catch (e) {
-                return 'tester';
-            }
+            } catch (e) { return 'tester'; }
         }
 
         var userRole = getUserRoleFromToken();
@@ -341,9 +338,7 @@
             var f = allPendings;
             if (currentFilter === 'active') f = allPendings.filter(function(p) { return !p.done; });
             else if (currentFilter === 'done') f = allPendings.filter(function(p) { return p.done; });
-
             if (f.length === 0) { list.innerHTML = '<div class="empty-state">Nenhuma pendência</div>'; return; }
-
             var html = '';
             for (var i = 0; i < f.length; i++) {
                 var p = f[i];
@@ -373,7 +368,7 @@
         };
 
         // =============================================
-        // FUNÇÃO CORRIGIDA - O RESULTADO AGORA APARECE NO CHAT
+        // sendChat COM POLLING ATÉ O RESULTADO FICAR PRONTO
         // =============================================
         window.sendChat = function() {
             var input = document.getElementById('chatInput');
@@ -394,7 +389,6 @@
                 allPendings.unshift(newPending);
                 renderPendings();
 
-                // CRIA A MENSAGEM "EXECUTANDO..."
                 var msgDiv = addChatMsg('bot', '⏳ Executando /' + command + '...');
 
                 fetch('/api/pendings/executar', {
@@ -404,19 +398,68 @@
                 })
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
-                    // EXTRAI O RESULTADO
-                    var resultado = data.result || data.message || data.response || '✅ Executado';
-                    if (data.data && data.data.result) resultado = data.data.result;
-                    if (data.output) resultado = data.output;
+                    addLog('📦 Resposta inicial: ' + JSON.stringify(data).substring(0, 200), 'info');
 
-                    newPending.done = true;
-                    newPending.result = resultado;
+                    // Se já tem resultado, mostra na hora
+                    if (data.result) {
+                        newPending.done = true;
+                        newPending.result = data.result;
+                        msgDiv.textContent = data.result;
+                        addLog('✅ Resultado imediato: ' + data.result, 'success');
+                        renderPendings();
+                        loadPendings();
+                        return;
+                    }
 
-                    // ATUALIZA A MENSAGEM NO CHAT
-                    msgDiv.textContent = resultado;
-                    addLog('✅ ' + resultado, 'success');
-                    renderPendings();
-                    loadPendings();
+                    // Se tem pendingId, faz polling até o resultado ficar pronto
+                    if (data.pendingId) {
+                        addLog('⏳ Aguardando resultado... (pendingId: ' + data.pendingId + ')', 'info');
+                        var attempts = 0;
+                        var maxAttempts = 30;
+
+                        var checkInterval = setInterval(function() {
+                            attempts++;
+                            fetch('/api/pendings/resultado?pendingId=' + data.pendingId, {
+                                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                            })
+                            .then(function(r) { return r.json(); })
+                            .then(function(checkData) {
+                                addLog('📋 Tentativa ' + attempts + ': done=' + checkData.done + ' result=' + (checkData.result || 'vazio'), 'info');
+
+                                if (checkData.done && checkData.result) {
+                                    clearInterval(checkInterval);
+                                    newPending.done = true;
+                                    newPending.result = checkData.result;
+                                    msgDiv.textContent = checkData.result;
+                                    addLog('✅ Resultado final: ' + checkData.result, 'success');
+                                    renderPendings();
+                                    loadPendings();
+                                } else if (attempts >= maxAttempts) {
+                                    clearInterval(checkInterval);
+                                    newPending.done = true;
+                                    newPending.result = '⏱️ Tempo limite excedido';
+                                    msgDiv.textContent = '⏱️ Tempo limite excedido';
+                                    addLog('⏱️ Timeout', 'error');
+                                    renderPendings();
+                                    loadPendings();
+                                }
+                            })
+                            .catch(function(e) {
+                                if (attempts >= maxAttempts) {
+                                    clearInterval(checkInterval);
+                                    addLog('❌ Erro no polling: ' + e.message, 'error');
+                                }
+                            });
+                        }, 1000);
+                    } else {
+                        // Não tem nem result nem pendingId
+                        newPending.done = true;
+                        newPending.result = '✅ Comando enviado';
+                        msgDiv.textContent = '✅ Comando enviado';
+                        addLog('⚠️ Sem pendingId', 'warn');
+                        renderPendings();
+                        loadPendings();
+                    }
                 })
                 .catch(function(e) {
                     addLog('❌ Erro: ' + e.message, 'error');
