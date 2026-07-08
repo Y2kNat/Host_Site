@@ -4,58 +4,1109 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HostVille BOT - Pendências</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #050505;
+            --card: rgba(255,255,255,0.03);
+            --card-hover: rgba(255,255,255,0.06);
+            --accent-blue: rgba(88,101,242,0.6);
+            --text: #ffffff;
+            --text-dim: rgba(255,255,255,0.5);
+            --text-tertiary: rgba(255,255,255,0.25);
+            --border: rgba(255,255,255,0.06);
+            --border-hover: rgba(255,255,255,0.12);
+            --radius: 14px;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #0a0a1a; color: #fff; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        h1 { color: #5865F2; margin-bottom: 20px; }
-        .back { color: #5865F2; text-decoration: none; font-size: 14px; }
-        .main { display: flex; gap: 20px; height: calc(100vh - 120px); }
-        .chat-panel { width: 20%; background: #16213e; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; }
-        .chat-panel h3 { color: #888; margin-bottom: 10px; font-size: 14px; }
-        .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 10px; font-size: 13px; }
-        .chat-messages .msg { margin-bottom: 8px; padding: 8px; border-radius: 5px; }
-        .chat-messages .user { background: #5865F2; text-align: right; }
-        .chat-messages .bot { background: #0f3460; }
-        .chat-input { display: flex; gap: 5px; }
-        .chat-input input { flex: 1; padding: 8px; border: none; border-radius: 5px; background: #0f3460; color: #fff; font-size: 12px; }
-        .chat-input button { padding: 8px 12px; background: #5865F2; border: none; border-radius: 5px; color: #fff; cursor: pointer; font-size: 12px; }
-        .cmd-btn { padding: 6px 10px; background: #3498db; border: none; border-radius: 5px; color: #fff; cursor: pointer; font-size: 11px; margin-bottom: 10px; width: 100%; }
-        .cmds-list { display: none; margin-bottom: 10px; font-size: 11px; }
-        .cmds-list.show { display: block; }
-        .cmds-list div { padding: 4px 6px; cursor: pointer; border-radius: 3px; }
-        .cmds-list div:hover { background: #0f3460; }
-        .pending-panel { width: 80%; background: #16213e; border-radius: 10px; padding: 20px; overflow-y: auto; }
-        .pending-panel h3 { color: #888; margin-bottom: 15px; }
-        .pending-item { padding: 12px; border-bottom: 1px solid #333; font-size: 13px; }
-        .badge { padding: 3px 6px; border-radius: 3px; font-size: 10px; }
-        .badge-active { background: #e74c3c; }
-        .badge-done { background: #2ecc71; }
+
+        body {
+            background: #050505;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            width: 100vw;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* LOADING OVERLAY */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease-out;
+        }
+
+        #loading-overlay canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #loading-overlay .welcome-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: 200;
+            font-size: 2rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            opacity: 0;
+            z-index: 10;
+            pointer-events: none;
+            user-select: none;
+            font-family: 'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif;
+        }
+
+        #loading-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #loading-overlay.hidden {
+            display: none;
+        }
+
+        /* MAIN CONTENT */
+        #main-content {
+            opacity: 0;
+            transition: opacity 0.8s ease-in;
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+        }
+
+        #main-content.visible {
+            opacity: 1;
+        }
+
+        .stage {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+        .blob-1 { width:400px; height:400px; background:rgba(88,101,242,0.3); left:-5%; top:-10%; animation:float1 20s ease-in-out infinite; }
+        .blob-2 { width:350px; height:350px; background:rgba(255,255,255,0.15); left:55%; top:-5%; animation:float2 25s ease-in-out infinite; }
+        .blob-3 { width:500px; height:500px; background:rgba(88,101,242,0.2); left:25%; top:40%; animation:float3 30s ease-in-out infinite; }
+        .blob-4 { width:300px; height:300px; background:rgba(255,255,255,0.12); left:70%; top:35%; animation:float1 22s ease-in-out infinite reverse; }
+        .blob-5 { width:380px; height:380px; background:rgba(88,101,242,0.25); left:10%; top:55%; animation:float2 28s ease-in-out infinite reverse; }
+        .blob-6 { width:250px; height:250px; background:rgba(255,255,255,0.1); left:45%; top:0%; animation:float3 18s ease-in-out infinite; }
+
+        @keyframes float1 {
+            0%,100%{transform:translate(0,0) scale(1)} 25%{transform:translate(100px,-50px) scale(1.15)} 50%{transform:translate(-40px,80px) scale(0.9)} 75%{transform:translate(-80px,-30px) scale(1.1)}
+        }
+        @keyframes float2 {
+            0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(-60px,60px) scale(1.2)} 66%{transform:translate(50px,-80px) scale(0.85)}
+        }
+        @keyframes float3 {
+            0%,100%{transform:translate(0,0) scale(1)} 20%{transform:translate(80px,40px) scale(1.1)} 40%{transform:translate(-50px,-60px) scale(0.9)} 60%{transform:translate(30px,80px) scale(1.15)} 80%{transform:translate(-70px,-30px) scale(0.95)}
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            flex-wrap: wrap;
+        }
+
+        .back-btn {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            padding: 8px 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 25px;
+            background: transparent;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .header h1 {
+            font-weight: 800;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            letter-spacing: -1px;
+            color: #fff;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .header .brand-id {
+            font-family: 'Space Mono', monospace;
+            font-size: 8px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            white-space: nowrap;
+        }
+
+        .main-layout {
+            display: flex;
+            gap: 16px;
+            height: calc(100vh - 160px);
+            min-height: 500px;
+        }
+
+        /* CHAT PANEL */
+        .chat-panel {
+            width: 320px;
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-panel:hover {
+            border-color: rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06);
+        }
+
+        .chat-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(88,101,242,0.3), transparent);
+        }
+
+        .chat-panel h3 {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .cmd-btn {
+            font-family: 'Space Mono', monospace;
+            font-size: 9px;
+            padding: 10px 14px;
+            background: rgba(88,101,242,0.15);
+            border: 1px solid rgba(88,101,242,0.3);
+            border-radius: 8px;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .cmd-btn:hover {
+            background: rgba(88,101,242,0.25);
+            border-color: rgba(88,101,242,0.5);
+            box-shadow: 0 0 20px rgba(88,101,242,0.2);
+        }
+        
+        .cmd-btn:active {
+            transform: scale(0.97);
+        }
+
+        .cmds-list {
+            display: none;
+            margin-bottom: 10px;
+            max-height: 180px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 6px;
+        }
+
+        .cmds-list.show {
+            display: block;
+        }
+
+        .cmds-list::-webkit-scrollbar { width: 3px; }
+        .cmds-list::-webkit-scrollbar-track { background: transparent; }
+        .cmds-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
+
+        .cmds-list div {
+            padding: 7px 10px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-family: 'Space Mono', monospace;
+            font-size: 9px;
+            color: rgba(255,255,255,0.6);
+            transition: all 0.2s;
+            letter-spacing: 0.5px;
+        }
+
+        .cmds-list div:hover {
+            background: rgba(88,101,242,0.2);
+            color: #fff;
+        }
+        
+        .cmds-list div:active {
+            background: rgba(88,101,242,0.4);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-height: 0;
+        }
+
+        .chat-messages::-webkit-scrollbar { width: 3px; }
+        .chat-messages::-webkit-scrollbar-track { background: transparent; }
+        .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
+
+        .chat-messages .msg {
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            line-height: 1.4;
+            max-width: 85%;
+            word-wrap: break-word;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        .chat-messages .user {
+            background: rgba(88,101,242,0.3);
+            align-self: flex-end;
+            border-bottom-right-radius: 3px;
+            color: #fff;
+        }
+
+        .chat-messages .bot {
+            background: rgba(255,255,255,0.05);
+            align-self: flex-start;
+            border-bottom-left-radius: 3px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 6px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+            outline: none;
+            min-width: 0;
+        }
+
+        .chat-input input:focus {
+            border-color: rgba(88,101,242,0.5);
+            box-shadow: 0 0 15px rgba(88,101,242,0.1);
+        }
+
+        .chat-input input::placeholder {
+            color: rgba(255,255,255,0.25);
+        }
+
+        .chat-input button {
+            padding: 10px 14px;
+            background: rgba(88,101,242,0.3);
+            border: 1px solid rgba(88,101,242,0.4);
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            font-family: 'Space Mono', monospace;
+            white-space: nowrap;
+        }
+
+        .chat-input button:hover {
+            background: rgba(88,101,242,0.5);
+            box-shadow: 0 0 20px rgba(88,101,242,0.3);
+        }
+        
+        .chat-input button:active {
+            transform: scale(0.95);
+        }
+
+        /* PENDING PANEL */
+        .pending-panel {
+            flex: 1;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 20px;
+            overflow-y: auto;
+            transition: all 0.3s;
+            position: relative;
+            min-width: 0;
+        }
+
+        .pending-panel:hover {
+            border-color: rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06);
+        }
+
+        .pending-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+
+        .pending-panel::-webkit-scrollbar { width: 3px; }
+        .pending-panel::-webkit-scrollbar-track { background: transparent; }
+        .pending-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
+
+        .pending-panel h3 {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .pending-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            font-family: 'Space Mono', monospace;
+            font-size: 9px;
+            padding: 6px 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            background: transparent;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            border-color: rgba(255,255,255,0.3);
+            color: #fff;
+        }
+
+        .filter-btn.active {
+            background: rgba(88,101,242,0.3);
+            border-color: rgba(88,101,242,0.5);
+            color: #fff;
+        }
+
+        .pending-item {
+            padding: 12px 14px;
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 10px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            background: rgba(0,0,0,0.2);
+            flex-wrap: wrap;
+        }
+
+        .pending-item:hover {
+            border-color: rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.3);
+            transform: translateX(4px);
+        }
+
+        .pending-item.done-item {
+            opacity: 0.6;
+        }
+
+        .pending-item.done-item:hover {
+            opacity: 0.8;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-family: 'Space Mono', monospace;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .badge-active {
+            background: rgba(231,76,60,0.2);
+            color: #e74c3c;
+            border: 1px solid rgba(231,76,60,0.3);
+        }
+
+        .badge-done {
+            background: rgba(46,204,113,0.2);
+            color: #2ecc71;
+            border: 1px solid rgba(46,204,113,0.3);
+        }
+
+        .pending-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 120px;
+        }
+
+        .pending-command {
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            color: #fff;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .pending-params {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            word-break: break-all;
+        }
+
+        .pending-result {
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 2px;
+            font-style: italic;
+        }
+
+        .pending-time {
+            font-family: 'Space Mono', monospace;
+            font-size: 8px;
+            color: rgba(255,255,255,0.25);
+            letter-spacing: 1px;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255,255,255,0.25);
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Mobile toggle button */
+        .mobile-toggle {
+            display: none;
+            font-family: 'Space Mono', monospace;
+            font-size: 9px;
+            padding: 8px 14px;
+            background: rgba(88,101,242,0.15);
+            border: 1px solid rgba(88,101,242,0.3);
+            border-radius: 8px;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .mobile-toggle.active {
+            background: rgba(88,101,242,0.3);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* MOBILE STYLES */
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+            
+            .header {
+                gap: 8px;
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+            }
+            
+            .header h1 {
+                font-size: 1.1rem;
+                min-width: auto;
+            }
+            
+            .brand-id {
+                display: none;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .main-layout {
+                flex-direction: column;
+                height: auto;
+                gap: 10px;
+            }
+
+            .chat-panel {
+                width: 100%;
+                height: auto;
+                max-height: 60vh;
+                display: none;
+            }
+            
+            .chat-panel.show-mobile {
+                display: flex;
+            }
+
+            .pending-panel {
+                height: auto;
+                max-height: 60vh;
+                display: block;
+            }
+            
+            .pending-panel.hide-mobile {
+                display: none;
+            }
+
+            .chat-messages {
+                max-height: 30vh;
+            }
+            
+            .pending-item {
+                padding: 10px 12px;
+                gap: 8px;
+            }
+            
+            .chat-input input {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1rem;
+            }
+            
+            .back-btn {
+                font-size: 8px;
+                padding: 6px 12px;
+                letter-spacing: 1px;
+            }
+            
+            .chat-panel {
+                padding: 12px;
+                border-radius: 10px;
+            }
+            
+            .pending-panel {
+                padding: 12px;
+                border-radius: 10px;
+            }
+            
+            .pending-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+            
+            .pending-time {
+                align-self: flex-end;
+            }
+            
+            .badge {
+                font-size: 8px;
+                padding: 3px 6px;
+            }
+            
+            .chat-messages .msg {
+                font-size: 10px;
+                padding: 6px 8px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .blob { animation: none; }
+            .pending-item:hover { transform: none; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="/dashboard" class="back">← Voltar</a>
-        <h1>⚡ Pendências & Comandos</h1>
-        <div class="main">
-            <div class="chat-panel">
-                <h3>🤖 Comandos</h3>
-                <button class="cmd-btn" onclick="toggleCmds()">🔘 Listar Comandos</button>
-                <div class="cmds-list" id="cmdsList"></div>
-                <div class="chat-messages" id="chatMessages"></div>
-                <div class="chat-input">
-                    <input type="text" id="chatInput" placeholder="/comando ou conversa..." onkeypress="if(event.key==='Enter')sendChat()">
-                    <button onclick="sendChat()">▶</button>
-                </div>
+
+    <!-- LOADING OVERLAY -->
+    <div id="loading-overlay">
+        <canvas id="loading-canvas"></canvas>
+        <div class="welcome-text" id="loading-text">LOADING</div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main-content">
+        <div class="stage">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+            <div class="blob blob-4"></div>
+            <div class="blob blob-5"></div>
+            <div class="blob blob-6"></div>
+        </div>
+
+        <div class="container">
+            <div class="header">
+                <a href="/dashboard" class="back-btn">← Voltar</a>
+                <h1>⚡ Pendências & Comandos</h1>
+                <span class="brand-id">System Node: HV-CMD</span>
             </div>
-            <div class="pending-panel">
-                <h3>📋 Pendências</h3>
-                <div id="pendingList">Carregando...</div>
+            
+            <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobileView()">
+                📋 Ver Pendências
+            </button>
+            
+            <div class="main-layout">
+                <div class="chat-panel show-mobile" id="chatPanel">
+                    <h3>🤖 Terminal de Comandos</h3>
+                    <button class="cmd-btn" onclick="toggleCmds()">📋 Listar Comandos</button>
+                    <div class="cmds-list" id="cmdsList"></div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="msg bot">Digite /comando ou converse com a IA</div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="/comando ou conversa..." onkeypress="if(event.key==='Enter')sendChat()">
+                        <button onclick="sendChat()">▶</button>
+                    </div>
+                </div>
+                
+                <div class="pending-panel" id="pendingPanel">
+                    <h3>📋 Histórico de Pendências</h3>
+                    <div class="pending-filters">
+                        <button class="filter-btn active" onclick="filterPendings('all', this)">Todas</button>
+                        <button class="filter-btn" onclick="filterPendings('active', this)">⏳ Ativas</button>
+                        <button class="filter-btn" onclick="filterPendings('done', this)">✓ Concluídas</button>
+                    </div>
+                    <div id="pendingList">
+                        <div class="empty-state">Carregando...</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
     <script>
-        if (!localStorage.getItem('token')) window.location.href = '/';
+    (function() {
+        'use strict';
+
+        // =============================================
+        // LOADING ANIMATION
+        // =============================================
+        class Particle {
+            constructor(baseX, baseY, baseZ, size) {
+                this.baseX = baseX;
+                this.baseY = baseY;
+                this.baseZ = baseZ;
+                this.x = baseX;
+                this.y = baseY;
+                this.z = baseZ;
+                this.size = size;
+            }
+            reset() {
+                this.x = this.baseX;
+                this.y = this.baseY;
+                this.z = this.baseZ;
+            }
+        }
+
+        class Camera {
+            constructor() {
+                this.z = 0;
+                this.fov = 60;
+                this.focalLength = 1.0 / Math.tan((this.fov * 0.5) * Math.PI / 180.0);
+                this.near = 0.1;
+            }
+            project(px, py, pz, sw, sh) {
+                const dz = pz - this.z;
+                if (dz < this.near) return null;
+                const scale = this.focalLength / dz;
+                return {
+                    x: (px - 0) * scale * (sw / 2) + sw / 2,
+                    y: -py * scale * (sh / 2) + sh / 2,
+                    z: dz,
+                    scale: scale
+                };
+            }
+        }
+
+        class SpiralAnimation {
+            constructor(canvas, textElement, onComplete) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.textElement = textElement;
+                this.onComplete = onComplete;
+                this.particles = [];
+                this.camera = new Camera();
+                this.animationId = null;
+                this.startTime = null;
+                this.animDuration = 4000;
+                this.fadeOutDuration = 400;
+                this.holdDuration = 150;
+                this.isFinished = false;
+                this.fadeOutStart = null;
+                this.holdStart = null;
+                this.textOpacity = 0;
+                this.textFadeDelay = 1000;
+                this.textFadeDuration = 600;
+                this.spiralLoops = 5;
+                this.spiralRadius = 4.5;
+                this.spiralHeight = 14.0;
+                this.particleCount = 2000;
+                this.baseSize = 2.0;
+                this.sizeVar = 0.8;
+                this.initParticles();
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+            }
+
+            initParticles() {
+                for (let i = 0; i < this.particleCount; i++) {
+                    const t = i / (this.particleCount - 1);
+                    const angle = t * Math.PI * 2 * this.spiralLoops;
+                    const radiusVar = 0.3 * Math.sin(t * 30) + 0.2;
+                    const radius = this.spiralRadius * (0.7 + t * 0.3) + (Math.random() - 0.5) * radiusVar;
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    const z = -t * this.spiralHeight + (Math.random() - 0.5) * 0.8;
+                    const size = this.baseSize + (Math.random() - 0.5) * this.sizeVar;
+                    this.particles.push(new Particle(x, y, z, Math.max(0.6, size)));
+                }
+                this.camera.z = 2.5;
+                this.initialZ = this.camera.z;
+                this.finalZ = -this.spiralHeight - 2.0;
+            }
+
+            resize() {
+                const dpr = window.devicePixelRatio || 1;
+                const dw = window.innerWidth;
+                const dh = window.innerHeight;
+                this.canvas.width = dw * dpr;
+                this.canvas.height = dh * dpr;
+                this.canvas.style.width = dw + 'px';
+                this.canvas.style.height = dh + 'px';
+                this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+                this.ctx.scale(dpr, dpr);
+                this.dw = dw;
+                this.dh = dh;
+            }
+
+            start() {
+                if (this.animationId) return;
+                this.startTime = performance.now();
+                this.holdStart = null;
+                this.fadeOutStart = null;
+                this.isFinished = false;
+                this.textOpacity = 0;
+                this.textElement.style.opacity = '0';
+                this.particles.forEach(p => p.reset());
+                this.camera.z = this.initialZ;
+                this.animate(performance.now());
+            }
+
+            animate(timestamp) {
+                if (this.isFinished) return;
+                const elapsed = timestamp - this.startTime;
+
+                if (elapsed < this.animDuration) {
+                    this.update(elapsed / this.animDuration);
+                } else if (!this.holdStart) {
+                    this.holdStart = timestamp;
+                    this.update(1.0);
+                } else if (elapsed < this.animDuration + this.holdDuration + this.fadeOutDuration) {
+                    if (!this.fadeOutStart) this.fadeOutStart = timestamp;
+                    const fe = timestamp - this.fadeOutStart;
+                    const fp = Math.min(1.0, fe / this.fadeOutDuration);
+                    const ef = this.easeInOutQuad(fp);
+                    const co = 1.0 - ef;
+                    this.ctx.clearRect(0, 0, this.dw, this.dh);
+                    if (co > 0.01) {
+                        this.ctx.globalAlpha = co;
+                        this.render(1.0);
+                        this.ctx.globalAlpha = 1.0;
+                    }
+                    this.textElement.style.opacity = Math.max(0, this.textOpacity - ef);
+                } else {
+                    this.finish();
+                    return;
+                }
+
+                if (elapsed < this.animDuration + this.holdDuration) {
+                    this.updateText(elapsed);
+                }
+
+                this.animationId = requestAnimationFrame((t) => this.animate(t));
+            }
+
+            update(progress) {
+                const ep = this.easeInOutCubic(progress);
+                this.camera.z = this.initialZ + (this.finalZ - this.initialZ) * ep;
+                const ef = 1.0 + progress * 0.5;
+                this.particles.forEach(p => {
+                    p.x = p.baseX * ef;
+                    p.y = p.baseY * ef;
+                });
+                this.ctx.clearRect(0, 0, this.dw, this.dh);
+                this.ctx.globalAlpha = 1.0;
+                this.render(progress);
+            }
+
+            render(progress) {
+                const ctx = this.ctx;
+                const cam = this.camera;
+                const w = this.dw;
+                const h = this.dh;
+                const projected = [];
+
+                for (let i = 0; i < this.particles.length; i++) {
+                    const p = this.particles[i];
+                    const proj = cam.project(p.x, p.y, p.z, w, h);
+                    if (proj) {
+                        projected.push({
+                            x: proj.x,
+                            y: proj.y,
+                            z: proj.z,
+                            size: p.size * proj.scale * 0.9,
+                            origSize: p.size
+                        });
+                    }
+                }
+
+                projected.sort((a, b) => b.z - a.z);
+
+                for (let i = 0; i < projected.length; i++) {
+                    const p = projected[i];
+                    const df = Math.min(1.0, Math.max(0.2, 1.0 - (p.z / 18.0)));
+                    const br = 0.7 + (p.origSize / (this.baseSize + this.sizeVar)) * 0.3;
+                    const alpha = df * br * 0.9;
+                    ctx.fillStyle = 'rgba(255, 255, 255, ' + alpha + ')';
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, Math.max(0.4, p.size * 0.5), 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            updateText(elapsed) {
+                if (elapsed >= this.textFadeDelay) {
+                    const fp = Math.min(1.0, (elapsed - this.textFadeDelay) / this.textFadeDuration);
+                    const ef = this.easeInOutQuad(fp);
+                    const bp = 3200;
+                    const bph = (elapsed - this.textFadeDelay) / bp;
+                    const br = 0.7 + 0.3 * (0.5 + 0.5 * Math.sin(bph * Math.PI * 2));
+                    this.textOpacity = ef * br;
+                    this.textElement.style.opacity = this.textOpacity;
+                }
+            }
+
+            finish() {
+                this.isFinished = true;
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+                this.ctx.clearRect(0, 0, this.dw, this.dh);
+                this.textElement.style.opacity = '0';
+
+                const overlay = document.getElementById('loading-overlay');
+                overlay.classList.add('fade-out');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    document.getElementById('main-content').classList.add('visible');
+                    if (this.onComplete) this.onComplete();
+                }, 600);
+            }
+
+            easeInOutQuad(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
+            easeInOutCubic(t) { return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1; }
+        }
+
+        // =============================================        // PAGE LOGIC
+        // =============================================
+        let pageLoaded = false;
+        let allPendings = [];
+        let currentFilter = 'all';
+
+        function initPage() {
+            if (pageLoaded) return;
+            pageLoaded = true;
+
+            if (!localStorage.getItem('token')) {
+                window.location.href = '/';
+                return;
+            }
+
+            const blobs = document.querySelectorAll('.blob');
+            document.addEventListener('mousemove', function(e) {
+                const x = (e.clientX / window.innerWidth - 0.5) * 2;
+                const y = (e.clientY / window.innerHeight - 0.5) * 2;
+                blobs.forEach(function(b, i) { 
+                    b.style.transform = 'translate(' + x*(i+1)*10 + 'px, ' + y*(i+1)*10 + 'px)'; 
+                });
+            });
+
+            loadPendings();
+            setInterval(loadPendings, 30000);
+            
+            window.addEventListener('resize', handleResize);
+            handleResize();
+        }
+        
+        function handleResize() {
+            const isMobile = window.innerWidth <= 768;
+            const toggle = document.getElementById('mobileToggle');
+            const chatPanel = document.getElementById('chatPanel');
+            const pendingPanel = document.getElementById('pendingPanel');
+            
+            if (isMobile) {
+                toggle.style.display = 'block';
+                if (!toggle.dataset.initialized) {
+                    toggle.dataset.initialized = 'true';
+                    chatPanel.classList.add('show-mobile');
+                    pendingPanel.classList.add('hide-mobile');
+                    toggle.textContent = '📋 Ver Pendências';
+                }
+            } else {
+                toggle.style.display = 'none';
+                chatPanel.classList.add('show-mobile');
+                chatPanel.classList.remove('hide-mobile');
+                pendingPanel.classList.remove('show-mobile', 'hide-mobile');
+            }
+        }
+
+        window.toggleMobileView = function() {
+            const toggle = document.getElementById('mobileToggle');
+            const chatPanel = document.getElementById('chatPanel');
+            const pendingPanel = document.getElementById('pendingPanel');
+            
+            if (chatPanel.classList.contains('show-mobile')) {
+                chatPanel.classList.remove('show-mobile');
+                chatPanel.classList.add('hide-mobile');
+                pendingPanel.classList.remove('hide-mobile');
+                pendingPanel.classList.add('show-mobile');
+                toggle.textContent = '💬 Terminal';
+                toggle.classList.add('active');
+            } else {
+                chatPanel.classList.add('show-mobile');
+                chatPanel.classList.remove('hide-mobile');
+                pendingPanel.classList.add('hide-mobile');
+                pendingPanel.classList.remove('show-mobile');
+                toggle.textContent = '📋 Ver Pendências';
+                toggle.classList.remove('active');
+            }
+        };
+
+        // Filtro de pendências
+        window.filterPendings = function(filter, btn) {
+            currentFilter = filter;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            renderFilteredPendings();
+        };
+
+        function renderFilteredPendings() {
+            const list = document.getElementById('pendingList');
+            
+            let filtered = allPendings;
+            if (currentFilter === 'active') {
+                filtered = allPendings.filter(p => !p.isDone);
+            } else if (currentFilter === 'done') {
+                filtered = allPendings.filter(p => p.isDone);
+            }
+            
+            if (filtered.length > 0) {
+                list.innerHTML = filtered.map(p => {
+                    const isDone = p.isDone;
+                    return `
+                        <div class="pending-item ${isDone ? 'done-item' : ''}">
+                            <span class="badge ${isDone ? 'badge-done' : 'badge-active'}">
+                                ${isDone ? '✓ Done' : '⏳ Active'}
+                            </span>
+                            <div class="pending-info">
+                                <span class="pending-command">/${p.command}</span>
+                                <span class="pending-params">${p.params}</span>
+                                ${p.result ? '<span class="pending-result">Resultado: ' + p.result + '</span>' : ''}
+                            </div>
+                            <span class="pending-time">${p.time}</span>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                const messages = {
+                    'all': 'Nenhuma pendência encontrada',
+                    'active': 'Nenhuma pendência ativa',
+                    'done': 'Nenhuma pendência concluída'
+                };
+                list.innerHTML = '<div class="empty-state">' + messages[currentFilter] + '</div>';
+            }
+        }
+
+        // Comandos
         const user = JSON.parse(localStorage.getItem('user') || '{}');
 
         const commandsByRole = {
@@ -65,15 +1116,18 @@
             tester: ['ping', 'uptime', 'bot']
         };
 
-        function toggleCmds() {
+        window.toggleCmds = function() {
             const list = document.getElementById('cmdsList');
-            if (list.classList.contains('show')) { list.classList.remove('show'); return; }
-            const cmds = commandsByRole[user.role] || [];
-            list.innerHTML = cmds.map(c => `<div onclick="document.getElementById('chatInput').value='/${c}';list.classList.remove('show');">/${c}</div>`).join('');
+            if (list.classList.contains('show')) { 
+                list.classList.remove('show'); 
+                return; 
+            }
+            const cmds = commandsByRole[user.role] || commandsByRole['tester'];
+            list.innerHTML = cmds.map(c => '<div onclick="document.getElementById(\'chatInput\').value=\'/' + c + '\';document.getElementById(\'cmdsList\').classList.remove(\'show\');">/' + c + '</div>').join('');
             list.classList.add('show');
-        }
+        };
 
-        async function sendChat() {
+        window.sendChat = async function() {
             const input = document.getElementById('chatInput');
             const msg = input.value.trim();
             if (!msg) return;
@@ -84,77 +1138,152 @@
                 const parts = msg.substring(1).split(' ');
                 const command = parts[0];
                 const params = parts.slice(1).join(' ');
+                
                 try {
                     const res = await fetch('/api/pendings/executar', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                         body: JSON.stringify({ command, params })
                     });
+                    
+                    if (!res.ok) throw new Error('API error: ' + res.status);
+                    
                     const data = await res.json();
+                    
                     if (data.pendingId) {
                         const msgDiv = addChatMsg('bot', '⏳ Executando...');
+                        let attempts = 0;
+                        const maxAttempts = 30;
+                        
                         const checkResult = setInterval(async () => {
-                            const checkRes = await fetch('/api/pendings/resultado?pendingId=' + data.pendingId, {
-                                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                            });
-                            const checkData = await checkRes.json();
-                            if (checkData.done) {
-                                clearInterval(checkResult);
-                                msgDiv.textContent = checkData.result;
+                            attempts++;
+                            try {
+                                const checkRes = await fetch('/api/pendings/resultado?pendingId=' + data.pendingId, {
+                                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                                });
+                                
+                                if (!checkRes.ok) {
+                                    if (attempts >= maxAttempts) {
+                                        clearInterval(checkResult);
+                                        msgDiv.textContent = '⏱️ Tempo limite excedido';
+                                    }
+                                    return;
+                                }
+                                
+                                const checkData = await checkRes.json();
+                                if (checkData.done || attempts >= maxAttempts) {
+                                    clearInterval(checkResult);
+                                    msgDiv.textContent = checkData.result || checkData.message || '✅ Comando executado';
+                                }
+                            } catch (e) {
+                                if (attempts >= maxAttempts) {
+                                    clearInterval(checkResult);
+                                    msgDiv.textContent = '❌ Erro de conexão';
+                                }
                             }
                         }, 1000);
                     } else {
-                        addChatMsg('bot', data.message || 'Erro');
+                        addChatMsg('bot', data.message || data.result || '✅ Comando enviado');
                     }
                 } catch (e) {
-                    addChatMsg('bot', 'Erro ao executar comando');
+                    console.error('Erro ao executar:', e);
+                    addChatMsg('bot', '❌ Erro ao executar comando');
                 }
+                
                 loadPendings();
             } else {
                 try {
                     const res = await fetch('/api/pendings/chat', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
-                        body: JSON.stringify({ message: msg, role: user.role })
+                        body: JSON.stringify({ message: msg, role: user.role || 'tester' })
                     });
+                    
+                    if (!res.ok) throw new Error('API error: ' + res.status);
+                    
                     const data = await res.json();
                     addChatMsg('bot', data.response || 'Sem resposta');
                 } catch (e) {
-                    addChatMsg('bot', 'Erro na IA');
+                    console.error('Erro na IA:', e);
+                    addChatMsg('bot', '❌ Erro na IA');
                 }
             }
-        }
+        };
 
         function addChatMsg(type, text) {
+            const chatMessages = document.getElementById('chatMessages');
+            const firstMsg = chatMessages.querySelector('.msg.bot');
+            if (firstMsg && firstMsg.textContent === 'Digite /comando ou converse com a IA') {
+                firstMsg.remove();
+            }
             const div = document.createElement('div');
             div.className = 'msg ' + type;
             div.textContent = text;
-            document.getElementById('chatMessages').appendChild(div);
+            chatMessages.appendChild(div);
             div.scrollIntoView({ behavior: 'smooth' });
             return div;
         }
 
         function loadPendings() {
-            fetch('/api/pendings/list', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } })
-            .then(r => r.json())
+            fetch('/api/pendings/list', { 
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
+            })
+            .then(r => {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
             .then(data => {
-                const list = document.getElementById('pendingList');
-                if (data.pendings && data.pendings.length > 0) {
-                    list.innerHTML = data.pendings.map(p => `
-                        <div class="pending-item">
-                            <span class="badge ${p.done ? 'badge-done' : 'badge-active'}">${p.done ? '✅' : '⏳'}</span>
-                            <strong>/${p.data?.command || p.type}</strong>
-                            <span style="color:#888">${p.data?.params || ''}</span>
-                            <span style="float:right;color:#888;font-size:11px">${new Date(p.createdAt).toLocaleString('pt-BR')}</span>
-                        </div>
-                    `).join('');
+                const pendings = data.pendings || data || [];
+                
+                if (Array.isArray(pendings) && pendings.length > 0) {
+                    allPendings = pendings.map(p => {
+                        const command = p.data?.command || p.command || p.type || 'comando';
+                        const params = p.data?.params || p.params || '';
+                        const result = p.data?.result || p.result || '';
+                        const createdAt = p.createdAt || p.created_at || new Date().toISOString();
+                        const isDone = p.done || p.status === 'done' || p.status === 'completed';
+                        
+                        return {
+                            command,
+                            params,
+                            result,
+                            time: new Date(createdAt).toLocaleString('pt-BR'),
+                            isDone,
+                            raw: p
+                        };
+                    });
                 } else {
-                    list.innerHTML = '<p style="color:#888">Nenhuma pendência</p>';
+                    allPendings = [];
                 }
+                
+                renderFilteredPendings();
+            })
+            .catch((err) => {
+                console.error('Erro ao carregar pendências:', err);
+                allPendings = [];
+                renderFilteredPendings();
             });
         }
 
-        loadPendings();
+        // =============================================
+        // INIT
+        // =============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('loading-canvas');
+            const textElement = document.getElementById('loading-text');
+            
+            if (!canvas || !textElement) {
+                document.getElementById('loading-overlay').classList.add('hidden');
+                document.getElementById('main-content').classList.add('visible');
+                initPage();
+                return;
+            }
+
+            const animation = new SpiralAnimation(canvas, textElement, initPage);
+            animation.start();
+        });
+
+    })();
     </script>
 </body>
 </html>
