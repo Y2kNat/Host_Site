@@ -12,8 +12,6 @@
             --bg: #050505;
             --card: rgba(255,255,255,0.03);
             --card-hover: rgba(255,255,255,0.06);
-            --accent: #ffffff;
-            --accent-blue: #5865F2;
             --text: #ffffff;
             --text-dim: rgba(255,255,255,0.5);
             --text-tertiary: rgba(255,255,255,0.25);
@@ -34,7 +32,6 @@
             overflow-x: hidden;
         }
 
-        /* Blobs */
         .stage {
             position: fixed;
             width: 100%;
@@ -77,7 +74,6 @@
             padding: 24px;
         }
 
-        /* Header */
         .header {
             display: flex;
             align-items: center;
@@ -126,7 +122,7 @@
             color: #fff;
         }
 
-        .header .badge-role {
+        .badge-role {
             font-family: 'Space Mono', monospace;
             font-size: 8px;
             letter-spacing: 3px;
@@ -135,7 +131,7 @@
             white-space: nowrap;
         }
 
-        /* Main Layout */
+        /* Layout - PC: lado a lado, Mobile: toggle */
         .main-layout {
             display: flex;
             gap: 16px;
@@ -193,12 +189,7 @@
             margin-bottom: 12px;
         }
 
-        .cmd-btn:hover {
-            background: rgba(88,101,242,0.22);
-            border-color: rgba(88,101,242,0.45);
-            box-shadow: 0 0 25px rgba(88,101,242,0.15);
-        }
-
+        .cmd-btn:hover { background: rgba(88,101,242,0.22); border-color: rgba(88,101,242,0.45); }
         .cmd-btn:active { transform: scale(0.97); }
 
         .cmds-list {
@@ -213,10 +204,6 @@
 
         .cmds-list.show { display: block; }
 
-        .cmds-list::-webkit-scrollbar { width: 3px; }
-        .cmds-list::-webkit-scrollbar-track { background: transparent; }
-        .cmds-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
-
         .cmds-list div {
             padding: 8px 12px;
             cursor: pointer;
@@ -225,11 +212,9 @@
             font-size: 9px;
             color: rgba(255,255,255,0.5);
             transition: all 0.2s;
-            letter-spacing: 0.5px;
         }
 
         .cmds-list div:hover { background: rgba(88,101,242,0.2); color: #fff; }
-        .cmds-list div:active { background: rgba(88,101,242,0.35); }
 
         .chat-messages {
             flex: 1;
@@ -240,10 +225,6 @@
             gap: 6px;
             min-height: 0;
         }
-
-        .chat-messages::-webkit-scrollbar { width: 3px; }
-        .chat-messages::-webkit-scrollbar-track { background: transparent; }
-        .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
 
         .chat-messages .msg {
             padding: 9px 12px;
@@ -259,7 +240,6 @@
             background: rgba(88,101,242,0.3);
             align-self: flex-end;
             border-bottom-right-radius: 3px;
-            color: #fff;
         }
 
         .chat-messages .bot {
@@ -269,10 +249,7 @@
             color: rgba(255,255,255,0.7);
         }
 
-        .chat-input {
-            display: flex;
-            gap: 6px;
-        }
+        .chat-input { display: flex; gap: 6px; }
 
         .chat-input input {
             flex: 1;
@@ -288,11 +265,7 @@
             min-width: 0;
         }
 
-        .chat-input input:focus {
-            border-color: rgba(88,101,242,0.5);
-            box-shadow: 0 0 20px rgba(88,101,242,0.1);
-        }
-
+        .chat-input input:focus { border-color: rgba(88,101,242,0.5); }
         .chat-input input::placeholder { color: rgba(255,255,255,0.2); }
 
         .chat-input button {
@@ -308,12 +281,7 @@
             white-space: nowrap;
         }
 
-        .chat-input button:hover {
-            background: rgba(88,101,242,0.5);
-            box-shadow: 0 0 25px rgba(88,101,242,0.3);
-        }
-
-        .chat-input button:active { transform: scale(0.95); }
+        .chat-input button:hover { background: rgba(88,101,242,0.5); }
 
         /* Pending Panel */
         .pending-panel {
@@ -337,10 +305,6 @@
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
         }
 
-        .pending-panel::-webkit-scrollbar { width: 3px; }
-        .pending-panel::-webkit-scrollbar-track { background: transparent; }
-        .pending-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
-
         .pending-header {
             display: flex;
             align-items: center;
@@ -359,11 +323,7 @@
             font-weight: 600;
         }
 
-        .pending-filters {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
+        .pending-filters { display: flex; gap: 6px; flex-wrap: wrap; }
 
         .filter-btn {
             font-family: 'Space Mono', monospace;
@@ -381,13 +341,7 @@
         }
 
         .filter-btn:hover { border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.8); }
-
-        .filter-btn.active {
-            background: rgba(88,101,242,0.25);
-            border-color: rgba(88,101,242,0.5);
-            color: #fff;
-            box-shadow: 0 0 15px rgba(88,101,242,0.2);
-        }
+        .filter-btn.active { background: rgba(88,101,242,0.25); border-color: rgba(88,101,242,0.5); color: #fff; }
 
         .pending-item {
             padding: 14px 16px;
@@ -421,54 +375,14 @@
             flex-shrink: 0;
         }
 
-        .badge-active {
-            background: rgba(255,107,107,0.2);
-            color: #ff6b6b;
-            border: 1px solid rgba(255,107,107,0.3);
-        }
+        .badge-active { background: rgba(255,107,107,0.2); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.3); }
+        .badge-done { background: rgba(46,204,113,0.2); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
 
-        .badge-done {
-            background: rgba(46,204,113,0.2);
-            color: #2ecc71;
-            border: 1px solid rgba(46,204,113,0.3);
-        }
-
-        .pending-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            min-width: 130px;
-        }
-
-        .pending-command {
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            color: #fff;
-            font-weight: 600;
-            word-break: break-all;
-        }
-
-        .pending-params {
-            font-size: 10px;
-            color: rgba(255,255,255,0.35);
-            word-break: break-all;
-        }
-
-        .pending-result {
-            font-size: 10px;
-            color: rgba(255,255,255,0.5);
-            margin-top: 2px;
-        }
-
-        .pending-time {
-            font-family: 'Space Mono', monospace;
-            font-size: 8px;
-            color: rgba(255,255,255,0.2);
-            letter-spacing: 1px;
-            flex-shrink: 0;
-            white-space: nowrap;
-        }
+        .pending-info { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 130px; }
+        .pending-command { font-family: 'Space Mono', monospace; font-size: 11px; color: #fff; font-weight: 600; word-break: break-all; }
+        .pending-params { font-size: 10px; color: rgba(255,255,255,0.35); word-break: break-all; }
+        .pending-result { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+        .pending-time { font-family: 'Space Mono', monospace; font-size: 8px; color: rgba(255,255,255,0.2); letter-spacing: 1px; flex-shrink: 0; white-space: nowrap; }
 
         .empty-state {
             text-align: center;
@@ -480,42 +394,60 @@
             text-transform: uppercase;
         }
 
-        /* Mobile Toggle */
-        .mobile-toggle {
+        /* Mobile Toggle - SÓ APARECE NO MOBILE */
+        .mobile-tabs {
             display: none;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mobile-tab {
+            flex: 1;
             font-family: 'Space Mono', monospace;
             font-size: 9px;
-            padding: 10px 16px;
-            background: rgba(88,101,242,0.15);
-            border: 1px solid rgba(88,101,242,0.3);
+            padding: 10px;
+            background: rgba(88,101,242,0.1);
+            border: 1px solid rgba(88,101,242,0.25);
             border-radius: 10px;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.6);
             cursor: pointer;
             letter-spacing: 1px;
             text-transform: uppercase;
             transition: all 0.3s;
-            margin-bottom: 12px;
+            text-align: center;
         }
 
-        .mobile-toggle:hover { background: rgba(88,101,242,0.25); }
+        .mobile-tab.active {
+            background: rgba(88,101,242,0.25);
+            border-color: rgba(88,101,242,0.5);
+            color: #fff;
+        }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Responsivo */
+        /* PC: mostra os dois lado a lado */
+        @media (min-width: 901px) {
+            .terminal-panel, .pending-panel { display: flex !important; }
+            .terminal-panel { display: flex !important; }
+            .pending-panel { display: block !important; }
+            .mobile-tabs { display: none !important; }
+        }
+
+        /* Mobile: toggle entre terminal e pendências */
         @media (max-width: 900px) {
-            .container { padding: 16px; }
-            .mobile-toggle { display: block; }
-            .main-layout { flex-direction: column; height: auto; gap: 12px; }
+            .container { padding: 12px; }
+            .mobile-tabs { display: flex; }
+            .main-layout { flex-direction: column; height: auto; gap: 10px; }
             .terminal-panel { width: 100%; height: auto; max-height: 55vh; display: none; }
             .terminal-panel.show-mobile { display: flex; }
-            .pending-panel { height: auto; max-height: 55vh; }
-            .pending-panel.hide-mobile { display: none; }
+            .pending-panel { height: auto; max-height: 55vh; display: none; }
+            .pending-panel.show-mobile { display: block; }
             .chat-input input { font-size: 16px; }
             .header h1 { font-size: 1.2rem; }
-            .pending-item { padding: 10px 12px; gap: 8px; }
+            .badge-role { display: none; }
         }
 
         @media (max-width: 480px) {
@@ -523,13 +455,9 @@
             .header { gap: 8px; padding-bottom: 12px; }
             .back-btn { font-size: 8px; padding: 6px 10px; }
             .header h1 { font-size: 1.1rem; }
-            .badge-role { display: none; }
-            .terminal-panel { padding: 14px; border-radius: 10px; }
-            .pending-panel { padding: 14px; border-radius: 10px; }
+            .terminal-panel, .pending-panel { padding: 14px; border-radius: 10px; }
             .pending-item { flex-direction: column; align-items: flex-start; gap: 5px; }
             .pending-time { align-self: flex-end; }
-            .chat-messages .msg { font-size: 10px; padding: 7px 9px; }
-            .chat-input button { padding: 10px 12px; font-size: 11px; }
         }
     </style>
 </head>
@@ -554,9 +482,11 @@
             <span class="badge-role" id="roleBadge">Role: FULL</span>
         </div>
 
-        <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobileView()">
-            📋 Ver Pendências
-        </button>
+        <!-- TABS MOBILE (só aparece no mobile) -->
+        <div class="mobile-tabs" id="mobileTabs">
+            <button class="mobile-tab active" onclick="switchMobileTab('terminal')">💬 Terminal</button>
+            <button class="mobile-tab" onclick="switchMobileTab('pending')">📋 Pendências</button>
+        </div>
 
         <div class="main-layout">
             <!-- Terminal Panel -->
@@ -594,22 +524,17 @@
     (function() {
         'use strict';
 
-        // Blobs mouse move
+        // Blobs
         const blobs = document.querySelectorAll('.blob');
         document.addEventListener('mousemove', (e) => {
             const x = (e.clientX / window.innerWidth - 0.5) * 2;
             const y = (e.clientY / window.innerHeight - 0.5) * 2;
-            blobs.forEach((b, i) => {
-                b.style.transform = `translate(${x*(i+1)*10}px, ${y*(i+1)*10}px)`;
-            });
+            blobs.forEach((b, i) => b.style.transform = `translate(${x*(i+1)*10}px, ${y*(i+1)*10}px)`);
         });
 
-        // Page logic
-        let allPendings = [], currentFilter = 'all', pageLoaded = false;
+        let allPendings = [], currentFilter = 'all';
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         const userRole = user.role || 'full';
-        
-        // Show role
         document.getElementById('roleBadge').textContent = 'Role: ' + userRole.toUpperCase();
 
         const commandsByRole = {
@@ -619,52 +544,38 @@
             tester: ['ping','uptime','bot']
         };
 
-        function initPage() {
-            if (pageLoaded) return;
-            pageLoaded = true;
-            if (!localStorage.getItem('token')) { window.location.href = '/'; return; }
-            loadPendings();
-            setInterval(loadPendings, 15000);
-            handleResize();
-            window.addEventListener('resize', handleResize);
-        }
-
-        function handleResize() {
-            const isMobile = window.innerWidth <= 900;
-            const toggle = document.getElementById('mobileToggle');
+        // Mobile tab switcher
+        window.switchMobileTab = function(tab) {
             const terminal = document.getElementById('terminalPanel');
             const pending = document.getElementById('pendingPanel');
+            const tabs = document.querySelectorAll('.mobile-tab');
             
-            if (isMobile) {
-                toggle.style.display = 'block';
-                if (!toggle.dataset.init) {
-                    toggle.dataset.init = '1';
-                    terminal.classList.add('show-mobile');
-                    pending.classList.add('hide-mobile');
-                }
-            } else {
-                toggle.style.display = 'none';
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'terminal') {
                 terminal.classList.add('show-mobile');
-                terminal.classList.remove('hide-mobile');
-                pending.classList.remove('show-mobile','hide-mobile');
-            }
-        }
-
-        window.toggleMobileView = function() {
-            const terminal = document.getElementById('terminalPanel');
-            const pending = document.getElementById('pendingPanel');
-            const toggle = document.getElementById('mobileToggle');
-            
-            if (terminal.classList.contains('show-mobile')) {
-                terminal.classList.remove('show-mobile'); terminal.classList.add('hide-mobile');
-                pending.classList.remove('hide-mobile'); pending.classList.add('show-mobile');
-                toggle.textContent = '💬 Terminal';
+                pending.classList.remove('show-mobile');
+                tabs[0].classList.add('active');
             } else {
-                terminal.classList.add('show-mobile'); terminal.classList.remove('hide-mobile');
-                pending.classList.add('hide-mobile'); pending.classList.remove('show-mobile');
-                toggle.textContent = '📋 Ver Pendências';
+                terminal.classList.remove('show-mobile');
+                pending.classList.add('show-mobile');
+                tabs[1].classList.add('active');
             }
         };
+
+        // Init
+        function init() {
+            if (!localStorage.getItem('token')) { window.location.href = '/'; return; }
+            
+            // PC: mostra os dois
+            if (window.innerWidth > 900) {
+                document.getElementById('terminalPanel').style.display = 'flex';
+                document.getElementById('pendingPanel').style.display = 'block';
+            }
+            
+            loadPendings();
+            setInterval(loadPendings, 15000);
+        }
 
         window.filterPendings = function(f, btn) {
             currentFilter = f;
@@ -723,20 +634,17 @@
                 allPendings.unshift(np);
                 renderPendings();
                 
-                const md = addChatMsg('bot', '⏳ Executando /' + command + '...');
+                const md = addChatMsg('bot', '⏳ /' + command + '...');
                 
                 fetch('/api/pendings/executar', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    },
+                    headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+localStorage.getItem('token') },
                     body: JSON.stringify({ command, params })
                 })
                 .then(r => r.json())
                 .then(d => {
                     np.done = true;
-                    np.result = d.result || d.message || '✅ Executado';
+                    np.result = d.result || d.message || '✅ OK';
                     md.textContent = np.result;
                     renderPendings();
                     loadPendings();
@@ -744,7 +652,7 @@
                 .catch(() => {
                     setTimeout(() => {
                         np.done = true;
-                        np.result = '✅ /' + command + ' executado';
+                        np.result = '✅ /' + command;
                         md.textContent = np.result;
                         renderPendings();
                     }, 2000);
@@ -783,12 +691,12 @@
                     }
                 }
             } catch (e) {
-                console.error('Erro ao carregar:', e);
+                console.error('Erro:', e);
             }
             renderPendings();
         }
 
-        document.addEventListener('DOMContentLoaded', initPage);
+        document.addEventListener('DOMContentLoaded', init);
     })();
     </script>
 </body>
