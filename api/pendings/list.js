@@ -19,18 +19,13 @@ module.exports = async function handler(req, res) {
         const uri = process.env.MONGO_URI;
         
         if (!uri) {
-            console.log('MONGO_URI não configurada');
             return res.status(200).json({ success: true, pendings: [] });
         }
 
-        // Conectar ao MongoDB
         if (mongoose.connection.readyState !== 1) {
-            console.log('Conectando ao MongoDB...');
             await mongoose.connect(uri);
-            console.log('Conectado!');
         }
 
-        // Acessar diretamente a coleção sem usar modelo
         const db = mongoose.connection.db;
         const collection = db.collection('pendings');
         
@@ -39,9 +34,10 @@ module.exports = async function handler(req, res) {
             .limit(100)
             .toArray();
 
-        console.log('Documentos encontrados:', docs.length);
-
-        const formatted = docs.map(function(doc) {
+        var formatted = [];
+        for (var i = 0; i < docs.length; i++) {
+            var doc = docs[i];
+            
             var command = 'comando';
             if (doc.type && doc.type !== 'comando') {
                 command = doc.type;
@@ -49,15 +45,34 @@ module.exports = async function handler(req, res) {
                 command = doc.data.command;
             }
 
-            return {
+            var params = '';
+            if (doc.data && doc.data.params) {
+                params = doc.data.params;
+            } else if (doc.params) {
+                params = doc.params;
+            }
+
+            var result = '';
+            if (doc.data && doc.data.result) {
+                result = doc.data.result;
+            } else if (doc.result) {
+                result = doc.result;
+            }
+
+            var done = false;
+            if (doc.done === true || doc.done === 'true') {
+                done = true;
+            }
+
+            formatted.push({
                 id: doc._id ? doc._id.toString() : '0',
                 command: command,
-                params: (doc.data && doc.data.params) || doc.params || '',
-                result: (doc.data && doc.data.result) || doc.result || '',
-                done: doc.done === true || doc.done === 'true',
+                params: params,
+                result: result,
+                done: done,
                 createdAt: doc.createdAt || new Date()
-            };
-        });
+            });
+        }
 
         res.status(200).json({
             success: true,
@@ -65,13 +80,9 @@ module.exports = async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error('ERRO COMPLETO:', error.message);
-        console.error('STACK:', error.stack);
-        
         res.status(200).json({
             success: true,
-            pendings: [],
-            error: error.message
+            pendings: []
         });
     }
 };
