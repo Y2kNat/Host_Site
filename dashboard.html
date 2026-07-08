@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono&display=swap" rel="stylesheet">
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <style>
         :root {
             --bg: #050505;
@@ -59,7 +60,7 @@
             height: 100%;
         }
 
-        #loading-overlay .welcome-text {
+        #loading-overlay .loading-text {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -371,10 +372,6 @@
             gap: 14px;
         }
 
-        .charts-grid.three-cols {
-            grid-template-columns: 1fr 1fr 1fr;
-        }
-
         .chart-panel {
             background: var(--card);
             border: 1px solid var(--border);
@@ -512,6 +509,114 @@
             font-weight: 600;
         }
 
+        /* CONSOLE PANEL */
+        .console-panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .console-panel:hover {
+            border-color: var(--border-hover);
+            background: var(--card-hover);
+        }
+
+        .console-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(88,101,242,0.4), transparent);
+        }
+
+        .console-panel h3 {
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .console-inner {
+            min-height: 200px;
+            max-height: 280px;
+            overflow-y: auto;
+            font-family: 'Space Mono', monospace;
+            font-size: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .console-inner::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .console-inner::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .console-inner::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.06);
+            border-radius: 10px;
+        }
+
+        .console-line {
+            padding: 5px 8px;
+            border-radius: 4px;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            animation: fadeInUp 0.2s ease-out;
+        }
+
+        .console-line.welcome-line {
+            background: rgba(88,101,242,0.15);
+            border: 1px solid rgba(88,101,242,0.3);
+        }
+
+        .console-time {
+            color: rgba(255,255,255,0.25);
+            white-space: nowrap;
+            min-width: 50px;
+            font-size: 7px;
+        }
+
+        .console-type {
+            text-transform: uppercase;
+            font-weight: 600;
+            min-width: 55px;
+            font-size: 7px;
+        }
+
+        .console-type.info { color: #5865F2; }
+        .console-type.success { color: #2ecc71; }
+        .console-type.warn { color: #f39c12; }
+        .console-type.error { color: #ff6b6b; }
+        .console-type.welcome { color: #5865F2; }
+
+        .console-msg {
+            color: rgba(255,255,255,0.65);
+            word-break: break-all;
+            font-size: 8px;
+        }
+
+        .console-placeholder {
+            color: rgba(255,255,255,0.2);
+            text-align: center;
+            padding: 40px;
+            font-size: 9px;
+        }
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -560,7 +665,7 @@
 
     <div id="loading-overlay">
         <canvas id="loading-canvas"></canvas>
-        <div class="welcome-text" id="welcome-text">WELCOME</div>
+        <div class="loading-text" id="loading-text">LOADING</div>
     </div>
 
     <div id="dashboard">
@@ -620,6 +725,12 @@
                         <h3>Pending Tasks</h3>
                         <div class="chart-inner" id="chart-pendings">
                             <span class="loading-pulse">Loading…</span>
+                        </div>
+                    </div>
+                    <div class="console-panel">
+                        <h3>🤖 Bot Console</h3>
+                        <div class="console-inner" id="bot-console">
+                            <div class="console-placeholder">Aguardando conexão com o bot...</div>
                         </div>
                     </div>
                 </div>
@@ -720,10 +831,10 @@
         }
 
         class SpiralAnimation {
-            constructor(canvas, welcomeElement, onComplete) {
+            constructor(canvas, loadingElement, onComplete) {
                 this.canvas = canvas;
                 this.ctx = canvas.getContext('2d');
-                this.welcomeElement = welcomeElement;
+                this.loadingElement = loadingElement;
                 this.onComplete = onComplete;
                 this.particles = [];
                 this.camera = new Camera();
@@ -799,7 +910,7 @@
                 this.fadeOutStartTime = null;
                 this.isFinished = false;
                 this.textOpacity = 0;
-                this.welcomeElement.style.opacity = '0';
+                this.loadingElement.style.opacity = '0';
                 for (var i = 0; i < this.particles.length; i++) {
                     this.particles[i].reset();
                 }
@@ -834,7 +945,7 @@
                         this.renderParticles(1.0);
                         this.ctx.globalAlpha = 1.0;
                     }
-                    this.welcomeElement.style.opacity = textOpacity;
+                    this.loadingElement.style.opacity = textOpacity;
                 } else {
                     this.finish();
                     return;
@@ -911,7 +1022,7 @@
                     var breathPhase = (elapsed - this.textFadeInDelay) / breathPeriod;
                     var breath = 0.7 + 0.3 * (0.5 + 0.5 * Math.sin(breathPhase * Math.PI * 2));
                     this.textOpacity = easedFade * breath;
-                    this.welcomeElement.style.opacity = this.textOpacity;
+                    this.loadingElement.style.opacity = this.textOpacity;
                 }
             }
 
@@ -922,7 +1033,7 @@
                     this.animationId = null;
                 }
                 this.ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
-                this.welcomeElement.style.opacity = '0';
+                this.loadingElement.style.opacity = '0';
 
                 var overlay = document.getElementById('loading-overlay');
                 overlay.classList.add('fade-out');
@@ -967,7 +1078,25 @@
             }
         }
 
+        function getUserNameFromToken() {
+            var token = localStorage.getItem('token');
+            if (!token) return 'User';
+            try {
+                var parts = token.split('.');
+                if (parts.length !== 3) return 'User';
+                var payload = parts[1];
+                payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+                while (payload.length % 4 !== 0) payload += '=';
+                var decoded = atob(payload);
+                var data = JSON.parse(decoded);
+                return data.user || 'User';
+            } catch (e) {
+                return 'User';
+            }
+        }
+
         var userRole = getUserRoleFromToken();
+        var userName = getUserNameFromToken();
 
         function initDashboard() {
             if (dashboardLoaded) {
@@ -980,7 +1109,6 @@
                 return;
             }
 
-            // Mostrar Credentials apenas para FULL
             if (userRole === 'full') {
                 document.getElementById('navCredentials').style.display = '';
             }
@@ -996,6 +1124,127 @@
 
             loadDashboardData();
             setInterval(loadDashboardData, 30000);
+
+            initBotConsole();
+        }
+
+        // =============================================
+        // BOT CONSOLE EM TEMPO REAL (PUSHER)
+        // =============================================
+        function initBotConsole() {
+            var consoleDiv = document.getElementById('bot-console');
+            var maxLogs = 100;
+            var logCount = 0;
+
+            // Adiciona mensagem de boas-vindas
+            function addWelcomeMessage() {
+                consoleDiv.innerHTML = '';
+                var welcomeLine = document.createElement('div');
+                welcomeLine.className = 'console-line welcome-line';
+                welcomeLine.innerHTML = '<span class="console-time">' + new Date().toLocaleTimeString('pt-BR') + '</span>' +
+                    '<span class="console-type welcome">HELLO</span>' +
+                    '<span class="console-msg">👋 Hello <strong>' + userName + '</strong>, your role is <strong>' + userRole.toUpperCase() + '</strong></span>';
+                consoleDiv.appendChild(welcomeLine);
+
+                var infoLine = document.createElement('div');
+                infoLine.className = 'console-line';
+                infoLine.innerHTML = '<span class="console-time">' + new Date().toLocaleTimeString('pt-BR') + '</span>' +
+                    '<span class="console-type info">INFO</span>' +
+                    '<span class="console-msg">Conectando ao bot em tempo real...</span>';
+                consoleDiv.appendChild(infoLine);
+            }
+
+            addWelcomeMessage();
+
+            // Busca a chave Pusher da API
+            fetch('/api/pusher-key')
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    var pusherKey = data.key;
+                    if (!pusherKey) {
+                        throw new Error('Key not found');
+                    }
+
+                    var pusher = new Pusher(pusherKey, {
+                        cluster: 'us2'
+                    });
+
+                    var channel = pusher.subscribe('bot-logs');
+
+                    channel.bind('new-log', function(data) {
+                        logCount++;
+
+                        var time = data.timestamp ? new Date(data.timestamp).toLocaleTimeString('pt-BR') : '';
+                        var type = data.type || 'info';
+                        var msg = data.message || '';
+
+                        var line = document.createElement('div');
+                        line.className = 'console-line';
+                        line.innerHTML = '<span class="console-time">' + time + '</span>' +
+                            '<span class="console-type ' + type + '">' + type.toUpperCase() + '</span>' +
+                            '<span class="console-msg">' + msg + '</span>';
+
+                        if (consoleDiv.firstChild) {
+                            consoleDiv.insertBefore(line, consoleDiv.firstChild.nextSibling || consoleDiv.firstChild);
+                        } else {
+                            consoleDiv.appendChild(line);
+                        }
+
+                        if (logCount > maxLogs) {
+                            var lines = consoleDiv.querySelectorAll('.console-line:not(.welcome-line)');
+                            if (lines.length > maxLogs) {
+                                consoleDiv.removeChild(lines[lines.length - 1]);
+                            }
+                            logCount--;
+                        }
+                    });
+
+                    channel.bind('pusher:subscription_succeeded', function() {
+                        var line = document.createElement('div');
+                        line.className = 'console-line';
+                        line.innerHTML = '<span class="console-time">' + new Date().toLocaleTimeString('pt-BR') + '</span>' +
+                            '<span class="console-type success">CONNECTED</span>' +
+                            '<span class="console-msg">✅ Conectado ao bot em tempo real</span>';
+                        
+                        var welcomeLine = consoleDiv.querySelector('.welcome-line');
+                        if (welcomeLine && welcomeLine.nextSibling) {
+                            consoleDiv.insertBefore(line, welcomeLine.nextSibling);
+                        } else {
+                            consoleDiv.appendChild(line);
+                        }
+                    });
+
+                    channel.bind('pusher:subscription_error', function() {
+                        var line = document.createElement('div');
+                        line.className = 'console-line';
+                        line.innerHTML = '<span class="console-time">' + new Date().toLocaleTimeString('pt-BR') + '</span>' +
+                            '<span class="console-type error">ERROR</span>' +
+                            '<span class="console-msg">❌ Erro ao conectar com o bot</span>';
+                        
+                        var welcomeLine = consoleDiv.querySelector('.welcome-line');
+                        if (welcomeLine && welcomeLine.nextSibling) {
+                            consoleDiv.insertBefore(line, welcomeLine.nextSibling);
+                        } else {
+                            consoleDiv.appendChild(line);
+                        }
+                    });
+
+                })
+                .catch(function(e) {
+                    console.error('Erro ao carregar Pusher key:', e.message);
+                    var line = document.createElement('div');
+                    line.className = 'console-line';
+                    line.innerHTML = '<span class="console-time">' + new Date().toLocaleTimeString('pt-BR') + '</span>' +
+                        '<span class="console-type error">ERROR</span>' +
+                        '<span class="console-msg">❌ Pusher key não configurada no servidor</span>';
+                    
+                    var welcomeLine = consoleDiv.querySelector('.welcome-line');
+                    if (welcomeLine && welcomeLine.nextSibling) {
+                        consoleDiv.insertBefore(line, welcomeLine.nextSibling);
+                    } else {
+                        consoleDiv.appendChild(line);
+                    }
+                });
         }
 
         function createLineChart(containerId, data, colors) {
@@ -1271,17 +1520,6 @@
                                 { data: 'Qui', ativas: 7, concluidas: 32 },
                                 { data: 'Sex', ativas: 6, concluidas: 34 }
                             ]
-                        },
-                        activity: {
-                            mensagens: 156,
-                            comandos: 89,
-                            historico: [
-                                { data: 'Seg', mensagens: 120, comandos: 70 },
-                                { data: 'Ter', mensagens: 135, comandos: 75 },
-                                { data: 'Qua', mensagens: 145, comandos: 82 },
-                                { data: 'Qui', mensagens: 150, comandos: 85 },
-                                { data: 'Sex', mensagens: 156, comandos: 89 }
-                            ]
                         }
                     };
                 }
@@ -1372,16 +1610,16 @@
         // =============================================
         document.addEventListener('DOMContentLoaded', function() {
             var canvas = document.getElementById('loading-canvas');
-            var welcomeElement = document.getElementById('welcome-text');
+            var loadingElement = document.getElementById('loading-text');
 
-            if (!canvas || !welcomeElement) {
+            if (!canvas || !loadingElement) {
                 document.getElementById('loading-overlay').classList.add('hidden');
                 document.getElementById('dashboard').classList.add('visible');
                 initDashboard();
                 return;
             }
 
-            var animation = new SpiralAnimation(canvas, welcomeElement, initDashboard);
+            var animation = new SpiralAnimation(canvas, loadingElement, initDashboard);
             animation.start();
         });
 
