@@ -37,7 +37,6 @@
             overflow-x: hidden;
         }
 
-        /* LOADING OVERLAY */
         #loading-overlay {
             position: fixed;
             top: 0;
@@ -87,7 +86,6 @@
             display: none;
         }
 
-        /* DASHBOARD */
         #dashboard {
             opacity: 0;
             transition: opacity 0.8s ease-in;
@@ -373,6 +371,10 @@
             gap: 14px;
         }
 
+        .charts-grid.three-cols {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
         .chart-panel {
             background: var(--card);
             border: 1px solid var(--border);
@@ -556,13 +558,11 @@
 </head>
 <body>
 
-    <!-- LOADING OVERLAY -->
     <div id="loading-overlay">
         <canvas id="loading-canvas"></canvas>
         <div class="welcome-text" id="welcome-text">WELCOME</div>
     </div>
 
-    <!-- DASHBOARD -->
     <div id="dashboard">
         <div class="stage">
             <div class="blob blob-1"></div>
@@ -599,11 +599,11 @@
             <main class="main-content">
                 <nav class="top-nav">
                     <a href="/pendencias">Command Center</a>
-                    <a href="/credenciais">Credentials</a>
+                    <a href="/credenciais" id="navCredentials" style="display:none;">Credentials</a>
                     <button class="btn-logout" onclick="logout()">Disconnect</button>
                 </nav>
 
-                <div class="charts-grid">
+                <div class="charts-grid" id="chartsGrid">
                     <div class="chart-panel">
                         <h3>Tickets Overview</h3>
                         <div class="chart-inner" id="chart-tickets">
@@ -619,12 +619,6 @@
                     <div class="chart-panel">
                         <h3>Pending Tasks</h3>
                         <div class="chart-inner" id="chart-pendings">
-                            <span class="loading-pulse">Loading…</span>
-                        </div>
-                    </div>
-                    <div class="chart-panel">
-                        <h3>System Activity</h3>
-                        <div class="chart-inner" id="chart-activity">
                             <span class="loading-pulse">Loading…</span>
                         </div>
                     </div>
@@ -956,6 +950,25 @@
         // =============================================
         var dashboardLoaded = false;
 
+        function getUserRoleFromToken() {
+            var token = localStorage.getItem('token');
+            if (!token) return 'tester';
+            try {
+                var parts = token.split('.');
+                if (parts.length !== 3) return 'tester';
+                var payload = parts[1];
+                payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+                while (payload.length % 4 !== 0) payload += '=';
+                var decoded = atob(payload);
+                var data = JSON.parse(decoded);
+                return data.role || 'tester';
+            } catch (e) {
+                return 'tester';
+            }
+        }
+
+        var userRole = getUserRoleFromToken();
+
         function initDashboard() {
             if (dashboardLoaded) {
                 return;
@@ -965,6 +978,11 @@
             if (!localStorage.getItem('token')) {
                 window.location.href = '/';
                 return;
+            }
+
+            // Mostrar Credentials apenas para FULL
+            if (userRole === 'full') {
+                document.getElementById('navCredentials').style.display = '';
             }
 
             var blobs = document.querySelectorAll('.blob');
@@ -1342,26 +1360,6 @@
                 { name: 'Active', data: pendingsActiveData, labels: pendingsLabels },
                 { name: 'Done', data: pendingsDoneData, labels: pendingsLabels }
             ], ['#ffffff', 'rgba(255,255,255,0.4)']);
-
-            var activityHistory = d.activity?.historico || [];
-            var activityMsgsData, activityCmdsData, activityLabels;
-
-            if (activityHistory.length > 0) {
-                activityMsgsData = activityHistory.map(function(h) { return h.mensagens || 0; });
-                activityCmdsData = activityHistory.map(function(h) { return h.comandos || 0; });
-                activityLabels = activityHistory.map(function(h) { return h.data || ''; });
-            } else {
-                var mensagens = d.activity?.mensagens || 0;
-                var comandos = d.activity?.comandos || 0;
-                activityMsgsData = [Math.max(0, mensagens - 10), mensagens];
-                activityCmdsData = [Math.max(0, comandos - 5), comandos];
-                activityLabels = ['Ant', 'Atual'];
-            }
-
-            createLineChart('chart-activity', [
-                { name: 'Messages', data: activityMsgsData, labels: activityLabels },
-                { name: 'Commands', data: activityCmdsData, labels: activityLabels }
-            ], ['#5865F2', 'rgba(88,101,242,0.4)']);
         }
 
         window.logout = function() {
