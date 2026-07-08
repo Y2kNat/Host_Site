@@ -1,4 +1,4 @@
-=<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -32,68 +32,39 @@
         }
 
         #loading-overlay {
-            position: fixed;
-            top: 0; left: 0;
+            position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
-            background: #000;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #000; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
             transition: opacity 0.6s ease-out;
         }
-
-        #loading-overlay canvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-        }
-
+        #loading-overlay canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         #loading-overlay .loading-text {
-            position: absolute;
-            top: 50%; left: 50%;
+            position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            color: white;
-            font-weight: 200;
-            font-size: 2rem;
-            letter-spacing: 0.4em;
-            text-transform: uppercase;
-            white-space: nowrap;
-            opacity: 0;
-            z-index: 10;
-            pointer-events: none;
-            user-select: none;
+            color: white; font-weight: 200; font-size: 2rem;
+            letter-spacing: 0.4em; text-transform: uppercase;
+            white-space: nowrap; opacity: 0; z-index: 10;
+            pointer-events: none; user-select: none;
             font-family: 'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif;
         }
-
         #loading-overlay.fade-out { opacity: 0; pointer-events: none; }
         #loading-overlay.hidden { display: none; }
 
         #main-content {
-            opacity: 0;
-            transition: opacity 0.8s ease-in;
-            position: relative;
-            z-index: 10;
-            min-height: 100vh;
+            opacity: 0; transition: opacity 0.8s ease-in;
+            position: relative; z-index: 10; min-height: 100vh;
         }
         #main-content.visible { opacity: 1; }
 
         .stage {
-            position: fixed;
-            width: 100%; height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
+            position: fixed; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none; overflow: hidden;
         }
-
         .blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(60px);
-            will-change: transform;
-            transform: translateZ(0);
+            position: absolute; border-radius: 50%;
+            filter: blur(60px); will-change: transform; transform: translateZ(0);
         }
-
         .blob-1 { width:400px; height:400px; background:rgba(88,101,242,0.3); left:-5%; top:-10%; animation:float1 20s ease-in-out infinite; }
         .blob-2 { width:350px; height:350px; background:rgba(255,255,255,0.15); left:55%; top:-5%; animation:float2 25s ease-in-out infinite; }
         .blob-3 { width:500px; height:500px; background:rgba(88,101,242,0.2); left:25%; top:40%; animation:float3 30s ease-in-out infinite; }
@@ -112,78 +83,61 @@
         }
 
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-
         .header {
             display: flex; align-items: center; gap: 12px;
             margin-bottom: 24px; padding-bottom: 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap;
         }
-
         .back-btn {
-            font-family: 'Space Mono', monospace;
-            font-size: 10px; color: rgba(255,255,255,0.5);
-            text-decoration: none; letter-spacing: 2px;
-            text-transform: uppercase; transition: all 0.3s;
-            padding: 8px 16px;
+            font-family: 'Space Mono', monospace; font-size: 10px;
+            color: rgba(255,255,255,0.5); text-decoration: none;
+            letter-spacing: 2px; text-transform: uppercase;
+            transition: all 0.3s; padding: 8px 16px;
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 25px; background: transparent;
             cursor: pointer; white-space: nowrap;
         }
         .back-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
-
         .header h1 {
             font-weight: 800; font-size: clamp(1.2rem, 4vw, 1.8rem);
             letter-spacing: -1px; color: #fff; flex: 1; min-width: 200px;
         }
-
         .header .brand-id {
             font-family: 'Space Mono', monospace; font-size: 8px;
             letter-spacing: 3px; text-transform: uppercase;
             color: rgba(255,255,255,0.35); white-space: nowrap;
         }
 
-        .main-layout {
-            display: flex; gap: 16px;
-            height: calc(100vh - 160px); min-height: 500px;
-        }
-
+        .main-layout { display: flex; gap: 16px; height: calc(100vh - 160px); min-height: 500px; }
         .chat-panel {
-            width: 320px; flex-shrink: 0;
-            background: var(--card); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 16px;
-            display: flex; flex-direction: column;
+            width: 320px; flex-shrink: 0; background: var(--card);
+            border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 16px; display: flex; flex-direction: column;
             transition: all 0.3s; position: relative; overflow: hidden;
         }
         .chat-panel:hover { border-color: var(--border-hover); background: var(--card-hover); }
         .chat-panel::before {
-            content: ''; position: absolute;
-            top: 0; left: 0; right: 0; height: 1px;
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
             background: linear-gradient(90deg, transparent, rgba(88,101,242,0.3), transparent);
         }
-
         .chat-panel h3 {
             font-family: 'Space Mono', monospace; font-size: 10px;
             text-transform: uppercase; letter-spacing: 2px;
             color: var(--text-dim); margin-bottom: 12px; font-weight: 600;
         }
-
         .cmd-btn {
             font-family: 'Space Mono', monospace; font-size: 9px;
-            padding: 10px 14px;
-            background: rgba(88,101,242,0.15);
-            border: 1px solid rgba(88,101,242,0.3);
-            border-radius: 8px; color: rgba(255,255,255,0.8);
-            cursor: pointer; letter-spacing: 1px;
+            padding: 10px 14px; background: rgba(88,101,242,0.15);
+            border: 1px solid rgba(88,101,242,0.3); border-radius: 8px;
+            color: rgba(255,255,255,0.8); cursor: pointer; letter-spacing: 1px;
             text-transform: uppercase; transition: all 0.3s;
             width: 100%; margin-bottom: 10px;
         }
         .cmd-btn:hover { background: rgba(88,101,242,0.25); border-color: rgba(88,101,242,0.5); }
-
         .cmds-list {
-            display: none; margin-bottom: 10px;
-            max-height: 200px; overflow-y: auto;
-            background: rgba(0,0,0,0.3); border-radius: 8px; padding: 6px;
+            display: none; margin-bottom: 10px; max-height: 200px;
+            overflow-y: auto; background: rgba(0,0,0,0.3);
+            border-radius: 8px; padding: 6px;
         }
         .cmds-list.show { display: block; }
         .cmds-list div {
@@ -192,7 +146,6 @@
             color: rgba(255,255,255,0.6); transition: all 0.2s;
         }
         .cmds-list div:hover { background: rgba(88,101,242,0.2); color: #fff; }
-
         .chat-messages {
             flex: 1; overflow-y: auto; margin-bottom: 10px;
             display: flex; flex-direction: column; gap: 6px; min-height: 0;
@@ -205,52 +158,43 @@
         }
         .chat-messages .user { background: rgba(88,101,242,0.3); align-self: flex-end; }
         .chat-messages .bot { background: rgba(255,255,255,0.05); align-self: flex-start; }
-
         .chat-input { display: flex; gap: 6px; }
         .chat-input input {
             flex: 1; padding: 10px 12px;
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 8px; background: rgba(0,0,0,0.3);
-            color: #fff; font-size: 11px;
-            font-family: 'Inter', sans-serif;
+            color: #fff; font-size: 11px; font-family: 'Inter', sans-serif;
             transition: all 0.3s; outline: none; min-width: 0;
         }
         .chat-input input:focus { border-color: rgba(88,101,242,0.5); }
         .chat-input button {
-            padding: 10px 14px;
-            background: rgba(88,101,242,0.3);
-            border: 1px solid rgba(88,101,242,0.4);
-            border-radius: 8px; color: #fff;
-            cursor: pointer; font-size: 12px;
+            padding: 10px 14px; background: rgba(88,101,242,0.3);
+            border: 1px solid rgba(88,101,242,0.4); border-radius: 8px;
+            color: #fff; cursor: pointer; font-size: 12px;
             font-family: 'Space Mono', monospace;
         }
         .chat-input button:hover { background: rgba(88,101,242,0.5); }
 
         .pending-panel {
-            flex: 1; background: var(--card);
-            border: 1px solid var(--border);
+            flex: 1; background: var(--card); border: 1px solid var(--border);
             border-radius: var(--radius); padding: 20px;
             overflow-y: auto; transition: all 0.3s;
             position: relative; min-width: 0;
         }
         .pending-panel:hover { border-color: var(--border-hover); background: var(--card-hover); }
         .pending-panel::before {
-            content: ''; position: absolute;
-            top: 0; left: 0; right: 0; height: 1px;
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
         }
-
         .pending-panel h3 {
             font-family: 'Space Mono', monospace; font-size: 10px;
             text-transform: uppercase; letter-spacing: 2px;
             color: var(--text-dim); margin-bottom: 16px; font-weight: 600;
         }
-
         .pending-filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
         .filter-btn {
             font-family: 'Space Mono', monospace; font-size: 9px;
-            padding: 6px 12px;
-            border: 1px solid rgba(255,255,255,0.1);
+            padding: 6px 12px; border: 1px solid rgba(255,255,255,0.1);
             border-radius: 20px; background: transparent;
             color: rgba(255,255,255,0.5); cursor: pointer;
             letter-spacing: 1px; text-transform: uppercase;
@@ -258,51 +202,38 @@
         }
         .filter-btn:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
         .filter-btn.active { background: rgba(88,101,242,0.3); border-color: rgba(88,101,242,0.5); color: #fff; }
-
         .pending-item {
-            padding: 12px 14px;
-            border: 1px solid rgba(255,255,255,0.04);
+            padding: 12px 14px; border: 1px solid rgba(255,255,255,0.04);
             border-radius: 10px; margin-bottom: 6px;
             display: flex; align-items: center; gap: 10px;
-            transition: all 0.3s; background: rgba(0,0,0,0.2);
-            flex-wrap: wrap;
+            transition: all 0.3s; background: rgba(0,0,0,0.2); flex-wrap: wrap;
         }
         .pending-item:hover { border-color: rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); }
         .pending-item.done-item { opacity: 0.6; }
         .pending-item.done-item:hover { opacity: 0.8; }
-
         .badge {
-            padding: 4px 8px; border-radius: 6px;
-            font-size: 9px; font-family: 'Space Mono', monospace;
-            letter-spacing: 1px; text-transform: uppercase; flex-shrink: 0;
+            padding: 4px 8px; border-radius: 6px; font-size: 9px;
+            font-family: 'Space Mono', monospace; letter-spacing: 1px;
+            text-transform: uppercase; flex-shrink: 0;
         }
         .badge-active { background: rgba(231,76,60,0.2); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); }
         .badge-done { background: rgba(46,204,113,0.2); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
-
         .pending-info { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 120px; }
         .pending-command { font-family: 'Space Mono', monospace; font-size: 11px; color: #fff; font-weight: 600; }
         .pending-params { font-size: 10px; color: rgba(255,255,255,0.4); }
         .pending-result { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
         .pending-time { font-family: 'Space Mono', monospace; font-size: 8px; color: rgba(255,255,255,0.25); flex-shrink: 0; }
-
         .empty-state {
             text-align: center; padding: 40px 20px;
-            color: rgba(255,255,255,0.25);
-            font-family: 'Space Mono', monospace;
-            font-size: 10px; letter-spacing: 2px;
-            text-transform: uppercase;
+            color: rgba(255,255,255,0.25); font-family: 'Space Mono', monospace;
+            font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
         }
-
         .mobile-toggle {
-            display: none;
-            font-family: 'Space Mono', monospace; font-size: 9px;
-            padding: 8px 14px;
-            background: rgba(88,101,242,0.15);
-            border: 1px solid rgba(88,101,242,0.3);
-            border-radius: 8px; color: rgba(255,255,255,0.8);
-            cursor: pointer; letter-spacing: 1px;
-            text-transform: uppercase; transition: all 0.3s;
-            margin-bottom: 10px;
+            display: none; font-family: 'Space Mono', monospace; font-size: 9px;
+            padding: 8px 14px; background: rgba(88,101,242,0.15);
+            border: 1px solid rgba(88,101,242,0.3); border-radius: 8px;
+            color: rgba(255,255,255,0.8); cursor: pointer; letter-spacing: 1px;
+            text-transform: uppercase; transition: all 0.3s; margin-bottom: 10px;
         }
 
         @keyframes fadeInUp {
@@ -352,9 +283,7 @@
                 <span class="brand-id" id="roleDisplay">System Node: HV-CMD</span>
             </div>
             
-            <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobileView()">
-                📋 Ver Pendências
-            </button>
+            <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobileView()">📋 Ver Pendências</button>
             
             <div class="main-layout">
                 <div class="chat-panel show-mobile" id="chatPanel">
@@ -362,10 +291,10 @@
                     <button class="cmd-btn" onclick="toggleCmds()">📋 Listar Comandos</button>
                     <div class="cmds-list" id="cmdsList"></div>
                     <div class="chat-messages" id="chatMessages">
-                        <div class="msg bot">Digite /comando ou converse com a IA</div>
+                        <div class="msg bot">Digite /comando para executar</div>
                     </div>
                     <div class="chat-input">
-                        <input type="text" id="chatInput" placeholder="/comando ou conversa..." onkeypress="if(event.key==='Enter')sendChat()">
+                        <input type="text" id="chatInput" placeholder="/comando..." onkeypress="if(event.key==='Enter')sendChat()">
                         <button onclick="sendChat()">▶</button>
                     </div>
                 </div>
@@ -378,7 +307,7 @@
                         <button class="filter-btn" onclick="filterPendings('done', this)">✓ Concluídas</button>
                     </div>
                     <div id="pendingList">
-                        <div class="empty-state">Carregando...</div>
+                        <div class="empty-state">Nenhuma pendência ainda</div>
                     </div>
                 </div>
             </div>
@@ -389,12 +318,13 @@
     (function() {
         'use strict';
 
-        // Loading animation
+        // =============================================
+        // LOADING ANIMATION
+        // =============================================
         class Particle {
             constructor(bx, by, bz, s) { this.bx = bx; this.by = by; this.bz = bz; this.x = bx; this.y = by; this.z = bz; this.s = s; }
             reset() { this.x = this.bx; this.y = this.by; this.z = this.bz; }
         }
-
         class Camera {
             constructor() { this.z = 0; this.fl = 1.0 / Math.tan(30 * Math.PI / 180); this.near = 0.1; }
             project(px, py, pz, sw, sh) {
@@ -404,7 +334,6 @@
                 return { x: px * sc * (sw/2) + sw/2, y: -py * sc * (sh/2) + sh/2, z: dz, scale: sc };
             }
         }
-
         class SpiralAnimation {
             constructor(canvas, textEl, onDone) {
                 this.cv = canvas; this.ctx = canvas.getContext('2d');
@@ -419,7 +348,6 @@
                 this.init(); this.resize();
                 window.addEventListener('resize', () => this.resize());
             }
-
             init() {
                 for (let i = 0; i < this.pc; i++) {
                     const t = i / (this.pc - 1);
@@ -430,7 +358,6 @@
                 }
                 this.cam.z = 2.5; this.iz = this.cam.z; this.fz = -this.sh - 2;
             }
-
             resize() {
                 const dpr = window.devicePixelRatio || 1;
                 const dw = window.innerWidth, dh = window.innerHeight;
@@ -439,7 +366,6 @@
                 this.ctx.setTransform(1,0,0,1,0,0); this.ctx.scale(dpr,dpr);
                 this.dw = dw; this.dh = dh;
             }
-
             start() {
                 if (this.aid) return;
                 this.st = performance.now(); this.hs = null; this.fos = null;
@@ -447,7 +373,6 @@
                 this.ps.forEach(p => p.reset()); this.cam.z = this.iz;
                 this.animate(performance.now());
             }
-
             animate(ts) {
                 if (this.done) return;
                 const e = ts - this.st;
@@ -465,7 +390,6 @@
                 if (e < this.ad + this.hd) this.updateText(e);
                 this.aid = requestAnimationFrame(t => this.animate(t));
             }
-
             update(prog) {
                 const ep = prog<0.5 ? 4*prog*prog*prog : (prog-1)*(2*prog-2)*(2*prog-2)+1;
                 this.cam.z = this.iz + (this.fz - this.iz)*ep;
@@ -474,7 +398,6 @@
                 this.ctx.clearRect(0,0,this.dw,this.dh);
                 this.ctx.globalAlpha = 1; this.render(prog);
             }
-
             render(prog) {
                 const ctx = this.ctx, cam = this.cam, w = this.dw, h = this.dh;
                 const proj = [];
@@ -491,7 +414,6 @@
                     ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(0.4, p.s*0.5), 0, Math.PI*2); ctx.fill();
                 }
             }
-
             updateText(e) {
                 if (e >= this.tfd) {
                     const fp = Math.min(1, (e-this.tfd)/this.tfdu);
@@ -500,7 +422,6 @@
                     this.to = ef*br; this.txt.style.opacity = this.to;
                 }
             }
-
             finish() {
                 this.done = true;
                 if (this.aid) { cancelAnimationFrame(this.aid); this.aid = null; }
@@ -519,18 +440,13 @@
         // =============================================
         // PAGE LOGIC
         // =============================================
-        let pageLoaded = false;
         let allPendings = [];
         let currentFilter = 'all';
+        let pageLoaded = false;
 
-        // Pega o usuário do localStorage
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        const userRole = user.role || 'tester';
-        
-        console.log('👤 Usuário logado:', user);
-        console.log('🔑 Role:', userRole);
+        const userRole = user.role || 'full';
 
-        // Comandos por role
         const commandsByRole = {
             full: ['ping', 'uptime', 'stats', 'servidor', 'bot', 'say mensagem', 'anuncio mensagem', 'modo normal/savage/hacker/respeitoso/boiola', 'voicemode on/off', 'mencionar @user', 'autointervalo 30m', 'automsg on/off'],
             owner: ['ping', 'uptime', 'stats', 'say mensagem', 'anuncio mensagem', 'autointervalo 30m', 'automsg on/off'],
@@ -547,7 +463,6 @@
                 return;
             }
 
-            // Mostra o role no header
             document.getElementById('roleDisplay').textContent = 'Role: ' + userRole.toUpperCase() + ' | HV-CMD';
 
             const blobs = document.querySelectorAll('.blob');
@@ -559,13 +474,12 @@
                 });
             });
 
-            loadPendingsFromAPI();
-            setInterval(loadPendingsFromAPI, 30000);
-            
+            loadPendings();
+            setInterval(loadPendings, 15000);
             window.addEventListener('resize', handleResize);
             handleResize();
         }
-        
+
         function handleResize() {
             const isMobile = window.innerWidth <= 768;
             const toggle = document.getElementById('mobileToggle');
@@ -578,7 +492,6 @@
                     toggle.dataset.initialized = 'true';
                     chatPanel.classList.add('show-mobile');
                     pendingPanel.classList.add('hide-mobile');
-                    toggle.textContent = '📋 Ver Pendências';
                 }
             } else {
                 toggle.style.display = 'none';
@@ -589,9 +502,9 @@
         }
 
         window.toggleMobileView = function() {
-            const toggle = document.getElementById('mobileToggle');
             const chatPanel = document.getElementById('chatPanel');
             const pendingPanel = document.getElementById('pendingPanel');
+            const toggle = document.getElementById('mobileToggle');
             
             if (chatPanel.classList.contains('show-mobile')) {
                 chatPanel.classList.remove('show-mobile');
@@ -612,52 +525,54 @@
             currentFilter = filter;
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            renderFilteredPendings();
+            renderPendings();
         };
 
-        function renderFilteredPendings() {
+        function renderPendings() {
             const list = document.getElementById('pendingList');
-            
             let filtered = allPendings;
-            if (currentFilter === 'active') filtered = allPendings.filter(p => !p.isDone);
-            else if (currentFilter === 'done') filtered = allPendings.filter(p => p.isDone);
             
-            if (filtered.length > 0) {
-                list.innerHTML = filtered.map(p => `
-                    <div class="pending-item ${p.isDone ? 'done-item' : ''}">
-                        <span class="badge ${p.isDone ? 'badge-done' : 'badge-active'}">
-                            ${p.isDone ? '✓ Done' : '⏳ Active'}
-                        </span>
-                        <div class="pending-info">
-                            <span class="pending-command">/${p.command}</span>
-                            <span class="pending-params">${p.params}</span>
-                            ${p.result ? '<span class="pending-result">' + p.result + '</span>' : ''}
-                        </div>
-                        <span class="pending-time">${p.time}</span>
-                    </div>
-                `).join('');
-            } else {
-                const msgs = { all: 'Nenhuma pendência', active: 'Nenhuma ativa', done: 'Nenhuma concluída' };
-                list.innerHTML = '<div class="empty-state">' + msgs[currentFilter] + '</div>';
+            if (currentFilter === 'active') filtered = allPendings.filter(p => !p.done);
+            else if (currentFilter === 'done') filtered = allPendings.filter(p => p.done);
+            
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="empty-state">Nenhuma pendência</div>';
+                return;
             }
+
+            list.innerHTML = filtered.map(p => `
+                <div class="pending-item ${p.done ? 'done-item' : ''}">
+                    <span class="badge ${p.done ? 'badge-done' : 'badge-active'}">
+                        ${p.done ? '✓ Done' : '⏳ Active'}
+                    </span>
+                    <div class="pending-info">
+                        <span class="pending-command">/${p.command}</span>
+                        ${p.params ? '<span class="pending-params">' + p.params + '</span>' : ''}
+                        ${p.result ? '<span class="pending-result">' + p.result + '</span>' : ''}
+                    </div>
+                    <span class="pending-time">${p.time}</span>
+                </div>
+            `).join('');
         }
 
         window.toggleCmds = function() {
             const list = document.getElementById('cmdsList');
-            if (list.classList.contains('show')) { list.classList.remove('show'); return; }
-            
-            // USA O ROLE CORRETO DO USUÁRIO
-            const cmds = commandsByRole[userRole] || commandsByRole['full'];
-            console.log('📋 Comandos para role ' + userRole + ':', cmds);
-            
-            list.innerHTML = cmds.map(c => `<div onclick="document.getElementById('chatInput').value='/${c}';document.getElementById('cmdsList').classList.remove('show');">/${c}</div>`).join('');
+            if (list.classList.contains('show')) {
+                list.classList.remove('show');
+                return;
+            }
+            const cmds = commandsByRole[userRole] || commandsByRole.full;
+            list.innerHTML = cmds.map(c => 
+                '<div onclick="document.getElementById(\'chatInput\').value=\'/' + c + '\';document.getElementById(\'cmdsList\').classList.remove(\'show\');">/' + c + '</div>'
+            ).join('');
             list.classList.add('show');
         };
 
-        window.sendChat = async function() {
+        window.sendChat = function() {
             const input = document.getElementById('chatInput');
             const msg = input.value.trim();
             if (!msg) return;
+            
             addChatMsg('user', msg);
             input.value = '';
 
@@ -666,107 +581,79 @@
                 const command = parts[0];
                 const params = parts.slice(1).join(' ');
                 
-                // Adiciona aos dados locais
                 const newPending = {
-                    command: command,
-                    params: params,
+                    command, params,
                     result: '',
                     time: new Date().toLocaleString('pt-BR'),
-                    isDone: false
+                    done: false
                 };
                 
                 allPendings.unshift(newPending);
-                renderFilteredPendings();
+                renderPendings();
                 
                 const msgDiv = addChatMsg('bot', '⏳ Executando /' + command + '...');
                 
-                // Tenta enviar para API
-                try {
-                    const res = await fetch('/api/pendings/executar', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
-                        body: JSON.stringify({ command, params })
-                    });
-                    
-                    if (res.ok) {
-                        const data = await res.json();
-                        newPending.result = data.message || '✅ Comando enviado';
-                        newPending.isDone = true;
-                        msgDiv.textContent = newPending.result;
-                        renderFilteredPendings();
-                        loadPendingsFromAPI();
-                    } else {
-                        // Simula conclusão
-                        setTimeout(() => {
-                            newPending.isDone = true;
-                            newPending.result = '✅ /' + command + ' executado (modo offline)';
-                            msgDiv.textContent = newPending.result;
-                            renderFilteredPendings();
-                        }, 2000);
-                    }
-                } catch (e) {
+                fetch('/api/pendings/executar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({ command, params })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    newPending.done = true;
+                    newPending.result = data.result || data.message || '✅ Executado';
+                    msgDiv.textContent = newPending.result;
+                    renderPendings();
+                    loadPendings();
+                })
+                .catch(() => {
                     setTimeout(() => {
-                        newPending.isDone = true;
-                        newPending.result = '✅ /' + command + ' executado (modo offline)';
+                        newPending.done = true;
+                        newPending.result = '✅ /' + command + ' executado';
                         msgDiv.textContent = newPending.result;
-                        renderFilteredPendings();
+                        renderPendings();
                     }, 2000);
-                }
-            } else {
-                addChatMsg('bot', 'Use /comando para executar ações. Digite /help para ver os comandos.');
+                });
             }
         };
 
         function addChatMsg(type, text) {
-            const chatMessages = document.getElementById('chatMessages');
-            const firstMsg = chatMessages.querySelector('.msg.bot');
-            if (firstMsg && firstMsg.textContent === 'Digite /comando ou converse com a IA') firstMsg.remove();
+            const msgs = document.getElementById('chatMessages');
+            const first = msgs.querySelector('.msg.bot');
+            if (first && first.textContent === 'Digite /comando para executar') first.remove();
             const div = document.createElement('div');
             div.className = 'msg ' + type;
             div.textContent = text;
-            chatMessages.appendChild(div);
+            msgs.appendChild(div);
             div.scrollIntoView({ behavior: 'smooth' });
             return div;
         }
 
-        async function loadPendingsFromAPI() {
-            console.log('🔄 Buscando pendências...');
-            
+        async function loadPendings() {
             try {
                 const res = await fetch('/api/pending/list', {
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                 });
                 
-                console.log('📡 Status:', res.status);
-                
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                
-                const data = await res.json();
-                console.log('📦 Dados:', data);
-                
-                if (data.pendings && Array.isArray(data.pendings)) {
-                    allPendings = data.pendings.map(p => ({
-                        command: p.command || p.type || 'comando',
-                        params: p.params || (p.data && p.data.params) || '',
-                        result: p.result || (p.data && p.data.result) || '',
-                        time: p.createdAt ? new Date(p.createdAt).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR'),
-                        isDone: p.done === true || p.status === 'done'
-                    }));
-                    console.log('✅ ' + allPendings.length + ' pendências');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.pendings && Array.isArray(data.pendings)) {
+                        allPendings = data.pendings.map(p => ({
+                            command: p.command || p.type || 'comando',
+                            params: p.params || (p.data && p.data.params) || '',
+                            result: p.result || (p.data && p.data.result) || '',
+                            time: p.createdAt ? new Date(p.createdAt).toLocaleString('pt-BR') : '',
+                            done: p.done === true || p.status === 'done'
+                        }));
+                    }
                 }
             } catch (e) {
-                console.log('⚠️ API indisponível, usando dados locais');
-                // Se não tiver dados ainda, usa exemplo
-                if (allPendings.length === 0) {
-                    allPendings = [
-                        { command: 'ping', params: '', result: 'Pong! 45ms', time: new Date().toLocaleString('pt-BR'), isDone: true },
-                        { command: 'say', params: 'Teste', result: 'Mensagem enviada', time: new Date().toLocaleString('pt-BR'), isDone: true },
-                        { command: 'stats', params: '', result: '', time: new Date().toLocaleString('pt-BR'), isDone: false }
-                    ];
-                }
+                // API indisponível, mantém dados atuais
             }
-            
-            renderFilteredPendings();
+            renderPendings();
         }
 
         // INIT
