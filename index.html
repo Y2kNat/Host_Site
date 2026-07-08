@@ -30,7 +30,7 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Background Blobs - NO FILTER, visible */
+        /* Background Blobs */
         .stage {
             position: absolute;
             width: 100%;
@@ -156,6 +156,33 @@
             margin-left: -4px;
             margin-top: 0;
             color: var(--accent);
+        }
+
+        /* Auto-login message */
+        .auto-login-msg {
+            text-align: center;
+            padding: 40px 0;
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+        }
+
+        .auto-login-msg .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .auto-login-msg .user-name {
+            color: #82b4ff;
+            font-weight: 600;
         }
 
         .form-group {
@@ -296,6 +323,18 @@
             color: var(--accent);
         }
 
+        .btn-logout-small {
+            color: rgba(255,107,107,0.6);
+            text-decoration: none;
+            font-size: 10px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .btn-logout-small:hover {
+            color: #ff6b6b;
+        }
+
         .svg-filter-hidden {
             position: absolute;
             width: 0;
@@ -330,7 +369,6 @@
         </defs>
     </svg>
 
-    <!-- Blobs SEM filtro gooey, com blur e opacidade visível -->
     <div class="stage">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
@@ -346,6 +384,18 @@
             <h1>HOST<br/>VILLE</h1>
         </header>
 
+        <!-- Tela de auto-login (escondida por padrão) -->
+        <div id="autoLoginScreen" style="display:none;">
+            <div class="auto-login-msg">
+                <span class="spinner"></span> Entrando automaticamente...<br><br>
+                <span>Bem-vindo de volta, <span class="user-name" id="autoLoginUser"></span>!</span>
+            </div>
+            <div class="footer-nav" style="justify-content: center;">
+                <span class="btn-logout-small" onclick="forceLogout()">Não é você? Clique aqui</span>
+            </div>
+        </div>
+
+        <!-- Tela de login normal -->
         <form id="loginForm" autocomplete="off">
             <div class="form-group">
                 <label>User Identity</label>
@@ -366,59 +416,155 @@
         </form>
 
         <p class="error-msg" id="errorMsg">Invalid credentials. Access denied.</p>
-
-        
     </main>
 
     <script>
-        const blobs = document.querySelectorAll('.blob');
-        
-        document.addEventListener('mousemove', (e) => {
-            const x = (e.clientX / window.innerWidth - 0.5) * 2;
-            const y = (e.clientY / window.innerHeight - 0.5) * 2;
-            blobs.forEach((blob, i) => {
-                blob.style.transform = `translate(${x * (i + 1) * 10}px, ${y * (i + 1) * 10}px)`;
-            });
-        });
+        (function() {
+            'use strict';
 
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            const err = document.getElementById('errorMsg');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Authenticating...';
-            err.classList.remove('show');
+            const blobs = document.querySelectorAll('.blob');
 
-            try {
-                const res = await fetch('/api/auth', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        username: document.getElementById('username').value,
-                        password: document.getElementById('password').value
-                    })
+            document.addEventListener('mousemove', function(e) {
+                var x = (e.clientX / window.innerWidth - 0.5) * 2;
+                var y = (e.clientY / window.innerHeight - 0.5) * 2;
+                blobs.forEach(function(blob, i) {
+                    blob.style.transform = 'translate(' + x * (i + 1) * 10 + 'px, ' + y * (i + 1) * 10 + 'px)';
                 });
-                const data = await res.json();
-                if (data.token) {
-                    btn.textContent = 'Access Granted';
-                    btn.style.background = '#2ecc71';
-                    btn.style.color = '#fff';
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    setTimeout(() => window.location.href = '/dashboard', 500);
-                } else {
-                    err.textContent = data.error || 'Invalid credentials.';
-                    err.classList.add('show');
+            });
+
+            // =============================================
+            // VERIFICA SE JÁ EXISTE TOKEN SALVO (AUTO-LOGIN)
+            // =============================================
+            function checkAutoLogin() {
+                var token = localStorage.getItem('token');
+                var user = localStorage.getItem('user');
+
+                if (token && user) {
+                    // Verifica se o token ainda é válido (não expirou)
+                    try {
+                        var parts = token.split('.');
+                        if (parts.length === 3) {
+                            var payload = parts[1];
+                            payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+                            while (payload.length % 4 !== 0) payload += '=';
+                            var decoded = JSON.parse(atob(payload));
+
+                            // Verifica se o token expirou
+                            var now = Math.floor(Date.now() / 1000);
+                            if (decoded.exp && decoded.exp > now) {
+                                // Token ainda válido - auto login
+                                showAutoLogin(JSON.parse(user));
+                                return;
+                            }
+                        }
+                    } catch (e) {
+                        // Token inválido, continua para login normal
+                    }
+                }
+
+                // Mostra formulário de login normal
+                document.getElementById('loginForm').style.display = '';
+                document.getElementById('autoLoginScreen').style.display = 'none';
+            }
+
+            function showAutoLogin(userData) {
+                // Esconde o formulário de login
+                document.getElementById('loginForm').style.display = 'none';
+                // Mostra a tela de auto-login
+                document.getElementById('autoLoginScreen').style.display = 'block';
+                document.getElementById('autoLoginUser').textContent = userData.name || userData.user || 'User';
+
+                // Redireciona para a dashboard após 1.5 segundos
+                setTimeout(function() {
+                    window.location.href = '/dashboard';
+                }, 1500);
+            }
+
+            function forceLogout() {
+                // Limpa o localStorage e cookies
+                localStorage.clear();
+
+                // Limpa cookies também
+                document.cookie.split(';').forEach(function(c) {
+                    document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+                });
+
+                // Mostra o formulário de login
+                document.getElementById('loginForm').style.display = '';
+                document.getElementById('autoLoginScreen').style.display = 'none';
+
+                // Limpa os campos
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+            }
+
+            // Expõe a função globalmente
+            window.forceLogout = forceLogout;
+
+            // =============================================
+            // LOGIN NORMAL
+            // =============================================
+            document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                var btn = document.getElementById('submitBtn');
+                var err = document.getElementById('errorMsg');
+                var username = document.getElementById('username').value;
+                var password = document.getElementById('password').value;
+
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span> Authenticating...';
+                err.classList.remove('show');
+
+                try {
+                    var res = await fetch('/api/auth', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            username: username,
+                            password: password
+                        })
+                    });
+
+                    var data = await res.json();
+
+                    if (data.token) {
+                        btn.textContent = 'Access Granted';
+                        btn.style.background = '#2ecc71';
+                        btn.style.color = '#fff';
+
+                        // Salva no localStorage
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('user', JSON.stringify(data.user));
+
+                        // Salva também em cookie para maior persistência
+                        var expires = new Date();
+                        expires.setDate(expires.getDate() + 7); // 7 dias
+                        document.cookie = 'hv_token=' + data.token + ';expires=' + expires.toUTCString() + ';path=/;SameSite=Lax';
+                        document.cookie = 'hv_user=' + JSON.stringify(data.user) + ';expires=' + expires.toUTCString() + ';path=/;SameSite=Lax';
+
+                        setTimeout(function() {
+                            window.location.href = '/dashboard';
+                        }, 500);
+
+                    } else {
+                        err.textContent = data.error || 'Invalid credentials.';
+                        err.classList.add('show');
+                        btn.disabled = false;
+                        btn.textContent = 'Get Started';
+                    }
+                } catch (error) {
+                    document.getElementById('errorMsg').textContent = 'Connection error.';
+                    document.getElementById('errorMsg').classList.add('show');
                     btn.disabled = false;
                     btn.textContent = 'Get Started';
                 }
-            } catch (err) {
-                document.getElementById('errorMsg').textContent = 'Connection error.';
-                document.getElementById('errorMsg').classList.add('show');
-                btn.disabled = false;
-                btn.textContent = 'Get Started';
-            }
-        });
+            });
+
+            // Inicia a verificação de auto-login
+            checkAutoLogin();
+
+        })();
     </script>
 </body>
 </html>
