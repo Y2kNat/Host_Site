@@ -282,10 +282,6 @@
             white-space: nowrap;
         }
 
-        .role-badge.restricted {
-            color: #ff6b6b;
-        }
-
         .main-layout {
             display: flex;
             gap: 16px;
@@ -879,7 +875,7 @@
                     <span class="brand-id">System Node: HV-CMD</span>
                     <h1>Pendências</h1>
                 </div>
-                <span class="role-badge" id="roleBadge">Role: FULL</span>
+                <span class="role-badge" id="roleBadge">Carregando...</span>
             </div>
             <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobileView()">📋 Ver Pendências</button>
             <div class="main-layout">
@@ -1057,7 +1053,10 @@
             }
 
             setupEventListeners() {
-                window.addEventListener('resize', this.resize.bind(this));
+                var self = this;
+                window.addEventListener('resize', function() {
+                    self.resize();
+                });
             }
 
             resize() {
@@ -1086,10 +1085,11 @@
                 this.isFinished = false;
                 this.textOpacity = 0;
                 this.welcomeElement.style.opacity = '0';
-                this.particles.forEach(function(p) {
-                    p.reset();
-                });
+                for (var i = 0; i < this.particles.length; i++) {
+                    this.particles[i].reset();
+                }
                 this.camera.position.z = this.initialCameraZ;
+                var self = this;
                 this.animate(performance.now());
             }
 
@@ -1129,7 +1129,10 @@
                     this.updateText(elapsed);
                 }
 
-                this.animationId = requestAnimationFrame(this.animate.bind(this));
+                var self = this;
+                this.animationId = requestAnimationFrame(function(ts) {
+                    self.animate(ts);
+                });
             }
 
             updateAnimation(progress) {
@@ -1137,11 +1140,11 @@
                 var targetZ = this.initialCameraZ + (this.finalCameraZ - this.initialCameraZ) * easedProgress;
                 this.camera.position.z = targetZ;
                 var expansionFactor = 1.0 + progress * 0.5;
-                this.particles.forEach(function(p) {
-                    p.position.x = p.basePosition.x * expansionFactor;
-                    p.position.y = p.basePosition.y * expansionFactor;
-                    p.position.z = p.basePosition.z;
-                });
+                for (var i = 0; i < this.particles.length; i++) {
+                    this.particles[i].position.x = this.particles[i].basePosition.x * expansionFactor;
+                    this.particles[i].position.y = this.particles[i].basePosition.y * expansionFactor;
+                    this.particles[i].position.z = this.particles[i].basePosition.z;
+                }
                 this.ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
                 this.ctx.globalAlpha = 1.0;
                 this.renderParticles(progress);
@@ -1246,11 +1249,44 @@
 
         var allPendings = [];
         var currentFilter = 'all';
-        var user = JSON.parse(localStorage.getItem('user') || '{}');
-        var userRole = user.role || 'full';
 
+        // Extrai o role diretamente do token JWT
+        function getUserRoleFromToken() {
+            var token = localStorage.getItem('token');
+            if (!token) {
+                return 'tester';
+            }
+
+            try {
+                // O token JWT tem 3 partes: header.payload.signature
+                var parts = token.split('.');
+                if (parts.length !== 3) {
+                    return 'tester';
+                }
+
+                // Decodifica o payload (parte do meio)
+                var payload = parts[1];
+                // Substitui caracteres para base64 válido
+                payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+                // Adiciona padding se necessário
+                while (payload.length % 4 !== 0) {
+                    payload += '=';
+                }
+                // Decodifica de base64
+                var decoded = atob(payload);
+                var data = JSON.parse(decoded);
+
+                addLog('🔑 Token decodificado. Role: ' + (data.role || 'não encontrado'), 'success');
+                return data.role || 'tester';
+            } catch (e) {
+                addLog('❌ Erro ao decodificar token: ' + e.message, 'error');
+                return 'tester';
+            }
+        }
+
+        var userRole = getUserRoleFromToken();
         document.getElementById('roleBadge').textContent = 'Role: ' + userRole.toUpperCase();
-        addLog('✅ Página carregada | Role: ' + userRole.toUpperCase(), 'success');
+        addLog('✅ Página carregada | Role: ' + userRole.toUpperCase() + ' (extraído do token JWT)', 'success');
 
         var commandsByRole = {
             full: ['ping', 'uptime', 'stats', 'servidor', 'bot', 'say mensagem', 'anuncio mensagem', 'modo normal/savage/hacker/respeitoso/boiola', 'voicemode on/off', 'mencionar @user', 'autointervalo 30m', 'automsg on/off'],
@@ -1308,9 +1344,10 @@
 
         window.filterPendings = function(filter, btn) {
             currentFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(function(b) {
-                b.classList.remove('active');
-            });
+            var allBtns = document.querySelectorAll('.filter-btn');
+            for (var i = 0; i < allBtns.length; i++) {
+                allBtns[i].classList.remove('active');
+            }
             btn.classList.add('active');
             renderPendings();
         };
@@ -1334,17 +1371,24 @@
                 return;
             }
 
-            list.innerHTML = filtered.map(function(p) {
-                return '<div class="pending-item ' + (p.done ? 'done-item' : '') + '">' +
-                    '<span class="badge ' + (p.done ? 'badge-done' : 'badge-active') + '">' + (p.done ? '✓ Done' : '⏳ Active') + '</span>' +
-                    '<div class="pending-info">' +
-                    '<span class="pending-command">/' + p.command + '</span>' +
-                    (p.params ? '<span class="pending-params">' + p.params + '</span>' : '') +
-                    (p.result ? '<span class="pending-result">' + p.result + '</span>' : '') +
-                    '</div>' +
-                    '<span class="pending-time">' + p.time + '</span>' +
-                    '</div>';
-            }).join('');
+            var html = '';
+            for (var i = 0; i < filtered.length; i++) {
+                var p = filtered[i];
+                html += '<div class="pending-item ' + (p.done ? 'done-item' : '') + '">';
+                html += '<span class="badge ' + (p.done ? 'badge-done' : 'badge-active') + '">' + (p.done ? '✓ Done' : '⏳ Active') + '</span>';
+                html += '<div class="pending-info">';
+                html += '<span class="pending-command">/' + p.command + '</span>';
+                if (p.params) {
+                    html += '<span class="pending-params">' + p.params + '</span>';
+                }
+                if (p.result) {
+                    html += '<span class="pending-result">' + p.result + '</span>';
+                }
+                html += '</div>';
+                html += '<span class="pending-time">' + p.time + '</span>';
+                html += '</div>';
+            }
+            list.innerHTML = html;
         }
 
         window.toggleCmds = function() {
@@ -1354,9 +1398,13 @@
                 return;
             }
             var cmds = commandsByRole[userRole] || commandsByRole.tester;
-            list.innerHTML = cmds.map(function(c) {
-                return '<div onclick="document.getElementById(\'chatInput\').value=\'/' + c + '\';document.getElementById(\'cmdsList\').classList.remove(\'show\')">/' + c + '</div>';
-            }).join('');
+            addLog('📋 ' + cmds.length + ' comandos para role: ' + userRole, 'info');
+            var html = '';
+            for (var i = 0; i < cmds.length; i++) {
+                var c = cmds[i];
+                html += '<div onclick="document.getElementById(\'chatInput\').value=\'/' + c + '\';document.getElementById(\'cmdsList\').classList.remove(\'show\')">/' + c + '</div>';
+            }
+            list.innerHTML = html;
             list.classList.add('show');
         };
 
@@ -1366,6 +1414,7 @@
             if (!msg) {
                 return;
             }
+
             addChatMsg('user', msg);
             input.value = '';
 
@@ -1404,8 +1453,10 @@
                     return r.json();
                 })
                 .then(function(data) {
+                    addLog('📦 Resposta da API: ' + JSON.stringify(data).substring(0, 200), 'info');
                     newPending.done = true;
                     newPending.result = data.result || data.message || '✅ Executado';
+                    // ATUALIZA A MENSAGEM NO CHAT COM O RESULTADO
                     msgDiv.textContent = newPending.result;
                     addLog('✅ Resultado: ' + newPending.result, 'success');
                     renderPendings();
