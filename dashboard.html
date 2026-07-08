@@ -1166,7 +1166,6 @@
             var maxLogs = 80;
             var STORAGE_KEY = 'hostville_console_logs';
 
-            // Carrega logs salvos do localStorage
             function loadSavedLogs() {
                 try {
                     var saved = localStorage.getItem(STORAGE_KEY);
@@ -1177,16 +1176,13 @@
                 return [];
             }
 
-            // Salva logs no localStorage
             function saveLogs(logs) {
                 try {
-                    // Mantém apenas os últimos 80 logs
                     var toSave = logs.slice(0, maxLogs);
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
                 } catch (e) {}
             }
 
-            // Array de logs em memória
             var consoleLogs = loadSavedLogs();
 
             function addConsoleLine(time, tag, msg, extraClass) {
@@ -1201,51 +1197,48 @@
             }
 
             function renderAllLogs() {
-                // Limpa o console
                 consoleDiv.innerHTML = '';
 
-                // Adiciona a mensagem de boas-vindas (sempre no topo)
+                // Mensagem de boas-vindas sempre no topo
                 var now = new Date().toLocaleTimeString('pt-BR');
                 var welcomeLine = addConsoleLine(now, 'WELCOME', '👋 Hello <strong>' + userName + '</strong>, your role is <strong>' + userRole.toUpperCase() + '</strong>', 'welcome-line');
                 consoleDiv.appendChild(welcomeLine);
 
-                // Adiciona todos os logs salvos (mais recentes primeiro, abaixo do welcome)
+                // Logs normais (mais recentes primeiro)
                 for (var i = 0; i < consoleLogs.length; i++) {
                     var log = consoleLogs[i];
                     consoleDiv.appendChild(addConsoleLine(log.time, log.tag, log.msg));
                 }
 
-                // Se não tem logs além do welcome, adiciona mensagem de conectando
                 if (consoleLogs.length === 0) {
                     var infoLine = addConsoleLine(now, 'INFO', '⏳ Connecting to bot realtime...');
                     consoleDiv.appendChild(infoLine);
                 }
 
-                // Scroll para o topo (onde estão as mensagens mais recentes)
                 consoleDiv.scrollTop = 0;
             }
 
             function addNewLog(time, tag, msg) {
-                // Adiciona no array (mais recente primeiro)
+                // Remove CONNECTED antigo se existir
+                consoleLogs = consoleLogs.filter(function(log) {
+                    return log.tag !== 'CONNECTED';
+                });
+
+                // Adiciona no topo
                 consoleLogs.unshift({
                     time: time,
                     tag: tag,
                     msg: msg
                 });
 
-                // Limita o tamanho
                 if (consoleLogs.length > maxLogs) {
                     consoleLogs = consoleLogs.slice(0, maxLogs);
                 }
 
-                // Salva no localStorage
                 saveLogs(consoleLogs);
-
-                // Renderiza tudo de novo
                 renderAllLogs();
             }
 
-            // Renderiza os logs iniciais
             renderAllLogs();
 
             fetch('/api/pusher-key')
@@ -1272,17 +1265,7 @@
 
                     channel.bind('pusher:subscription_succeeded', function() {
                         var now = new Date().toLocaleTimeString('pt-BR');
-                        // Só adiciona se não tiver um CONNECTED nos últimos logs
-                        var hasConnected = false;
-                        for (var i = 0; i < Math.min(consoleLogs.length, 5); i++) {
-                            if (consoleLogs[i].tag === 'CONNECTED') {
-                                hasConnected = true;
-                                break;
-                            }
-                        }
-                        if (!hasConnected) {
-                            addNewLog(now, 'CONNECTED', '✅ Connected to bot realtime stream');
-                        }
+                        addNewLog(now, 'CONNECTED', '✅ Connected to bot realtime stream');
                     });
 
                     channel.bind('pusher:subscription_error', function() {
@@ -1293,7 +1276,6 @@
                 })
                 .catch(function(e) {
                     var now = new Date().toLocaleTimeString('pt-BR');
-                    // Verifica se já existe mensagem de erro
                     var hasError = false;
                     for (var i = 0; i < consoleLogs.length; i++) {
                         if (consoleLogs[i].msg.indexOf('Pusher key') > -1) {
