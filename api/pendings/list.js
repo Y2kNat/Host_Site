@@ -1,108 +1,83 @@
-// api/pendings/list.js
 const mongoose = require('mongoose');
 
-module.exports = async (req, res) => {
-    // Configurar CORS
+const MONGODB_URI = process.env.MONGO_URI;
+
+let cached = global.mongoose;
+if (!cached) {
+    cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectDB() {
+    if (cached.conn) {
+        return cached.conn;
+    }
+    if (!cached.promise) {
+        cached.promise = mongoose.connect(MONGODB_URI).then(function(m) {
+            return m;
+        });
+    }
+    cached.conn = await cached.promise;
+    return cached.conn;
+}
+
+module.exports = async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
-    
-    // Responder a requisições OPTIONS (preflight)
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+
     if (req.method === 'OPTIONS') {
-        return res.status(200).end();
+        res.status(200).end();
+        return;
     }
-    
-    // Apenas permitir método GET
+
     if (req.method !== 'GET') {
-        return res.status(405).json({ 
-            success: false, 
-            error: 'Método não permitido' 
-        });
+        res.status(405).json({ success: false, error: 'Method not allowed', pendings: [] });
+        return;
     }
 
     try {
-        // Obter a URI do MongoDB das variáveis de ambiente
-        const uri = process.env.MONGO_URI;
-        
-        // Se não houver URI configurada, retornar array vazio
-        if (!uri) {
-            console.log('MONGO_URI não está configurada nas variáveis de ambiente');
-            return res.status(200).json({ 
-                success: true, 
-                pendings: [],
-                debug: {
-                    error: 'MONGO_URI não configurada'
-                }
-            });
-        }
+        await connectDB();
 
-        // Conectar ao MongoDB se ainda não estiver conectado
-        if (mongoose.connection.readyState !== 1) {
-            console.log('Conectando ao MongoDB...');
-            await mongoose.connect(uri);
-            console.log('Conectado ao MongoDB com sucesso');
-        }
+        var Pending = mongoose.models.Pending || mongoose.model('Pending', new mongoose.Schema({
+            type: String,
+            data: Object,
+            done: Boolean,
+            createdAt: Date
+        }));
 
-        // Obter a referência ao banco de dados
-        const db = mongoose.connection.db;
-        
-        // Listar todas as coleções para debug
-        const collections = await db.listCollections().toArray();
-        const collectionNames = collections.map(function(c) {
-            return c.name;
-        });
-        console.log('Coleções disponíveis:', collectionNames);
+        var pendings = await Pending.find({}).sort({ createdAt: -1 }).limit(100).lean();
 
-        // Obter a coleção pendings
-        const pendingsCollection = db.collection('pendings');
-        
-        // Contar total de documentos
-        const totalDocuments = await pendingsCollection.countDocuments({});
-        console.log('Total de documentos na coleção pendings:', totalDocuments);
-
-        // Buscar todos os documentos ordenados por data de criação (mais recentes primeiro)
-        const documents = await pendingsCollection.find({})
-            .sort({ createdAt: -1 })
-            .limit(100)
-            .toArray();
-
-        console.log('Documentos encontrados:', documents.length);
-
-        // Se encontrou documentos, logar o primeiro para debug
-        if (documents.length > 0) {
-            console.log('Primeiro documento (resumido):', JSON.stringify(documents[0]).substring(0, 300));
-        }
-
-        // Formatar os documentos para o formato esperado pelo frontend
-        const formattedPendings = documents.map(function(doc) {
-            // Extrair o comando de várias fontes possíveis
+        var formatted = pendings.map(function(p) {
             var command = 'comando';
-            
-            // Tentar extrair de doc.type
-            if (doc.type && doc.type !== 'comando') {
-                command = doc.type;
-            }
-            // Tentar extrair de doc.data.command
-            else if (doc.data && doc.data.command && doc.data.command !== 'comando') {
-                command = doc.data.command;
-            }
-            // Tentar extrair de doc.data.type
-            else if (doc.data && doc.data.type) {
-                command = doc.data.type;
-            }
-            // Tentar extrair de doc.command
-            else if (doc.command && doc.command !== 'comando') {
-                command = doc.command;
-            }
-            // Tentar extrair de doc.name
-            else if (doc.name) {
-                command = doc.name;
+            if (p.type && p.type !== 'comando') {
+                command = p.type;
+            } else if (p.data && p.data.command) {
+                command = p.data.command;
+            } else if (p.command) {
+                command = p.command;
             }
 
-            // Extrair parâmetros
-            var params = '';
-            if (doc.data && doc.data.params) {
-                params = doc.data.params;
-            } else if (doc.params) {
+            return {
+                id: p._id ? p._id.toString() : '0',
+                command: command,
+                params: (p.data && p.data.params) || p.params || '',
+                result: (p.data && p.data.result) || p.result || '',
+                done: p.done === true || p.done === 'true',
+                createdAt: p.createdAt || new Date()
+            };
+        });
+
+        res.status(200).json({
+            success: true,
+            pendings: formatted
+        });
+    } catch (error) {
+        res.status(200).json({
+            success: true,
+            pendings: []
+        });
+    }
+};            } else if (doc.params) {
                 params = doc.params;
             }
 
