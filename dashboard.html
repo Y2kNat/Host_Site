@@ -1159,11 +1159,35 @@
         }
 
         // =============================================
-        // BOT CONSOLE EM TEMPO REAL (PUSHER)
+        // BOT CONSOLE EM TEMPO REAL (PUSHER) COM ARMAZENAMENTO LOCAL
         // =============================================
         function initBotConsole() {
             var consoleDiv = document.getElementById('bot-console');
             var maxLogs = 80;
+            var STORAGE_KEY = 'hostville_console_logs';
+
+            // Carrega logs salvos do localStorage
+            function loadSavedLogs() {
+                try {
+                    var saved = localStorage.getItem(STORAGE_KEY);
+                    if (saved) {
+                        return JSON.parse(saved);
+                    }
+                } catch (e) {}
+                return [];
+            }
+
+            // Salva logs no localStorage
+            function saveLogs(logs) {
+                try {
+                    // Mantém apenas os últimos 80 logs
+                    var toSave = logs.slice(0, maxLogs);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+                } catch (e) {}
+            }
+
+            // Array de logs em memória
+            var consoleLogs = loadSavedLogs();
 
             function addConsoleLine(time, tag, msg, extraClass) {
                 var line = document.createElement('div');
@@ -1176,20 +1200,53 @@
                 return line;
             }
 
-            function addWelcomeMessage() {
+            function renderAllLogs() {
+                // Limpa o console
                 consoleDiv.innerHTML = '';
-                var now = new Date().toLocaleTimeString('pt-BR');
 
-                // Mensagem de boas-vindas (sempre no topo)
+                // Adiciona a mensagem de boas-vindas (sempre no topo)
+                var now = new Date().toLocaleTimeString('pt-BR');
                 var welcomeLine = addConsoleLine(now, 'WELCOME', '👋 Hello <strong>' + userName + '</strong>, your role is <strong>' + userRole.toUpperCase() + '</strong>', 'welcome-line');
                 consoleDiv.appendChild(welcomeLine);
 
-                // Mensagem de conectando
-                var infoLine = addConsoleLine(now, 'INFO', '⏳ Connecting to bot realtime...');
-                consoleDiv.appendChild(infoLine);
+                // Adiciona todos os logs salvos (mais recentes primeiro, abaixo do welcome)
+                for (var i = 0; i < consoleLogs.length; i++) {
+                    var log = consoleLogs[i];
+                    consoleDiv.appendChild(addConsoleLine(log.time, log.tag, log.msg));
+                }
+
+                // Se não tem logs além do welcome, adiciona mensagem de conectando
+                if (consoleLogs.length === 0) {
+                    var infoLine = addConsoleLine(now, 'INFO', '⏳ Connecting to bot realtime...');
+                    consoleDiv.appendChild(infoLine);
+                }
+
+                // Scroll para o topo (onde estão as mensagens mais recentes)
+                consoleDiv.scrollTop = 0;
             }
 
-            addWelcomeMessage();
+            function addNewLog(time, tag, msg) {
+                // Adiciona no array (mais recente primeiro)
+                consoleLogs.unshift({
+                    time: time,
+                    tag: tag,
+                    msg: msg
+                });
+
+                // Limita o tamanho
+                if (consoleLogs.length > maxLogs) {
+                    consoleLogs = consoleLogs.slice(0, maxLogs);
+                }
+
+                // Salva no localStorage
+                saveLogs(consoleLogs);
+
+                // Renderiza tudo de novo
+                renderAllLogs();
+            }
+
+            // Renderiza os logs iniciais
+            renderAllLogs();
 
             fetch('/api/pusher-key')
                 .then(function(res) { return res.json(); })
@@ -1210,62 +1267,42 @@
                         var type = data.type || 'INFO';
                         var msg = data.message || '';
 
-                        var line = addConsoleLine(time, type, msg);
-
-                        // INSERE SEMPRE ABAIXO DA MENSAGEM DE BOAS-VINDAS (depois do welcome e do info)
-                        var children = consoleDiv.children;
-                        if (children.length >= 2) {
-                            // Insere depois do segundo filho (índice 2)
-                            consoleDiv.insertBefore(line, children[2]);
-                        } else {
-                            consoleDiv.appendChild(line);
-                        }
-
-                        // Remove linhas excedentes (mantém welcome + info + maxLogs)
-                        var allLines = consoleDiv.querySelectorAll('.console-line');
-                        if (allLines.length > maxLogs + 2) {
-                            for (var i = allLines.length - 1; i >= maxLogs + 2; i--) {
-                                if (!allLines[i].classList.contains('welcome-line')) {
-                                    allLines[i].remove();
-                                }
-                            }
-                        }
+                        addNewLog(time, type.toUpperCase(), msg);
                     });
 
                     channel.bind('pusher:subscription_succeeded', function() {
                         var now = new Date().toLocaleTimeString('pt-BR');
-                        var connectedLine = addConsoleLine(now, 'CONNECTED', '✅ Connected to bot realtime stream');
-
-                        var children = consoleDiv.children;
-                        if (children.length >= 2) {
-                            consoleDiv.insertBefore(connectedLine, children[2]);
-                        } else {
-                            consoleDiv.appendChild(connectedLine);
+                        // Só adiciona se não tiver um CONNECTED nos últimos logs
+                        var hasConnected = false;
+                        for (var i = 0; i < Math.min(consoleLogs.length, 5); i++) {
+                            if (consoleLogs[i].tag === 'CONNECTED') {
+                                hasConnected = true;
+                                break;
+                            }
+                        }
+                        if (!hasConnected) {
+                            addNewLog(now, 'CONNECTED', '✅ Connected to bot realtime stream');
                         }
                     });
 
                     channel.bind('pusher:subscription_error', function() {
                         var now = new Date().toLocaleTimeString('pt-BR');
-                        var errorLine = addConsoleLine(now, 'ERROR', '❌ Failed to connect to bot stream');
-
-                        var children = consoleDiv.children;
-                        if (children.length >= 2) {
-                            consoleDiv.insertBefore(errorLine, children[2]);
-                        } else {
-                            consoleDiv.appendChild(errorLine);
-                        }
+                        addNewLog(now, 'ERROR', '❌ Failed to connect to bot stream');
                     });
 
                 })
                 .catch(function(e) {
                     var now = new Date().toLocaleTimeString('pt-BR');
-                    var errorLine = addConsoleLine(now, 'ERROR', '❌ Pusher key not configured on server');
-
-                    var children = consoleDiv.children;
-                    if (children.length >= 2) {
-                        consoleDiv.insertBefore(errorLine, children[2]);
-                    } else {
-                        consoleDiv.appendChild(errorLine);
+                    // Verifica se já existe mensagem de erro
+                    var hasError = false;
+                    for (var i = 0; i < consoleLogs.length; i++) {
+                        if (consoleLogs[i].msg.indexOf('Pusher key') > -1) {
+                            hasError = true;
+                            break;
+                        }
+                    }
+                    if (!hasError) {
+                        addNewLog(now, 'ERROR', '❌ Pusher key not configured on server');
                     }
                 });
         }
