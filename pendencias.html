@@ -169,24 +169,48 @@
         }
 
         @keyframes float1 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(100px, -50px) scale(1.15); }
-            50% { transform: translate(-40px, 80px) scale(0.9); }
-            75% { transform: translate(-80px, -30px) scale(1.1); }
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(100px, -50px) scale(1.15);
+            }
+            50% {
+                transform: translate(-40px, 80px) scale(0.9);
+            }
+            75% {
+                transform: translate(-80px, -30px) scale(1.1);
+            }
         }
 
         @keyframes float2 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(-60px, 60px) scale(1.2); }
-            66% { transform: translate(50px, -80px) scale(0.85); }
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(-60px, 60px) scale(1.2);
+            }
+            66% {
+                transform: translate(50px, -80px) scale(0.85);
+            }
         }
 
         @keyframes float3 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            20% { transform: translate(80px, 40px) scale(1.1); }
-            40% { transform: translate(-50px, -60px) scale(0.9); }
-            60% { transform: translate(30px, 80px) scale(1.15); }
-            80% { transform: translate(-70px, -30px) scale(0.95); }
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            20% {
+                transform: translate(80px, 40px) scale(1.1);
+            }
+            40% {
+                transform: translate(-50px, -60px) scale(0.9);
+            }
+            60% {
+                transform: translate(30px, 80px) scale(1.15);
+            }
+            80% {
+                transform: translate(-70px, -30px) scale(0.95);
+            }
         }
 
         .container {
@@ -256,6 +280,10 @@
             color: rgba(255,255,255,0.3);
             text-transform: uppercase;
             white-space: nowrap;
+        }
+
+        .role-badge.restricted {
+            color: #ff6b6b;
         }
 
         .main-layout {
@@ -895,90 +923,120 @@
         // =============================================
         // LOADING ANIMATION
         // =============================================
-        class Vec2 {
+        class Vector2 {
             constructor(x, y) {
                 this.x = x || 0;
                 this.y = y || 0;
             }
         }
 
-        class Vec3 {
+        class Vector3 {
             constructor(x, y, z) {
                 this.x = x || 0;
                 this.y = y || 0;
                 this.z = z || 0;
             }
+
+            clone() {
+                return new Vector3(this.x, this.y, this.z);
+            }
+
+            add(v) {
+                this.x += v.x;
+                this.y += v.y;
+                this.z += v.z;
+                return this;
+            }
+
+            scale(s) {
+                this.x *= s;
+                this.y *= s;
+                this.z *= s;
+                return this;
+            }
         }
 
         class Particle {
             constructor(baseX, baseY, baseZ, size) {
-                this.baseX = baseX;
-                this.baseY = baseY;
-                this.baseZ = baseZ;
-                this.x = baseX;
-                this.y = baseY;
-                this.z = baseZ;
+                this.basePosition = new Vector3(baseX, baseY, baseZ);
+                this.position = new Vector3(baseX, baseY, baseZ);
                 this.size = size;
+                this.screenPos = new Vector2();
+                this.projectedZ = 0;
             }
 
             reset() {
-                this.x = this.baseX;
-                this.y = this.baseY;
-                this.z = this.baseZ;
+                this.position.x = this.basePosition.x;
+                this.position.y = this.basePosition.y;
+                this.position.z = this.basePosition.z;
             }
         }
 
         class Camera {
             constructor() {
-                this.z = 0;
+                this.position = new Vector3(0, 0, 0);
                 this.fov = 60;
                 this.focalLength = 1.0 / Math.tan((this.fov * 0.5) * Math.PI / 180.0);
                 this.near = 0.1;
+                this.far = 1000;
             }
 
-            project(px, py, pz, sw, sh) {
-                var dz = pz - this.z;
+            project(point, screenWidth, screenHeight) {
+                var camZ = this.position.z;
+                var dx = point.x - this.position.x;
+                var dy = point.y - this.position.y;
+                var dz = point.z - camZ;
+
                 if (dz < this.near) {
                     return null;
                 }
+
                 var scale = this.focalLength / dz;
+                var screenX = dx * scale * (screenWidth / 2) + screenWidth / 2;
+                var screenY = -dy * scale * (screenHeight / 2) + screenHeight / 2;
+
                 return {
-                    x: (px - 0) * scale * (sw / 2) + sw / 2,
-                    y: -py * scale * (sh / 2) + sh / 2,
+                    x: screenX,
+                    y: screenY,
                     z: dz,
                     scale: scale
                 };
             }
+
+            moveForward(speed) {
+                this.position.z += speed;
+            }
         }
 
         class SpiralAnimation {
-            constructor(canvas, textElement, onComplete) {
+            constructor(canvas, welcomeElement, onComplete) {
                 this.canvas = canvas;
                 this.ctx = canvas.getContext('2d');
-                this.textElement = textElement;
+                this.welcomeElement = welcomeElement;
                 this.onComplete = onComplete;
                 this.particles = [];
                 this.camera = new Camera();
                 this.animationId = null;
-                this.startTime = null;
-                this.animDuration = 3000;
-                this.fadeOutDuration = 400;
-                this.holdDuration = 150;
+                this.animationStartTime = null;
+                this.animationDuration = 5000;
+                this.fadeOutDuration = 500;
+                this.holdDuration = 200;
+                this.totalDuration = this.animationDuration + this.holdDuration + this.fadeOutDuration;
                 this.isFinished = false;
-                this.fadeOutStart = null;
-                this.holdStart = null;
-                this.textOpacity = 0;
-                this.textFadeDelay = 800;
-                this.textFadeDuration = 500;
+                this.fadeOutStartTime = null;
+                this.holdStartTime = null;
                 this.spiralLoops = 5;
                 this.spiralRadius = 4.5;
                 this.spiralHeight = 14.0;
-                this.particleCount = 1500;
+                this.particleCount = 2500;
                 this.baseSize = 2.0;
-                this.sizeVar = 0.8;
+                this.sizeVariation = 0.8;
+                this.textOpacity = 0;
+                this.textFadeInDelay = 1200;
+                this.textFadeInDuration = 700;
                 this.initParticles();
                 this.resize();
-                window.addEventListener('resize', this.resize.bind(this));
+                this.setupEventListeners();
             }
 
             initParticles() {
@@ -990,42 +1048,48 @@
                     var x = Math.cos(angle) * radius;
                     var y = Math.sin(angle) * radius;
                     var z = -t * this.spiralHeight + (Math.random() - 0.5) * 0.8;
-                    var size = this.baseSize + (Math.random() - 0.5) * this.sizeVar;
+                    var size = this.baseSize + (Math.random() - 0.5) * this.sizeVariation;
                     this.particles.push(new Particle(x, y, z, Math.max(0.6, size)));
                 }
-                this.camera.z = 2.5;
-                this.initialZ = this.camera.z;
-                this.finalZ = -this.spiralHeight - 2.0;
+                this.camera.position.z = 2.5;
+                this.initialCameraZ = this.camera.position.z;
+                this.finalCameraZ = -this.spiralHeight - 2.0;
+            }
+
+            setupEventListeners() {
+                window.addEventListener('resize', this.resize.bind(this));
             }
 
             resize() {
                 var dpr = window.devicePixelRatio || 1;
-                var dw = window.innerWidth;
-                var dh = window.innerHeight;
-                this.canvas.width = dw * dpr;
-                this.canvas.height = dh * dpr;
-                this.canvas.style.width = dw + 'px';
-                this.canvas.style.height = dh + 'px';
+                var displayWidth = window.innerWidth;
+                var displayHeight = window.innerHeight;
+                this.canvas.width = displayWidth * dpr;
+                this.canvas.height = displayHeight * dpr;
+                this.canvas.style.width = displayWidth + 'px';
+                this.canvas.style.height = displayHeight + 'px';
                 this.ctx.setTransform(1, 0, 0, 1, 0, 0);
                 this.ctx.scale(dpr, dpr);
-                this.dw = dw;
-                this.dh = dh;
+                this.displayWidth = displayWidth;
+                this.displayHeight = displayHeight;
+                this.centerX = displayWidth / 2;
+                this.centerY = displayHeight / 2;
             }
 
             start() {
                 if (this.animationId) {
                     return;
                 }
-                this.startTime = performance.now();
-                this.holdStart = null;
-                this.fadeOutStart = null;
+                this.animationStartTime = performance.now();
+                this.holdStartTime = null;
+                this.fadeOutStartTime = null;
                 this.isFinished = false;
                 this.textOpacity = 0;
-                this.textElement.style.opacity = '0';
+                this.welcomeElement.style.opacity = '0';
                 this.particles.forEach(function(p) {
                     p.reset();
                 });
-                this.camera.z = this.initialZ;
+                this.camera.position.z = this.initialCameraZ;
                 this.animate(performance.now());
             }
 
@@ -1033,84 +1097,87 @@
                 if (this.isFinished) {
                     return;
                 }
-                var elapsed = timestamp - this.startTime;
+                var elapsed = timestamp - this.animationStartTime;
 
-                if (elapsed < this.animDuration) {
-                    this.update(elapsed / this.animDuration);
-                } else if (!this.holdStart) {
-                    this.holdStart = timestamp;
-                    this.update(1.0);
-                } else if (elapsed < this.animDuration + this.holdDuration + this.fadeOutDuration) {
-                    if (!this.fadeOutStart) {
-                        this.fadeOutStart = timestamp;
+                if (elapsed < this.animationDuration) {
+                    this.updateAnimation(elapsed / this.animationDuration);
+                } else if (!this.holdStartTime) {
+                    this.holdStartTime = timestamp;
+                    this.updateAnimation(1.0);
+                } else if (elapsed < this.animationDuration + this.holdDuration + this.fadeOutDuration) {
+                    if (!this.fadeOutStartTime) {
+                        this.fadeOutStartTime = timestamp;
                     }
-                    var fe = timestamp - this.fadeOutStart;
-                    var fp = Math.min(1.0, fe / this.fadeOutDuration);
-                    var ef = this.easeInOutQuad(fp);
-                    var co = 1.0 - ef;
-                    this.ctx.clearRect(0, 0, this.dw, this.dh);
-                    if (co > 0.01) {
-                        this.ctx.globalAlpha = co;
-                        this.render(1.0);
+                    var fadeElapsed = timestamp - this.fadeOutStartTime;
+                    var fadeProgress = Math.min(1.0, fadeElapsed / this.fadeOutDuration);
+                    var easedFade = this.easeInOutQuad(fadeProgress);
+                    var canvasOpacity = 1.0 - easedFade;
+                    var textOpacity = Math.max(0, this.textOpacity - easedFade);
+                    this.ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
+                    if (canvasOpacity > 0.01) {
+                        this.ctx.globalAlpha = canvasOpacity;
+                        this.renderParticles(1.0);
                         this.ctx.globalAlpha = 1.0;
                     }
-                    this.textElement.style.opacity = Math.max(0, this.textOpacity - ef);
+                    this.welcomeElement.style.opacity = textOpacity;
                 } else {
                     this.finish();
                     return;
                 }
 
-                if (elapsed < this.animDuration + this.holdDuration) {
+                if (elapsed < this.animationDuration + this.holdDuration) {
                     this.updateText(elapsed);
                 }
 
                 this.animationId = requestAnimationFrame(this.animate.bind(this));
             }
 
-            update(progress) {
-                var ep = this.easeInOutCubic(progress);
-                this.camera.z = this.initialZ + (this.finalZ - this.initialZ) * ep;
-                var ef = 1.0 + progress * 0.5;
-                var self = this;
+            updateAnimation(progress) {
+                var easedProgress = this.easeInOutCubic(progress);
+                var targetZ = this.initialCameraZ + (this.finalCameraZ - this.initialCameraZ) * easedProgress;
+                this.camera.position.z = targetZ;
+                var expansionFactor = 1.0 + progress * 0.5;
                 this.particles.forEach(function(p) {
-                    p.x = p.baseX * ef;
-                    p.y = p.baseY * ef;
+                    p.position.x = p.basePosition.x * expansionFactor;
+                    p.position.y = p.basePosition.y * expansionFactor;
+                    p.position.z = p.basePosition.z;
                 });
-                this.ctx.clearRect(0, 0, this.dw, this.dh);
+                this.ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
                 this.ctx.globalAlpha = 1.0;
-                this.render(progress);
+                this.renderParticles(progress);
             }
 
-            render(progress) {
+            renderParticles(progress) {
                 var ctx = this.ctx;
+                var particles = this.particles;
                 var cam = this.camera;
-                var w = this.dw;
-                var h = this.dh;
-                var projected = [];
+                var w = this.displayWidth;
+                var h = this.displayHeight;
+                var projectedParticles = [];
 
-                for (var i = 0; i < this.particles.length; i++) {
-                    var p = this.particles[i];
-                    var proj = cam.project(p.x, p.y, p.z, w, h);
-                    if (proj) {
-                        projected.push({
-                            x: proj.x,
-                            y: proj.y,
-                            z: proj.z,
-                            size: p.size * proj.scale * 0.9,
-                            origSize: p.size
+                for (var i = 0; i < particles.length; i++) {
+                    var p = particles[i];
+                    var projected = cam.project(p.position, w, h);
+                    if (projected) {
+                        projectedParticles.push({
+                            x: projected.x,
+                            y: projected.y,
+                            z: projected.z,
+                            size: p.size * projected.scale * 0.9,
+                            originalSize: p.size
                         });
                     }
                 }
 
-                projected.sort(function(a, b) {
+                projectedParticles.sort(function(a, b) {
                     return b.z - a.z;
                 });
 
-                for (var i = 0; i < projected.length; i++) {
-                    var p = projected[i];
-                    var df = Math.min(1.0, Math.max(0.2, 1.0 - (p.z / 18.0)));
-                    var br = 0.7 + (p.origSize / (this.baseSize + this.sizeVar)) * 0.3;
-                    var alpha = df * br * 0.9;
+                for (var i = 0; i < projectedParticles.length; i++) {
+                    var p = projectedParticles[i];
+                    var depthFade = Math.min(1.0, Math.max(0.2, 1.0 - (p.z / 18.0)));
+                    var brightness = 0.7 + (p.originalSize / (this.baseSize + this.sizeVariation)) * 0.3;
+                    var alpha = depthFade * brightness * 0.9;
                     ctx.fillStyle = 'rgba(255, 255, 255, ' + alpha + ')';
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, Math.max(0.4, p.size * 0.5), 0, Math.PI * 2);
@@ -1119,14 +1186,14 @@
             }
 
             updateText(elapsed) {
-                if (elapsed >= this.textFadeDelay) {
-                    var fp = Math.min(1.0, (elapsed - this.textFadeDelay) / this.textFadeDuration);
-                    var ef = this.easeInOutQuad(fp);
-                    var bp = 3200;
-                    var bph = (elapsed - this.textFadeDelay) / bp;
-                    var br = 0.7 + 0.3 * (0.5 + 0.5 * Math.sin(bph * Math.PI * 2));
-                    this.textOpacity = ef * br;
-                    this.textElement.style.opacity = this.textOpacity;
+                if (elapsed >= this.textFadeInDelay) {
+                    var fadeProgress = Math.min(1.0, (elapsed - this.textFadeInDelay) / this.textFadeInDuration);
+                    var easedFade = this.easeInOutQuad(fadeProgress);
+                    var breathPeriod = 3200;
+                    var breathPhase = (elapsed - this.textFadeInDelay) / breathPeriod;
+                    var breath = 0.7 + 0.3 * (0.5 + 0.5 * Math.sin(breathPhase * Math.PI * 2));
+                    this.textOpacity = easedFade * breath;
+                    this.welcomeElement.style.opacity = this.textOpacity;
                 }
             }
 
@@ -1136,8 +1203,8 @@
                     cancelAnimationFrame(this.animationId);
                     this.animationId = null;
                 }
-                this.ctx.clearRect(0, 0, this.dw, this.dh);
-                this.textElement.style.opacity = '0';
+                this.ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
+                this.welcomeElement.style.opacity = '0';
 
                 var overlay = document.getElementById('loading-overlay');
                 overlay.classList.add('fade-out');
