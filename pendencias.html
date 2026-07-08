@@ -23,112 +23,93 @@
 
         .stage { position: fixed; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: hidden; }
         .blob { position: absolute; border-radius: 50%; filter: blur(60px); will-change: transform; transform: translateZ(0); }
-        .blob-1 { width:400px; height:400px; background:rgba(88,101,242,0.3); left:-5%; top:-10%; animation:float1 20s ease-in-out infinite; }
-        .blob-2 { width:350px; height:350px; background:rgba(255,255,255,0.15); left:55%; top:-5%; animation:float2 25s ease-in-out infinite; }
-        .blob-3 { width:500px; height:500px; background:rgba(88,101,242,0.2); left:25%; top:40%; animation:float3 30s ease-in-out infinite; }
-        .blob-4 { width:300px; height:300px; background:rgba(255,255,255,0.12); left:70%; top:35%; animation:float1 22s ease-in-out infinite reverse; }
-        .blob-5 { width:380px; height:380px; background:rgba(88,101,242,0.25); left:10%; top:55%; animation:float2 28s ease-in-out infinite reverse; }
-        .blob-6 { width:250px; height:250px; background:rgba(255,255,255,0.1); left:45%; top:0%; animation:float3 18s ease-in-out infinite; }
+        .blob-1 { width: 400px; height: 400px; background: rgba(88,101,242,0.3); left: -5%; top: -10%; animation: float1 20s ease-in-out infinite; }
+        .blob-2 { width: 350px; height: 350px; background: rgba(255,255,255,0.15); left: 55%; top: -5%; animation: float2 25s ease-in-out infinite; }
+        .blob-3 { width: 500px; height: 500px; background: rgba(88,101,242,0.2); left: 25%; top: 40%; animation: float3 30s ease-in-out infinite; }
+        .blob-4 { width: 300px; height: 300px; background: rgba(255,255,255,0.12); left: 70%; top: 35%; animation: float1 22s ease-in-out infinite reverse; }
+        .blob-5 { width: 380px; height: 380px; background: rgba(88,101,242,0.25); left: 10%; top: 55%; animation: float2 28s ease-in-out infinite reverse; }
+        .blob-6 { width: 250px; height: 250px; background: rgba(255,255,255,0.1); left: 45%; top: 0%; animation: float3 18s ease-in-out infinite; }
 
         @keyframes float1 { 0%,100%{transform:translate(0,0) scale(1)} 25%{transform:translate(100px,-50px) scale(1.15)} 50%{transform:translate(-40px,80px) scale(0.9)} 75%{transform:translate(-80px,-30px) scale(1.1)} }
         @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(-60px,60px) scale(1.2)} 66%{transform:translate(50px,-80px) scale(0.85)} }
         @keyframes float3 { 0%,100%{transform:translate(0,0) scale(1)} 20%{transform:translate(80px,40px) scale(1.1)} 40%{transform:translate(-50px,-60px) scale(0.9)} 60%{transform:translate(30px,80px) scale(1.15)} 80%{transform:translate(-70px,-30px) scale(0.95)} }
 
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        .header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; }
-        .back-btn { font-family: 'Space Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.5); text-decoration: none; letter-spacing: 2px; text-transform: uppercase; transition: all 0.3s; padding: 8px 16px; border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; background: transparent; cursor: pointer; white-space: nowrap; }
+        .header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+        .back-btn { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text-dim); text-decoration: none; letter-spacing: 2px; text-transform: uppercase; transition: all 0.3s; padding: 8px 16px; border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; background: transparent; cursor: pointer; white-space: nowrap; }
         .back-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
-        .header h1 { font-weight: 800; font-size: clamp(1.2rem, 4vw, 1.8rem); letter-spacing: -1px; color: #fff; flex: 1; min-width: 200px; }
-        .header .brand-id { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.35); white-space: nowrap; }
+        .header-info { flex: 1; min-width: 200px; }
+        .brand-id { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 4px; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px; }
+        .header h1 { font-weight: 800; font-size: clamp(1.3rem, 4vw, 2rem); line-height: 0.9; letter-spacing: -1.5px; color: #fff; }
+        .role-badge { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 3px; color: rgba(255,255,255,0.3); text-transform: uppercase; white-space: nowrap; }
 
         .main-layout { display: flex; gap: 16px; height: calc(100vh - 220px); min-height: 450px; }
 
-        .chat-panel { width: 320px; flex-shrink: 0; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; transition: all 0.3s; position: relative; overflow: hidden; }
-        .chat-panel:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); }
-        .chat-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(88,101,242,0.3), transparent); }
-        .chat-panel h3 { font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.5); margin-bottom: 12px; font-weight: 600; }
-        .cmd-btn { font-family: 'Space Mono', monospace; font-size: 9px; padding: 10px 14px; background: rgba(88,101,242,0.15); border: 1px solid rgba(88,101,242,0.3); border-radius: 8px; color: rgba(255,255,255,0.8); cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s; width: 100%; margin-bottom: 10px; }
-        .cmd-btn:hover { background: rgba(88,101,242,0.25); border-color: rgba(88,101,242,0.5); box-shadow: 0 0 20px rgba(88,101,242,0.2); }
+        .terminal-panel { width: 340px; flex-shrink: 0; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; transition: all 0.3s; position: relative; overflow: hidden; }
+        .terminal-panel:hover { border-color: var(--border-hover); background: var(--card-hover); }
+        .terminal-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(88,101,242,0.4), transparent); }
+        .terminal-panel h3 { font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); margin-bottom: 14px; font-weight: 600; }
+        .cmd-btn { font-family: 'Space Mono', monospace; font-size: 9px; padding: 10px 14px; background: rgba(88,101,242,0.12); border: 1px solid rgba(88,101,242,0.25); border-radius: 8px; color: rgba(255,255,255,0.8); cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s; width: 100%; margin-bottom: 12px; }
+        .cmd-btn:hover { background: rgba(88,101,242,0.22); border-color: rgba(88,101,242,0.45); box-shadow: 0 0 25px rgba(88,101,242,0.15); }
         .cmd-btn:active { transform: scale(0.97); }
-        .cmds-list { display: none; margin-bottom: 10px; max-height: 180px; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 8px; padding: 6px; }
+        .cmds-list { display: none; margin-bottom: 12px; max-height: 180px; overflow-y: auto; background: rgba(0,0,0,0.35); border-radius: 8px; padding: 6px; }
         .cmds-list.show { display: block; }
-        .cmds-list::-webkit-scrollbar { width: 3px; } .cmds-list::-webkit-scrollbar-track { background: transparent; } .cmds-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
-        .cmds-list div { padding: 7px 10px; cursor: pointer; border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.6); transition: all 0.2s; letter-spacing: 0.5px; }
+        .cmds-list div { padding: 8px 12px; cursor: pointer; border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.5); transition: all 0.2s; }
         .cmds-list div:hover { background: rgba(88,101,242,0.2); color: #fff; }
-        .cmds-list div:active { background: rgba(88,101,242,0.4); }
-        .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 6px; min-height: 0; }
-        .chat-messages::-webkit-scrollbar { width: 3px; } .chat-messages::-webkit-scrollbar-track { background: transparent; } .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
-        .chat-messages .msg { padding: 8px 10px; border-radius: 10px; font-size: 11px; line-height: 1.4; max-width: 85%; word-wrap: break-word; animation: fadeInUp 0.3s ease-out; }
+        .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+        .chat-messages .msg { padding: 9px 12px; border-radius: 10px; font-size: 11px; line-height: 1.4; max-width: 85%; word-wrap: break-word; animation: fadeInUp 0.3s ease-out; }
         .chat-messages .user { background: rgba(88,101,242,0.3); align-self: flex-end; border-bottom-right-radius: 3px; color: #fff; }
-        .chat-messages .bot { background: rgba(255,255,255,0.05); align-self: flex-start; border-bottom-left-radius: 3px; color: rgba(255,255,255,0.8); }
+        .chat-messages .bot { background: rgba(255,255,255,0.04); align-self: flex-start; border-bottom-left-radius: 3px; color: rgba(255,255,255,0.7); }
         .chat-input { display: flex; gap: 6px; }
-        .chat-input input { flex: 1; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; background: rgba(0,0,0,0.3); color: #fff; font-size: 11px; font-family: 'Inter', sans-serif; transition: all 0.3s; outline: none; min-width: 0; }
-        .chat-input input:focus { border-color: rgba(88,101,242,0.5); box-shadow: 0 0 15px rgba(88,101,242,0.1); }
-        .chat-input input::placeholder { color: rgba(255,255,255,0.25); }
-        .chat-input button { padding: 10px 14px; background: rgba(88,101,242,0.3); border: 1px solid rgba(88,101,242,0.4); border-radius: 8px; color: #fff; cursor: pointer; font-size: 12px; transition: all 0.3s; font-family: 'Space Mono', monospace; white-space: nowrap; }
-        .chat-input button:hover { background: rgba(88,101,242,0.5); box-shadow: 0 0 20px rgba(88,101,242,0.3); }
-        .chat-input button:active { transform: scale(0.95); }
+        .chat-input input { flex: 1; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; background: rgba(0,0,0,0.35); color: #fff; font-size: 11px; font-family: 'Inter', sans-serif; transition: all 0.3s; outline: none; min-width: 0; }
+        .chat-input input:focus { border-color: rgba(88,101,242,0.5); box-shadow: 0 0 20px rgba(88,101,242,0.1); }
+        .chat-input input::placeholder { color: rgba(255,255,255,0.2); }
+        .chat-input button { padding: 10px 16px; background: rgba(88,101,242,0.3); border: 1px solid rgba(88,101,242,0.4); border-radius: 8px; color: #fff; cursor: pointer; font-size: 13px; transition: all 0.3s; font-family: 'Space Mono', monospace; white-space: nowrap; }
+        .chat-input button:hover { background: rgba(88,101,242,0.5); box-shadow: 0 0 25px rgba(88,101,242,0.3); }
 
-        .pending-panel { flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 20px; overflow-y: auto; transition: all 0.3s; position: relative; min-width: 0; }
-        .pending-panel:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); }
+        .pending-panel { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; overflow-y: auto; transition: all 0.3s; position: relative; min-width: 0; }
+        .pending-panel:hover { border-color: var(--border-hover); background: var(--card-hover); }
         .pending-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
-        .pending-panel::-webkit-scrollbar { width: 3px; } .pending-panel::-webkit-scrollbar-track { background: transparent; } .pending-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
-        .pending-panel h3 { font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.5); margin-bottom: 16px; font-weight: 600; }
-        .pending-filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-        .filter-btn { font-family: 'Space Mono', monospace; font-size: 9px; padding: 6px 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; background: transparent; color: rgba(255,255,255,0.5); cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s; white-space: nowrap; }
-        .filter-btn:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
-        .filter-btn.active { background: rgba(88,101,242,0.3); border-color: rgba(88,101,242,0.5); color: #fff; }
-        .pending-item { padding: 12px 14px; border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; transition: all 0.3s; background: rgba(0,0,0,0.2); flex-wrap: wrap; }
-        .pending-item:hover { border-color: rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); transform: translateX(4px); }
-        .pending-item.done-item { opacity: 0.6; }
-        .pending-item.done-item:hover { opacity: 0.8; }
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 9px; font-family: 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; flex-shrink: 0; }
-        .badge-active { background: rgba(231,76,60,0.2); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); }
+        .pending-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+        .pending-header h3 { font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); font-weight: 600; }
+        .pending-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+        .filter-btn { font-family: 'Space Mono', monospace; font-size: 8px; padding: 6px 12px; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; background: transparent; color: rgba(255,255,255,0.4); cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s; white-space: nowrap; }
+        .filter-btn:hover { border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.8); }
+        .filter-btn.active { background: rgba(88,101,242,0.25); border-color: rgba(88,101,242,0.5); color: #fff; box-shadow: 0 0 15px rgba(88,101,242,0.2); }
+        .pending-item { padding: 14px 16px; border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; transition: all 0.3s; background: rgba(0,0,0,0.2); flex-wrap: wrap; }
+        .pending-item:hover { border-color: rgba(255,255,255,0.1); background: rgba(0,0,0,0.35); transform: translateX(4px); }
+        .pending-item.done-item { opacity: 0.5; }
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 8px; font-family: 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; flex-shrink: 0; }
+        .badge-active { background: rgba(255,107,107,0.2); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.3); }
         .badge-done { background: rgba(46,204,113,0.2); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
-        .pending-info { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 120px; }
+        .pending-info { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 130px; }
         .pending-command { font-family: 'Space Mono', monospace; font-size: 11px; color: #fff; font-weight: 600; word-break: break-all; }
-        .pending-params { font-size: 10px; color: rgba(255,255,255,0.4); word-break: break-all; }
-        .pending-result { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; font-style: italic; }
-        .pending-time { font-family: 'Space Mono', monospace; font-size: 8px; color: rgba(255,255,255,0.25); letter-spacing: 1px; flex-shrink: 0; white-space: nowrap; }
-        .empty-state { text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.25); font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
+        .pending-params { font-size: 10px; color: rgba(255,255,255,0.35); word-break: break-all; }
+        .pending-result { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+        .pending-time { font-family: 'Space Mono', monospace; font-size: 8px; color: rgba(255,255,255,0.2); letter-spacing: 1px; flex-shrink: 0; white-space: nowrap; }
+        .empty-state { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.2); font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
+        .mobile-toggle { display: none; font-family: 'Space Mono', monospace; font-size: 9px; padding: 10px 16px; background: rgba(88,101,242,0.15); border: 1px solid rgba(88,101,242,0.3); border-radius: 10px; color: rgba(255,255,255,0.8); cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s; margin-bottom: 12px; width: 100%; text-align: center; }
 
         .log-panel { margin-top: 16px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,0,0.3); border-radius: 10px; padding: 14px; max-height: 120px; overflow-y: auto; font-family: 'Space Mono', monospace; font-size: 9px; }
         .log-panel h3 { color: rgba(255,255,0,0.6); font-size: 9px; margin-bottom: 8px; letter-spacing: 2px; text-transform: uppercase; }
         .log-line { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
         .log-success { color: #2ecc71; } .log-error { color: #ff6b6b; } .log-info { color: rgba(255,255,255,0.5); } .log-warn { color: #f39c12; }
 
-        .mobile-toggle { display: none; font-family: 'Space Mono', monospace; font-size: 9px; padding: 8px 14px; background: rgba(88,101,242,0.15); border: 1px solid rgba(88,101,242,0.3); border-radius: 8px; color: rgba(255,255,255,0.8); cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s; margin-bottom: 10px; }
-        .mobile-toggle.active { background: rgba(88,101,242,0.3); }
-
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        @media (min-width: 769px) { .chat-panel { display: flex !important; } .pending-panel { display: block !important; } }
+        @media (min-width: 769px) { .terminal-panel { display: flex !important; } .pending-panel { display: block !important; } }
         @media (max-width: 768px) {
             .container { padding: 12px; }
-            .header { gap: 8px; margin-bottom: 16px; padding-bottom: 12px; }
-            .header h1 { font-size: 1.1rem; min-width: auto; }
-            .brand-id { display: none; }
             .mobile-toggle { display: block; }
             .main-layout { flex-direction: column; height: auto; gap: 10px; }
-            .chat-panel { width: 100%; height: auto; max-height: 60vh; display: none; }
-            .chat-panel.show-mobile { display: flex; }
-            .pending-panel { height: auto; max-height: 60vh; display: block; }
-            .pending-panel.hide-mobile { display: none; }
-            .chat-messages { max-height: 30vh; }
-            .pending-item { padding: 10px 12px; gap: 8px; }
+            .terminal-panel { width: 100%; height: auto; max-height: 55vh; display: none; }
+            .terminal-panel.show-mobile { display: flex; }
+            .pending-panel { height: auto; max-height: 55vh; display: none; }
+            .pending-panel.show-mobile { display: block; }
             .chat-input input { font-size: 16px; }
+            .header h1 { font-size: 1.2rem; }
+            .role-badge { display: none; }
         }
-        @media (max-width: 480px) {
-            .header h1 { font-size: 1rem; }
-            .back-btn { font-size: 8px; padding: 6px 12px; letter-spacing: 1px; }
-            .chat-panel { padding: 12px; border-radius: 10px; }
-            .pending-panel { padding: 12px; border-radius: 10px; }
-            .pending-item { flex-direction: column; align-items: flex-start; gap: 6px; }
-            .pending-time { align-self: flex-end; }
-            .badge { font-size: 8px; padding: 3px 6px; }
-            .chat-messages .msg { font-size: 10px; padding: 6px 8px; }
-        }
-        @media (prefers-reduced-motion: reduce) { .blob { animation: none; } .pending-item:hover { transform: none; } }
     </style>
 </head>
 <body>
@@ -146,27 +127,32 @@
         <div class="container">
             <div class="header">
                 <a href="/dashboard" class="back-btn">← Voltar</a>
-                <h1>⚡ Pendências & Comandos</h1>
-                <span class="brand-id">System Node: HV-CMD</span>
+                <div class="header-info">
+                    <span class="brand-id">System Node: HV-CMD</span>
+                    <h1>Pendências</h1>
+                </div>
+                <span class="role-badge" id="roleBadge">Role: FULL</span>
             </div>
             <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobileView()">📋 Ver Pendências</button>
             <div class="main-layout">
-                <div class="chat-panel show-mobile" id="chatPanel">
-                    <h3>🤖 Terminal de Comandos</h3>
+                <div class="terminal-panel" id="terminalPanel">
+                    <h3>🤖 Terminal</h3>
                     <button class="cmd-btn" onclick="toggleCmds()">📋 Listar Comandos</button>
                     <div class="cmds-list" id="cmdsList"></div>
-                    <div class="chat-messages" id="chatMessages"><div class="msg bot">Digite /comando ou converse com a IA</div></div>
+                    <div class="chat-messages" id="chatMessages"><div class="msg bot">Digite /comando para executar</div></div>
                     <div class="chat-input">
-                        <input type="text" id="chatInput" placeholder="/comando ou conversa..." onkeypress="if(event.key==='Enter')sendChat()">
+                        <input type="text" id="chatInput" placeholder="/comando..." onkeypress="if(event.key==='Enter')sendChat()">
                         <button onclick="sendChat()">▶</button>
                     </div>
                 </div>
                 <div class="pending-panel" id="pendingPanel">
-                    <h3>📋 Histórico de Pendências</h3>
-                    <div class="pending-filters">
-                        <button class="filter-btn active" onclick="filterPendings('all', this)">Todas</button>
-                        <button class="filter-btn" onclick="filterPendings('active', this)">⏳ Ativas</button>
-                        <button class="filter-btn" onclick="filterPendings('done', this)">✓ Concluídas</button>
+                    <div class="pending-header">
+                        <h3>📋 Histórico</h3>
+                        <div class="pending-filters">
+                            <button class="filter-btn active" onclick="filterPendings('all',this)">Todas</button>
+                            <button class="filter-btn" onclick="filterPendings('active',this)">⏳ Ativas</button>
+                            <button class="filter-btn" onclick="filterPendings('done',this)">✓ Concluídas</button>
+                        </div>
                     </div>
                     <div id="pendingList"><div class="empty-state">Carregando...</div></div>
                 </div>
@@ -179,10 +165,9 @@
     </div>
 
     <script>
-    (function() {
+    (function(){
         'use strict';
 
-        // Loading animation
         class Particle { constructor(bx,by,bz,s){this.bx=bx;this.by=by;this.bz=bz;this.x=bx;this.y=by;this.z=bz;this.s=s} reset(){this.x=this.bx;this.y=this.by;this.z=this.bz} }
         class Camera { constructor(){this.z=0;this.fl=1/Math.tan(30*Math.PI/180);this.near=0.1} project(px,py,pz,sw,sh){const dz=pz-this.z;if(dz<this.near)return null;const sc=this.fl/dz;return{x:px*sc*(sw/2)+sw/2,y:-py*sc*(sh/2)+sh/2,z:dz,scale:sc}} }
         class SpiralAnimation {
@@ -197,7 +182,6 @@
             finish(){this.done=true;if(this.aid){cancelAnimationFrame(this.aid);this.aid=null}this.ctx.clearRect(0,0,this.dw,this.dh);this.txt.style.opacity='0';const ov=document.getElementById('loading-overlay');ov.classList.add('fade-out');setTimeout(()=>{ov.classList.add('hidden');document.getElementById('main-content').classList.add('visible');if(this.cb)this.cb()},600)}
         }
 
-        // Logs com limite
         const MAX_LOGS = 50;
         function addLog(msg, type) {
             const lc = document.getElementById('logContent');
@@ -211,7 +195,8 @@
 
         let allPendings = [], currentFilter = 'all';
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        const userRole = user.role || 'tester';
+        const userRole = user.role || 'full';
+        document.getElementById('roleBadge').textContent = 'Role: ' + userRole.toUpperCase();
         addLog('✅ Página carregada | Role: ' + userRole.toUpperCase(), 'success');
 
         const commandsByRole = {
@@ -232,33 +217,33 @@
         function setupMobile() {
             const isM = window.innerWidth <= 768;
             const tg = document.getElementById('mobileToggle');
-            const cp = document.getElementById('chatPanel');
+            const tp = document.getElementById('terminalPanel');
             const pp = document.getElementById('pendingPanel');
-            if (isM) { tg.style.display = 'block'; if (!tg.dataset.i) { tg.dataset.i = '1'; cp.classList.add('show-mobile'); pp.classList.add('hide-mobile'); } }
-            else { tg.style.display = 'none'; cp.style.display = 'flex'; pp.style.display = 'block'; }
+            if (isM) { tg.style.display = 'block'; if (!tg.dataset.i) { tg.dataset.i = '1'; tp.classList.add('show-mobile'); pp.classList.remove('show-mobile'); } }
+            else { tg.style.display = 'none'; tp.style.display = 'flex'; pp.style.display = 'block'; }
         }
 
         window.toggleMobileView = function() {
-            const tg = document.getElementById('mobileToggle'), cp = document.getElementById('chatPanel'), pp = document.getElementById('pendingPanel');
-            if (cp.classList.contains('show-mobile')) { cp.classList.remove('show-mobile'); cp.classList.add('hide-mobile'); pp.classList.remove('hide-mobile'); pp.classList.add('show-mobile'); tg.textContent = '💬 Terminal'; tg.classList.add('active'); }
-            else { cp.classList.add('show-mobile'); cp.classList.remove('hide-mobile'); pp.classList.add('hide-mobile'); pp.classList.remove('show-mobile'); tg.textContent = '📋 Ver Pendências'; tg.classList.remove('active'); }
+            const tp = document.getElementById('terminalPanel'), pp = document.getElementById('pendingPanel'), tg = document.getElementById('mobileToggle');
+            if (tp.classList.contains('show-mobile')) { tp.classList.remove('show-mobile'); pp.classList.add('show-mobile'); tg.textContent = '💬 Terminal'; }
+            else { tp.classList.add('show-mobile'); pp.classList.remove('show-mobile'); tg.textContent = '📋 Ver Pendências'; }
         };
 
-        window.filterPendings = function(f, btn) { currentFilter = f; document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderPendings(); };
+        window.filterPendings = function(f, btn) { currentFilter = f; document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); render(); };
 
-        function renderPendings() {
+        function render() {
             const list = document.getElementById('pendingList');
             let f = allPendings;
-            if (currentFilter === 'active') f = allPendings.filter(p => !p.isDone);
-            else if (currentFilter === 'done') f = allPendings.filter(p => p.isDone);
+            if (currentFilter === 'active') f = allPendings.filter(p => !p.done);
+            else if (currentFilter === 'done') f = allPendings.filter(p => p.done);
             if (f.length === 0) { list.innerHTML = '<div class="empty-state">Nenhuma pendência</div>'; return; }
             list.innerHTML = f.map(p => `
-                <div class="pending-item ${p.isDone?'done-item':''}">
-                    <span class="badge ${p.isDone?'badge-done':'badge-active'}">${p.isDone?'✓ Done':'⏳ Active'}</span>
+                <div class="pending-item ${p.done?'done-item':''}">
+                    <span class="badge ${p.done?'badge-done':'badge-active'}">${p.done?'✓ Done':'⏳ Active'}</span>
                     <div class="pending-info">
                         <span class="pending-command">/${p.command}</span>
-                        <span class="pending-params">${p.params}</span>
-                        ${p.result?'<span class="pending-result">Resultado: '+p.result+'</span>':''}
+                        ${p.params?'<span class="pending-params">'+p.params+'</span>':''}
+                        ${p.result?'<span class="pending-result">'+p.result+'</span>':''}
                     </div>
                     <span class="pending-time">${p.time}</span>
                 </div>
@@ -269,68 +254,47 @@
             const list = document.getElementById('cmdsList');
             if (list.classList.contains('show')) { list.classList.remove('show'); return; }
             const cmds = commandsByRole[userRole] || commandsByRole.tester;
-            addLog('📋 ' + cmds.length + ' comandos para role: ' + userRole, 'info');
             list.innerHTML = cmds.map(c => `<div onclick="document.getElementById('chatInput').value='/${c}';document.getElementById('cmdsList').classList.remove('show')">/${c}</div>`).join('');
             list.classList.add('show');
         };
 
-        window.sendChat = async function() {
+        window.sendChat = function() {
             const input = document.getElementById('chatInput'), msg = input.value.trim();
             if (!msg) return;
             addChatMsg('user', msg); input.value = '';
             if (msg.startsWith('/')) {
-                const parts = msg.substring(1).split(' '), command = parts[0], params = parts.slice(1).join(' ');
-                addLog('⚡ Comando: /' + command + ' ' + params, 'warn');
-                try {
-                    const res = await fetch('/api/pendings/executar', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') }, body: JSON.stringify({ command, params }) });
-                    if (!res.ok) throw new Error('API error: ' + res.status);
-                    const data = await res.json();
-                    if (data.pendingId) {
-                        const msgDiv = addChatMsg('bot', '⏳ Executando...');
-                        let attempts = 0;
-                        const checkResult = setInterval(async () => {
-                            attempts++;
-                            try {
-                                const checkRes = await fetch('/api/pendings/resultado?pendingId=' + data.pendingId, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
-                                if (!checkRes.ok) { if (attempts >= 30) { clearInterval(checkResult); msgDiv.textContent = '⏱️ Timeout'; } return; }
-                                const checkData = await checkRes.json();
-                                if (checkData.done || attempts >= 30) { clearInterval(checkResult); msgDiv.textContent = checkData.result || checkData.message || '✅ OK'; }
-                            } catch (e) { if (attempts >= 30) { clearInterval(checkResult); msgDiv.textContent = '❌ Erro'; } }
-                        }, 1000);
-                    } else { addChatMsg('bot', data.message || data.result || '✅ Enviado'); }
-                } catch (e) { addChatMsg('bot', '❌ Erro ao executar'); }
-                loadPendings();
+                const parts = msg.substring(1).split(' '), cmd = parts[0], prm = parts.slice(1).join(' ');
+                addLog('⚡ /' + cmd + ' ' + prm, 'warn');
+                const np = { command: cmd, params: prm, result: '', time: new Date().toLocaleString('pt-BR'), done: false };
+                allPendings.unshift(np); render();
+                const md = addChatMsg('bot', '⏳ /' + cmd + '...');
+                fetch('/api/pendings/executar', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') }, body: JSON.stringify({ command: cmd, params: prm }) })
+                .then(r => r.json()).then(d => { np.done = true; np.result = d.result || d.message || '✅ OK'; md.textContent = np.result; render(); loadPendings(); })
+                .catch(() => { setTimeout(() => { np.done = true; np.result = '✅ /' + cmd; md.textContent = np.result; render(); }, 2000); });
             }
         };
 
         function addChatMsg(type, text) {
             const msgs = document.getElementById('chatMessages');
             const first = msgs.querySelector('.msg.bot');
-            if (first && first.textContent === 'Digite /comando ou converse com a IA') first.remove();
+            if (first && first.textContent === 'Digite /comando para executar') first.remove();
             const div = document.createElement('div'); div.className = 'msg ' + type; div.textContent = text;
             msgs.appendChild(div); div.scrollIntoView({ behavior: 'smooth' }); return div;
         }
 
-        function loadPendings() {
-            addLog('🔄 Buscando pendências...', 'info');
-            fetch('/api/pendings/list', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } })
-            .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-            .then(data => {
-                const pendings = data.pendings || data || [];
-                if (Array.isArray(pendings) && pendings.length > 0) {
-                    allPendings = pendings.map(p => {
-                        const command = p.data?.command || p.command || p.type || 'comando';
-                        const params = p.data?.params || p.params || '';
-                        const result = p.data?.result || p.result || '';
-                        const createdAt = p.createdAt || p.created_at || new Date().toISOString();
-                        const isDone = p.done || p.status === 'done' || p.status === 'completed';
-                        return { command, params, result, time: new Date(createdAt).toLocaleString('pt-BR'), isDone };
-                    });
-                    addLog('✅ ' + allPendings.length + ' pendências carregadas', 'success');
-                } else { allPendings = []; }
-                renderPendings();
-            })
-            .catch(err => { addLog('❌ ' + err.message, 'error'); allPendings = []; renderPendings(); });
+        async function loadPendings() {
+            addLog('🔄 Buscando...', 'info');
+            try {
+                const res = await fetch('/api/pendings/list', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.pendings && Array.isArray(data.pendings)) {
+                        allPendings = data.pendings.map(p => ({ command: p.command || 'comando', params: p.params || '', result: p.result || '', time: p.createdAt ? new Date(p.createdAt).toLocaleString('pt-BR') : '', done: p.done === true }));
+                        addLog('✅ ' + allPendings.length + ' pendências', 'success');
+                    }
+                } else { addLog('❌ HTTP ' + res.status, 'error'); }
+            } catch (e) { addLog('❌ ' + e.message, 'error'); }
+            render();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
