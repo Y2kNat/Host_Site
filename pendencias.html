@@ -1407,16 +1407,16 @@
                     newPending.done = true;
                     newPending.result = data.result || data.message || '✅ Executado';
                     msgDiv.textContent = newPending.result;
+                    addLog('✅ Resultado: ' + newPending.result, 'success');
                     renderPendings();
                     loadPendings();
                 })
-                .catch(function() {
-                    setTimeout(function() {
-                        newPending.done = true;
-                        newPending.result = '✅ /' + command + ' executado';
-                        msgDiv.textContent = newPending.result;
-                        renderPendings();
-                    }, 2000);
+                .catch(function(e) {
+                    addLog('❌ Erro: ' + e.message, 'error');
+                    newPending.done = true;
+                    newPending.result = '❌ Erro ao executar /' + command;
+                    msgDiv.textContent = newPending.result;
+                    renderPendings();
                 });
             }
         };
