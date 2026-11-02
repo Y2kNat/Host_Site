@@ -1,0 +1,14 @@
+# Segredos — nunca versionar
+.env
+.env.*
+!.env.example
+
+# Dependências
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# Vercel
+.vercel/
